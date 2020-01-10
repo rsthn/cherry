@@ -1,0 +1,4 @@
+node_modules/
+.svn
+.svnignore
+.svn-revision

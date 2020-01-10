@@ -1,0 +1,35 @@
+{
+  "name": "@rsthn/cherry",
+  "version": "2.0.0",
+  "description": "Cherry JS Game Library",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo Ok",
+    "sample": "browserify sample.js | uglifyjs > bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rsthn/cherryjs.git"
+  },
+  "author": "RedStar Technologies",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rsthn/cherryjs/issues"
+  },
+  "homepage": "https://github.com/rsthn/cherryjs#readme",
+  "devDependencies": {
+    "browserify": "^16.5.0",
+    "uglify-es": "^3.3.9"
+  },
+  "dependencies": {
+    "@rsthn/rin": "^2.0.1",
+    "filereader": "^0.10.3",
+    "image-size": "^0.8.3"
+  },
+  "files": [
+	  "core/",
+	  "wrappers/",
+	  "main.js",
+	  "LICENSE"
+  ]
+}
