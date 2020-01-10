@@ -14,7 +14,7 @@
 **	USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-require('./../core/globals');
+require('./../globals');
 
 const Rin = require('@rsthn/rin/alpha');
 const Class = require('@rsthn/rin/class');

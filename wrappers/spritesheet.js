@@ -15,7 +15,7 @@
 */
 
 const Class = require('@rsthn/rin/class');
-const Canvas = require('./../core/canvas');
+const Canvas = require('./../canvas');
 
 /*
 	If source is "image":

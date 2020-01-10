@@ -27,7 +27,6 @@
     "image-size": "^0.8.3"
   },
   "files": [
-	  "core/",
 	  "wrappers/",
 	  "main.js",
 	  "LICENSE"

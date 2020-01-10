@@ -1,5 +1,5 @@
 /*
-**	cherryjs/main
+**	cherryjs/controls
 **
 **	Copyright (c) 2013-2020, RedStar Technologies, All rights reserved.
 **	https://www.rsthn.com/
@@ -14,41 +14,44 @@
 **	USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-require('./globals');
+const System = require('./system');
 
-module.exports =
+/**
+**	Provides utility functions for controls (buttons, sticks, etc).
+*/
+
+module.exports = 
 {
-	Matrix: require('./matrix'),
-	Rect: require('./rect'),
-	Vec2: require('./vec2'),
+	/**
+	**	Position reference points.
+	*/
+	LEFT:	0x000,
+	RIGHT:	0x001,
+	TOP:	0x000,
+	BOTTOM:	0x001,
+	CENTER: 0x002,
 
-	Perf: require('./perf'),
-	Timer: require('./timer'),
+	/**
+	**	Returns the X position given a reference value.
+	*/
+	getXByRef: function (refX)
+	{
+		return refX == this.CENTER ? (System.screenWidth*0.5) : (refX == this.LEFT ? 0 : System.screenWidth - 1);
+	},
 
-	Linkable: require('./linkable'),
-	List: require('./list'),
+	/**
+	**	Returns the Y position given a reference value.
+	*/
+	getYByRef: function (refY)
+	{
+		return refY == this.CENTER ? (System.screenHeight*0.5) : (refY == this.TOP ? 0 : System.screenHeight - 1);
+	},
 
-	Canvas: require('./canvas'),
-	System: require('./system'),
-	Resources: require('./resources'),
-	Wrappers: require('./wrappers'),
-
-	QuadTreeItem: require('./quadtreeitem'),
-	QuadTreeNode: require('./quadtreenode'),
-	QuadTree: require('./quadtree'),
-
-	DisplayElement: require('./displayelement'),
-	Viewport: require('./viewport'),
-	World: require('./world'),
-
-	Easing: require('./easing'),
-	Anim: require('./anim'),
-
-	Controls: require('./controls')
+	/**
+	**	Returns the F factor given a reference value.
+	*/
+	getFByRef: function (ref)
+	{
+		return ref == this.CENTER ? -0.5 : (ref & 1 ? -1 : 0);
+	}
 };
-
-Object.assign(module.exports.Controls,
-{
-	Button: require('./controls/button'),
-	Stick: require('./controls/stick')
-});

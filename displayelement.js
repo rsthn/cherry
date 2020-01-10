@@ -1,5 +1,5 @@
 /*
-**	cherryjs/core/displayelement
+**	cherryjs/displayelement
 **
 **	Copyright (c) 2016-2020, RedStar Technologies, All rights reserved.
 **	https://www.rsthn.com/

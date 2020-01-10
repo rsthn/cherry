@@ -1,5 +1,5 @@
 /*
-**	cherryjs/core/resources
+**	cherryjs/resources
 **
 **	Copyright (c) 2016-2020, RedStar Technologies, All rights reserved.
 **	https://www.rsthn.com/
@@ -19,7 +19,7 @@ require('./globals');
 const Rin = require('@rsthn/rin/alpha');
 const System = require('./system');
 const Canvas = require('./canvas');
-const Wrappers = require('./../wrappers/wrappers');
+const Wrappers = require('./wrappers');
 
 /**
 **	Require poly-filling when running headless.
