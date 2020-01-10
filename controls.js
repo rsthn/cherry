@@ -1,5 +1,5 @@
 /*
-**	cherryjs/controls
+**	@rsthn/cherry/controls
 **
 **	Copyright (c) 2013-2020, RedStar Technologies, All rights reserved.
 **	https://www.rsthn.com/
@@ -55,3 +55,10 @@ module.exports =
 		return ref == this.CENTER ? -0.5 : (ref & 1 ? -1 : 0);
 	}
 };
+
+/**
+**	Predefined controls.
+*/
+
+module.exports.Button = require('./controls/button');
+module.exports.Stick = require('./controls/stick');

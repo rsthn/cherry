@@ -1,5 +1,5 @@
 /*
-**	cherryjs/main
+**	@rsthn/cherry
 **
 **	Copyright (c) 2013-2020, RedStar Technologies, All rights reserved.
 **	https://www.rsthn.com/
@@ -33,11 +33,11 @@ module.exports =
 	Resources: require('./resources'),
 	Wrappers: require('./wrappers'),
 
-	QuadTreeItem: require('./quadtreeitem'),
-	QuadTreeNode: require('./quadtreenode'),
+	QuadTreeItem: require('./quadtree-item'),
+	QuadTreeNode: require('./quadtree-node'),
 	QuadTree: require('./quadtree'),
 
-	DisplayElement: require('./displayelement'),
+	DisplayElement: require('./display-element'),
 	Viewport: require('./viewport'),
 	World: require('./world'),
 
@@ -46,9 +46,3 @@ module.exports =
 
 	Controls: require('./controls')
 };
-
-Object.assign(module.exports.Controls,
-{
-	Button: require('./controls/button'),
-	Stick: require('./controls/stick')
-});

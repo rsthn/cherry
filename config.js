@@ -1,7 +1,7 @@
 /*
-**	@rsthn/cherry/wrappers/drawable
+**	@rsthn/cherry/config
 **
-**	Copyright (c) 2016-2020, RedStar Technologies, All rights reserved.
+**	Copyright (c) 2013-2020, RedStar Technologies, All rights reserved.
 **	https://www.rsthn.com/
 **
 **	THIS LIBRARY IS PROVIDED BY REDSTAR TECHNOLOGIES "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
@@ -14,34 +14,27 @@
 **	USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-const Class = require('@rsthn/rin/class');
+/**
+**	Contains configuration constants. Can be extended as needed from other modules.
+*/
 
-module.exports = Class.extend
-({
-	className: "Drawable",
+module.exports =
+{
+	FPS:					60,
 
-	width: null,
-	height: null,
+	WIDTH: 					360,
+	HEIGHT: 				640,
 
-	__ctor: function (r)
+	ORIGINAL_TILE_SIZE:		32,
+	TILE_SIZE: 				64,
+
+	BOARD_WIDTH:			10,
+	BOARD_HEIGHT:			5,
+
+	SCALE:					1,
+
+	init: function ()
 	{
-		if (r.type != "image")
-			throw new Error ("Resource is not an image.");
-
-		this.r = r;
-		this.r.wrapper = this;
-
-		this.width = this.r.width;
-		this.height = this.r.height;
-	},
-
-	draw: function (g, x, y)
-	{
-		g.drawImageResource (this.r, x, y);
-	},
-
-	getDrawable: function ()
-	{
-		return this;
+		this.SCALE = this.TILE_SIZE / this.ORIGINAL_TILE_SIZE;
 	}
-});
+};

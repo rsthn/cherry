@@ -1,7 +1,7 @@
 /*
-**	@rsthn/cherry/wrappers/drawable
+**	@rsthn/cherry/gx
 **
-**	Copyright (c) 2016-2020, RedStar Technologies, All rights reserved.
+**	Copyright (c) 2013-2020, RedStar Technologies, All rights reserved.
 **	https://www.rsthn.com/
 **
 **	THIS LIBRARY IS PROVIDED BY REDSTAR TECHNOLOGIES "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
@@ -14,34 +14,27 @@
 **	USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-const Class = require('@rsthn/rin/class');
+/**
+**	The GX module contains helper classes and utilities to make games faster.
+*/
 
-module.exports = Class.extend
-({
-	className: "Drawable",
+module.exports =
+{
+	PriorityQueue: require('./gx/priority-queue'),
+	Boot: require('./gx/boot'),
 
-	width: null,
-	height: null,
+	PointerHandler: require('./gx/pointer-handler'),
+	KeyboardHandler: require('./gx/keyboard-handler'),
+	ScreenControls: require('./gx/screen-controls'),
 
-	__ctor: function (r)
-	{
-		if (r.type != "image")
-			throw new Error ("Resource is not an image.");
-
-		this.r = r;
-		this.r.wrapper = this;
-
-		this.width = this.r.width;
-		this.height = this.r.height;
-	},
-
-	draw: function (g, x, y)
-	{
-		g.drawImageResource (this.r, x, y);
-	},
-
-	getDrawable: function ()
-	{
-		return this;
-	}
-});
+	VisualElement: require('./gx/visual-element'),
+	VisualButton: require('./gx/visual-button'),
+	
+	DisplayList: require('./gx/display-list'),
+	Vfx: require('./gx/vfx'),
+	Layer: require('./gx/layer'),
+	Layers: require('./gx/layers'),
+	Gamepad: require('./gx/gamepad'),
+	Variable: require('./gx/variable'),
+	Sfx: require('./gx/sfx')
+};

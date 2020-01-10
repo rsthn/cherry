@@ -1,5 +1,5 @@
 /*
-**	cherryjs/displayelement
+**	@rsthn/cherry/display-element
 **
 **	Copyright (c) 2016-2020, RedStar Technologies, All rights reserved.
 **	https://www.rsthn.com/
@@ -14,7 +14,7 @@
 **	USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-const QuadTreeItem = require('./quadtreeitem');
+const QuadTreeItem = require('./quadtree-item');
 
 /**
 **	Describes a rectangular 2D display element.

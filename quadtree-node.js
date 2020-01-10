@@ -1,5 +1,5 @@
 /*
-**	cherryjs/quadtreenode
+**	@rsthn/cherry/quadtree-node
 **
 **	Copyright (c) 2016-2020, RedStar Technologies, All rights reserved.
 **	https://www.rsthn.com/
@@ -18,7 +18,7 @@ require('./globals');
 
 const Class = require('@rsthn/rin/class');
 const Rect = require('./rect');
-const QuadTreeItem = require('./quadtreeitem');
+const QuadTreeItem = require('./quadtree-item');
 
 /**
 **	Describes a node of the quad tree.

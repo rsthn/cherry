@@ -1,5 +1,5 @@
 /*
-**	cherryjs/perf
+**	@rsthn/cherry/perf
 **
 **	Copyright (c) 2013-2020, RedStar Technologies, All rights reserved.
 **	https://www.rsthn.com/

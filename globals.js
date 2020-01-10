@@ -1,5 +1,5 @@
 /*
-**	cherryjs/globals
+**	@rsthn/cherry/globals
 **
 **	Copyright (c) 2016-2020, RedStar Technologies, All rights reserved.
 **	https://www.rsthn.com/
@@ -14,9 +14,37 @@
 **	USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+const C = require('./config');
+
 /**
 **	Global functions and definitions.
 */
+
+/**
+**	Variables and behavior flags, can be extended as needed from other modules.
+*/
+
+module.exports =
+{
+	area: null,
+
+	debugHitbox: false,
+	debugBounds: false,
+	debugImage: false
+};
+
+
+/**
+**	Converts the given pixel-value to actual screen pixels taking into account the current scale.
+**
+**	>> float px (float value);
+*/
+
+globalThis.px = function(value)
+{
+	return value*C.SCALE;
+};
+
 
 /**
 **	Disposes an object, first by checking if it has a 'dispose' method, and if not, tried to check

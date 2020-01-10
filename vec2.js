@@ -1,5 +1,5 @@
 /*
-**	cherryjs/vec2
+**	@rsthn/cherry/vec2
 **
 **	Copyright (c) 2016-2020, RedStar Technologies, All rights reserved.
 **	https://www.rsthn.com/

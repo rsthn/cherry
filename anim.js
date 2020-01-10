@@ -1,5 +1,5 @@
 /*
-**	cherryjs/anim
+**	@rsthn/cherry/anim
 **
 **	Copyright (c) 2013-2020, RedStar Technologies, All rights reserved.
 **	https://www.rsthn.com/

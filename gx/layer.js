@@ -1,7 +1,7 @@
 /*
-**	@rsthn/cherry/wrappers/drawable
+**	@rsthn/cherry/gx/layer
 **
-**	Copyright (c) 2016-2020, RedStar Technologies, All rights reserved.
+**	Copyright (c) 2013-2020, RedStar Technologies, All rights reserved.
 **	https://www.rsthn.com/
 **
 **	THIS LIBRARY IS PROVIDED BY REDSTAR TECHNOLOGIES "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
@@ -16,32 +16,64 @@
 
 const Class = require('@rsthn/rin/class');
 
+/**
+**
+*/
+
 module.exports = Class.extend
 ({
-	className: "Drawable",
+	className: 'Layer',
 
-	width: null,
-	height: null,
+	visible: true,
+	active: true,
 
-	__ctor: function (r)
+	time: 0,
+
+	__ctor: function()
 	{
-		if (r.type != "image")
-			throw new Error ("Resource is not an image.");
-
-		this.r = r;
-		this.r.wrapper = this;
-
-		this.width = this.r.width;
-		this.height = this.r.height;
+		this.time = 0;
+		this.init.apply(this, arguments);
 	},
 
-	draw: function (g, x, y)
+	__dtor: function()
 	{
-		g.drawImageResource (this.r, x, y);
 	},
 
-	getDrawable: function ()
+	init: function()
 	{
-		return this;
+		/* USER-DEFINED */
+	},
+
+	layerDraw: function(g)
+	{
+		if (!this.visible) return;
+
+		this.draw(g);
+	},
+
+	layerUpdate: function(dt)
+	{
+		if (!this.active) return;
+
+		this.time += dt;
+		this.update(dt);
+	},
+
+	activate: function ()
+	{
+		/* USER-DEFINED */
+	},
+
+	deactivate: function ()
+	{
+		/* USER-DEFINED */
+	},
+
+	draw: function(g) {
+		/* USER-DEFINED */
+	},
+
+	update: function(dt) {
+		/* USER-DEFINED */
 	}
 });

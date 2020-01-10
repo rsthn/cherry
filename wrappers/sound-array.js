@@ -1,5 +1,5 @@
 /*
-**	cherryjs/wrappers/sound-array
+**	@rsthn/cherry/wrappers/sound-array
 **
 **	Copyright (c) 2016-2020, RedStar Technologies, All rights reserved.
 **	https://www.rsthn.com/
@@ -14,7 +14,7 @@
 **	USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-require('./../globals');
+require('../globals');
 
 const Rin = require('@rsthn/rin/alpha');
 const Class = require('@rsthn/rin/class');

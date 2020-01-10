@@ -1,5 +1,5 @@
 /*
-**	cherryjs/wrappers/spritesheet-animation
+**	@rsthn/cherry/wrappers/spritesheet-animation
 **
 **	Copyright (c) 2016-2020, RedStar Technologies, All rights reserved.
 **	https://www.rsthn.com/
@@ -16,6 +16,7 @@
 
 const Class = require('@rsthn/rin/class');
 const SpriteSheet = require('./spritesheet');
+const System = require('../system');
 
 /*
 	anim: {

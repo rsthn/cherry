@@ -1,5 +1,5 @@
 /*
-**	cherryjs/controls/button
+**	@rsthn/cherry/controls/button
 **
 **	Copyright (c) 2013-2020, RedStar Technologies, All rights reserved.
 **	https://www.rsthn.com/
@@ -15,8 +15,8 @@
 */
 
 const Class = require('@rsthn/rin/class');
-const Controls = require('./../controls');
-const Rect = require('./../rect');
+const Controls = require('../controls');
+const Rect = require('../rect');
 
 /**
 **	Button class provides an easy way to add push-button support to the world.

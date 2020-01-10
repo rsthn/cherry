@@ -1,5 +1,5 @@
 /*
-**	cherryjs/wrappers/spritefont
+**	@rsthn/cherry/wrappers/spritefont
 **
 **	Copyright (c) 2016-2020, RedStar Technologies, All rights reserved.
 **	https://www.rsthn.com/
@@ -15,7 +15,7 @@
 */
 
 const Class = require('@rsthn/rin/class');
-const Canvas = require('./../canvas');
+const Canvas = require('../canvas');
 
 /*
 	font: {

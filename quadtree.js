@@ -1,5 +1,5 @@
 /*
-**	cherryjs/quadtree
+**	@rsthn/cherry/quadtree
 **
 **	Copyright (c) 2016-2020, RedStar Technologies, All rights reserved.
 **	https://www.rsthn.com/
@@ -18,8 +18,8 @@ require('./globals');
 
 const Class = require('@rsthn/rin/class');
 const List = require('./list');
-const QuadTreeNode = require('./quadtreenode');
-const QuadTreeItem = require('./quadtreeitem');
+const QuadTreeNode = require('./quadtree-node');
+const QuadTreeItem = require('./quadtree-item');
 
 /**
 **	Implemention of a quad tree for optimized storage of spatial items.

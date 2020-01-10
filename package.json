@@ -22,13 +22,13 @@
     "uglify-es": "^3.3.9"
   },
   "dependencies": {
-    "@rsthn/rin": "^2.0.1",
+    "@rsthn/rin": "^2.0.2-0",
     "filereader": "^0.10.3",
     "image-size": "^0.8.3"
   },
   "files": [
-	  "wrappers/",
-	  "main.js",
-	  "LICENSE"
+    "wrappers/",
+    "main.js",
+    "LICENSE"
   ]
 }

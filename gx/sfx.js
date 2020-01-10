@@ -1,7 +1,7 @@
 /*
-**	@rsthn/cherry/wrappers/drawable
+**	@rsthn/cherry/gx/sfx
 **
-**	Copyright (c) 2016-2020, RedStar Technologies, All rights reserved.
+**	Copyright (c) 2013-2020, RedStar Technologies, All rights reserved.
 **	https://www.rsthn.com/
 **
 **	THIS LIBRARY IS PROVIDED BY REDSTAR TECHNOLOGIES "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
@@ -14,34 +14,33 @@
 **	USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-const Class = require('@rsthn/rin/class');
+const Boot = require('./boot');
+const System = require('../system');
 
-module.exports = Class.extend
+/**
+**
+*/
+
+module.exports = Boot.Module.create
 ({
-	className: "Drawable",
+	time: 0,
 
-	width: null,
-	height: null,
-
-	__ctor: function (r)
+	onStartup: function ()
 	{
-		if (r.type != "image")
-			throw new Error ("Resource is not an image.");
-
-		this.r = r;
-		this.r.wrapper = this;
-
-		this.width = this.r.width;
-		this.height = this.r.height;
+		System.updateQueueAdd (this);
 	},
 
-	draw: function (g, x, y)
+	onShutdown: function ()
 	{
-		g.drawImageResource (this.r, x, y);
+		System.updateQueueRemove (this);
 	},
 
-	getDrawable: function ()
+	update: function (dt)
 	{
-		return this;
+		this.time += dt;
+	},
+
+	play: function (name)
+	{
 	}
 });

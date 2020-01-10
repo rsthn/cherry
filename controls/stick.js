@@ -1,5 +1,5 @@
 /*
-**	cherryjs/controls/stick
+**	@rsthn/cherry/controls/stick
 **
 **	Copyright (c) 2013-2020, RedStar Technologies, All rights reserved.
 **	https://www.rsthn.com/
@@ -15,8 +15,8 @@
 */
 
 const Class = require('@rsthn/rin/class');
-const Controls = require('./../controls');
-const Rect = require('./../rect');
+const Controls = require('../controls');
+const Rect = require('../rect');
 
 /**
 **	Stick class provides an easy way to add directional control sticks to the world.
