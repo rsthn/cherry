@@ -270,5 +270,24 @@ const Easing = module.exports =
 		{
 			return (Math.cos (3.1416*t) - 1) / -2;
 		}
+	},
+
+	/* ******************************************** */
+	Step:
+	{
+		IN: function (t)
+		{
+			return t != 1.0 ? 0 : 1.0;
+		},
+
+		OUT: function (t)
+		{
+			return t != 1.0 ? 0 : 1.0;
+		},
+
+		IN_OUT: function (t)
+		{
+			return t != 1.0 ? 0 : 1.0;
+		}
 	}
 };

@@ -14,10 +14,11 @@
 **	USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-require('./globals');
-
 module.exports =
 {
+	G: require('./globals'),
+	C: require('./config'),
+
 	Matrix: require('./matrix'),
 	Rect: require('./rect'),
 	Vec2: require('./vec2'),
@@ -25,13 +26,16 @@ module.exports =
 	Perf: require('./perf'),
 	Timer: require('./timer'),
 
+	Recycler: require('./recycler'),
 	Linkable: require('./linkable'),
 	List: require('./list'),
 
 	Canvas: require('./canvas'),
+	KeyCodes: require('./keycodes'),
 	System: require('./system'),
-	Resources: require('./resources'),
+
 	Wrappers: require('./wrappers'),
+	Resources: require('./resources'),
 
 	QuadTreeItem: require('./quadtree-item'),
 	QuadTreeNode: require('./quadtree-node'),

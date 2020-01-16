@@ -39,8 +39,8 @@ const Vfx = module.exports = VisualElement.extend
 		if ("onFinished" in anim)
 			anim.onFinished (() => this.finished());
 
-		if (Vfx.displayList != null)
-			Vfx.displayList.push(this);
+		if (Vfx.targetDisplayList != null)
+			Vfx.targetDisplayList.push(this);
 	},
 
 	finished: function()
@@ -104,4 +104,4 @@ const Vfx = module.exports = VisualElement.extend
 	}
 });
 
-Vfx.displayList = null;
+Vfx.targetDisplayList = null;

@@ -72,7 +72,7 @@ module.exports = Class.extend
 		this.endValue = endValue;
 
 		this.duration = duration || this.defaultDuration;
-		this.callback = callback;
+		this.callback = callback || this.callback;
 
 		return this.restart();
 	},
@@ -80,6 +80,13 @@ module.exports = Class.extend
 	delta: function (deltaValue, duration, callback)
 	{
 		return this.animate(this.value, this.endValue+deltaValue, duration, callback);
+	},
+
+	set: function (value)
+	{
+		this.enabled = false;
+		this.value = value;
+		return this;
 	},
 
 	update: function(dt)
