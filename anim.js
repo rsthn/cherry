@@ -114,7 +114,7 @@ const Anim = module.exports = Class.extend
 		this.paused = false;
 	},
 
-	// Updates the animation by the specified delta time.
+	// Updates the animation by the specified delta time, ensure the time is specified in the same units as the duration of the actions.
 	update: function (dt)
 	{
 		if (this.paused) return false;
@@ -129,7 +129,7 @@ const Anim = module.exports = Class.extend
 		while (this.index < this.block.length)
 		{
 			var cmd = this.block[this.index];
-			var millis;
+			var duration;
 
 			switch (cmd.op)
 			{
@@ -222,18 +222,72 @@ const Anim = module.exports = Class.extend
 					this.index++;
 					break;
 
+				case "repeat":
+					if (cmd.started == false)
+					{
+						cmd._block = cmd.block;
+						cmd._index = 0;
+						cmd._blockTime = this.blockTime;
+						cmd._count = cmd.count;
+
+						cmd.started = true;
+					}
+
+					var _block = this.block;
+					var _index = this.index;
+					var _blockTime = this.blockTime;
+
+					this.block = cmd._block;
+					this.index = cmd._index;
+					this.blockTime = cmd._blockTime;
+
+					i = this.update(0);
+
+					cmd._block = this.block;
+					cmd._index = this.index;
+					cmd._blockTime = this.blockTime;
+
+					this.block = _block;
+					this.index = _index;
+					this.blockTime = _blockTime;
+
+					if (i !== true) return false;
+
+					if (cmd._count <= 1)
+					{
+						cmd.started = false;
+
+						this.blockTime = cmd._blockTime;
+						this.index++;
+
+						return false;
+					}
+					else
+					{
+						cmd._index = 0;
+						cmd._count--;
+
+						return false;
+					}
+
+					break;
+
 				case "set":
 					this.data[cmd.field] = cmd.value;
 					this.index++;
 					break;
 
-				case "wait":
-					millis = Rin.typeOf(cmd.millis) == "string" ? this.data[cmd.millis] : cmd.millis;
+				case "restart":
+					this.index = 0;
+					break;
 
-					if (this.time < this.blockTime + millis)
+				case "wait":
+					duration = Rin.typeOf(cmd.duration) == "string" ? this.data[cmd.duration] : cmd.duration;
+
+					if (this.time < this.blockTime + duration)
 						return false;
 
-					this.blockTime += millis;
+					this.blockTime += duration;
 					this.index++;
 					break;
 
@@ -250,10 +304,10 @@ const Anim = module.exports = Class.extend
 						cmd.started = true;
 					}
 
-					millis = Rin.typeOf(cmd.millis) == "string" ? this.data[cmd.millis] : cmd.millis;
+					duration = Rin.typeOf(cmd.duration) == "string" ? this.data[cmd.duration] : cmd.duration;
 
-					if (this.time < this.blockTime + millis)
-						dt = (this.time - this.blockTime) / millis;
+					if (this.time < this.blockTime + duration)
+						dt = (this.time - this.blockTime) / duration;
 					else
 						dt = 1;
 
@@ -266,7 +320,7 @@ const Anim = module.exports = Class.extend
 
 					cmd.started = false;
 
-					this.blockTime += millis;
+					this.blockTime += duration;
 					this.index++;
 					break;
 
@@ -277,10 +331,10 @@ const Anim = module.exports = Class.extend
 						cmd.last = null;
 					}
 
-					millis = Rin.typeOf(cmd.millis) == "string" ? this.data[cmd.millis] : cmd.millis;
+					duration = Rin.typeOf(cmd.duration) == "string" ? this.data[cmd.duration] : cmd.duration;
 
-					if (this.time < this.blockTime + millis)
-						dt = (this.time - this.blockTime) / millis;
+					if (this.time < this.blockTime + duration)
+						dt = (this.time - this.blockTime) / duration;
 					else
 						dt = 1;
 
@@ -304,15 +358,15 @@ const Anim = module.exports = Class.extend
 
 					cmd.started = false;
 
-					this.blockTime += millis;
+					this.blockTime += duration;
 					this.index++;
 					break;
 
 				case "randt":
-					millis = Rin.typeOf(cmd.millis) == "string" ? this.data[cmd.millis] : cmd.millis;
+					duration = Rin.typeOf(cmd.duration) == "string" ? this.data[cmd.duration] : cmd.duration;
 
-					if (this.time < this.blockTime + millis)
-						dt = (this.time - this.blockTime) / millis;
+					if (this.time < this.blockTime + duration)
+						dt = (this.time - this.blockTime) / duration;
 					else
 						dt = 1;
 
@@ -325,7 +379,7 @@ const Anim = module.exports = Class.extend
 
 					if (dt != 1) return false;
 
-					this.blockTime += millis;
+					this.blockTime += duration;
 					this.index++;
 					break;
 
@@ -382,6 +436,19 @@ const Anim = module.exports = Class.extend
 		return this;
 	},
 
+	// Repeats a block the specified number of times.
+	repeat: function (count)
+	{
+		var block = [ ];
+
+		this.block.push({ op: "repeat", started: false, block: block, count: count });
+
+		this.stack.push (this.block);
+		this.block = block;
+
+		return this;
+	},
+
 	// Sets the callback of the current block.
 	callback: function (fn)
 	{
@@ -405,29 +472,36 @@ const Anim = module.exports = Class.extend
 		return this;
 	},
 
-	// Waits for the specified number of milliseconds.
-	wait: function (millis)
+	// Restarts the current block.
+	restart: function (duration)
 	{
-		this.block.push({ op: "wait", millis: millis });
+		this.block.push({ op: "restart" });
+		return this;
+	},
+
+	// Waits for the specified duration.
+	wait: function (duration)
+	{
+		this.block.push({ op: "wait", duration: duration });
 		return this;
 	},
 
 	// Sets the range of a variable.
-	range: function (field, millis, startValue, endValue, easing)
+	range: function (field, duration, startValue, endValue, easing)
 	{
-		this.block.push({ op: "range", started: false, field: field, millis: millis, startValue: startValue, endValue: endValue, easing: easing ? easing : null });
+		this.block.push({ op: "range", started: false, field: field, duration: duration, startValue: startValue, endValue: endValue, easing: easing ? easing : null });
 		return this;
 	},
 
 	// Generates a certain amount of random numbers in the given range (inclusive).
-	rand: function (field, millis, count, startValue, endValue, easing)
+	rand: function (field, duration, count, startValue, endValue, easing)
 	{
-		this.block.push({ op: "rand", started: false, field: field, millis: millis, count: count, startValue: startValue, endValue: endValue, easing: easing ? easing : null });
+		this.block.push({ op: "rand", started: false, field: field, duration: duration, count: count, startValue: startValue, endValue: endValue, easing: easing ? easing : null });
 		return this;
 	},
 
 	// Generates a certain amount of random numbers in the given range (inclusive). This uses a static random table to determine the next values.
-	randt: function (field, millis, count, startValue, endValue, easing)
+	randt: function (field, duration, count, startValue, endValue, easing)
 	{
 		var table = [ ];
 
@@ -444,7 +518,7 @@ const Anim = module.exports = Class.extend
 			table[a] = c;
 		}
 
-		this.block.push({ op: "randt", field: field, millis: millis, count: count, startValue: startValue, endValue: endValue, table: table, easing: easing ? easing : null });
+		this.block.push({ op: "randt", field: field, duration: duration, count: count, startValue: startValue, endValue: endValue, table: table, easing: easing ? easing : null });
 		return this;
 	},
 

@@ -166,6 +166,8 @@ const Animation = Class.extend
 
 		if (this.time >= this.frameMillis)
 		{
+			const frameIndex = this.seq_i;
+
 			this.time -= this.frameMillis;
 			this.seq_i++;
 
@@ -208,7 +210,7 @@ const Animation = Class.extend
 
 			if (this.onFrameCallback)
 			{
-				if (this.onFrameCallback(this.seq_i, this.seq.group.length, this.onFrameArg) === false)
+				if (this.onFrameCallback(frameIndex, this.seq.group.length, this.onFrameArg) === false)
 					this.onFrameCallback = null;
 			}
 		}

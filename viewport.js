@@ -50,6 +50,7 @@ const Viewport = module.exports = function (sx, sy, width, height, worldWidth, w
 	this.worldY2 = +worldHeight;
 
 	this.bounds = Rect.alloc();
+	this.focusBounds = Rect.alloc();
 	this.screenBounds = Rect.alloc();
 
 	this.x = 0;
@@ -144,6 +145,11 @@ Viewport.prototype.setEnabled = function (enabled)
 Viewport.prototype.updateBounds = function ()
 {
 	this.bounds.set (this.x-(this.width/this.scale)+this.dx, this.y-(this.height/this.scale)+this.dy, this.x+(this.width/this.scale)+this.dx, this.y+(this.height/this.scale)+this.dy);
+
+	this.focusBounds.set (
+		this.x - this.focusFactorX*this.width + this.centerRatioX*this.width, this.y - this.focusFactorY*this.height + this.centerRatioY*this.height,
+		this.x + this.focusFactorX*this.width + this.centerRatioX*this.width, this.y + this.focusFactorY*this.height + this.centerRatioY*this.height
+	);
 };
 
 /**
@@ -276,50 +282,60 @@ Viewport.prototype.getScreenBounds = function ()
 };
 
 /**
-**	Moves the viewport to focus on the specified point. I no focus factor is specified the default will be used.
+**	Returns the bounds of the focus-area rectangle in world-space.
 */
-Viewport.prototype.focusOn = function (i, j, kx/*0*/, ky/*0*/)
+Viewport.prototype.getFocusBounds = function ()
 {
-	if (!kx) kx = this.focusFactorX;
-	if (!ky) ky = this.focusFactorY;
+	return this.focusBounds;
+};
 
-	var x1 = this.x - kx*this.width + this.centerRatioX*this.width;
-	var x2 = this.x + kx*this.width + this.centerRatioX*this.width;
+/**
+**	Moves the viewport to focus on the specified point. If no focus factor is specified the default will be used.
+*/
+Viewport.prototype.focusOn = function (i, j, kx, ky)
+{
+	if (kx === undefined) kx = this.focusFactorX;
+	if (ky === undefined) ky = this.focusFactorY;
 
-	var y1 = this.y - ky*this.height + this.centerRatioY*this.height;
-	var y2 = this.y + ky*this.height + this.centerRatioY*this.height;
+	let x1 = this.x - kx*this.width + this.centerRatioX*this.width;
+	let x2 = this.x + kx*this.width + this.centerRatioX*this.width;
 
-	if (i < x1)
-	{
-		this.x += i - x1;
-	}
-	else if (i > x2)
-	{
-		this.x += i - x2;
-	}
-	
-	if (j < y1)
-	{
-		this.y += j - y1;
-	}
-	else if (j > y2)
-	{
-		this.y += j - y2;
-	}
+	let y1 = this.y - ky*this.height + this.centerRatioY*this.height;
+	let y2 = this.y + ky*this.height + this.centerRatioY*this.height;
 
-	x1 = this.x - this.width;
-	x2 = this.x + this.width;
-	y1 = this.y - this.height;
-	y2 = this.y + this.height;
+	let nx = this.x;
+	let ny = this.y;
 
-	
-	if (x1 < this.worldX1) this.x = this.worldX1 + this.width;
-	if (x2 > this.worldX2) this.x = this.worldX2 - this.width;
+	if (i < x1) nx += i - x1;
+	else if (i > x2) nx += i - x2;
 
-	if (y1 < this.worldY1) this.y = this.worldY1 + this.height;
-	if (y2 > this.worldY2) this.y = this.worldY2 - this.height;
+	if (j < y1) ny += j - y1;
+	else if (j > y2) ny += j - y2;
+
+	x1 = nx - this.width;
+	x2 = nx + this.width;
+	y1 = ny - this.height;
+	y2 = ny + this.height;
+
+	if (x1 < this.worldX1) nx = this.worldX1 + this.width;
+	if (x2 > this.worldX2) nx = this.worldX2 - this.width;
+
+	if (y1 < this.worldY1) ny = this.worldY1 + this.height;
+	if (y2 > this.worldY2) ny = this.worldY2 - this.height;
+
+	this.x = nx;
+	this.y = ny;
 
 	this.updateBounds();
+};
+
+/**
+**	Updates the viewport.
+*/
+Viewport.prototype.update = function (dt)
+{
+	if (this.focusTarget != null)
+		this.focusOn (this.focusTarget.getX(), this.focusTarget.getY());
 };
 
 /**
@@ -340,15 +356,6 @@ Viewport.prototype.setFocusFactor = function (/*float*/valueX, /*float*/valueY)
 	this.focusFactorY = valueY === undefined ? valueX : valueY;
 
 	return this;
-};
-
-/**
-**	Updates the viewport.
-*/
-Viewport.prototype.update = function (/*float*/dt)
-{
-	if (this.focusTarget != null)
-		this.focusOn (this.focusTarget.getX(), this.focusTarget.getY());
 };
 
 /**

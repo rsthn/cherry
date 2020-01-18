@@ -90,7 +90,7 @@ module.exports = Class.extend
 		if (r.type == "image")
 		{
 			this.numCols = ~~(r.data.width / this.r_frameWidth);
-			this.numRows = ~~(r.data.height / this.r_frameHeight);
+			this.numRows = Math.ceil(r.data.height / this.r_frameHeight);
 
 			this.numFrames = r.config.numFrames || (this.numCols * this.numRows);
 		}

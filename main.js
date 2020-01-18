@@ -24,6 +24,7 @@ module.exports =
 	Vec2: require('./vec2'),
 
 	Perf: require('./perf'),
+	Log: require('./log'),
 	Timer: require('./timer'),
 
 	Recycler: require('./recycler'),
