@@ -29,14 +29,17 @@ module.exports = Class.extend
 	easing: null,
 	callback: null,
 
-	time: 0, defaultDuration: 0, duration: 0,
+	time: 0, dt: 0,
+	defaultDuration: 0, duration: 0,
 	startValue: 0, endValue: 0,
 
 	value: null,
 
 	__ctor: function (value, easing, duration)
 	{
-		this.value = this.startValue = this.endValue = value || 0;
+		this.startValue = this.endValue = this.value = value || 0;
+		this.ivalue = 0;
+
 		this.easing = easing || Easing.Linear.IN;
 		this.defaultDuration = this.duration = duration || 0.500;
 	},
@@ -54,8 +57,11 @@ module.exports = Class.extend
 
 	restart: function ()
 	{
-		this.time = 0;
+		this.time = this.dt = 0;
 		this.enabled = true;
+
+		this.value = this.getValueAt(0);
+		this.ivalue = 0;
 
 		return this;
 	},
@@ -66,7 +72,12 @@ module.exports = Class.extend
 		return this;
 	},
 
-	animate: function (startValue, endValue, duration, callback)
+	getValueAt: function (t)
+	{
+		return this.easing(t) * (this.endValue - this.startValue) + this.startValue;
+	},
+
+	range: function (startValue, endValue, duration, callback)
 	{
 		this.startValue = startValue;
 		this.endValue = endValue;
@@ -79,13 +90,16 @@ module.exports = Class.extend
 
 	delta: function (deltaValue, duration, callback)
 	{
-		return this.animate(this.value, this.endValue+deltaValue, duration, callback);
+		return this.range (this.value, this.endValue+deltaValue, duration, callback);
 	},
 
 	set: function (value)
 	{
 		this.enabled = false;
+
 		this.value = value;
+		this.ivalue = 0;
+
 		return this;
 	},
 
@@ -94,17 +108,32 @@ module.exports = Class.extend
 		if (this.enabled == false)
 			return;
 
-		this.time += dt;
-		if (this.time > this.duration) this.time = this.duration;
-
-		this.value = this.easing(this.time / this.duration) * (this.endValue - this.startValue) + this.startValue;
-
-		if (this.time == this.duration)
+		if (this.duration != -1 && this.time == this.duration)
 		{
 			this.enabled = false;
+			this.ivalue = 0;
 
 			if (this.callback != null)
 				this.callback();
+
+			return;
 		}
+
+		const ltime = this.time;
+
+		this.time += dt;
+		if (this.duration != -1 && this.time > this.duration) this.time = this.duration;
+
+		this.dt = this.time - ltime;
+
+		const x0 = ltime;
+		const x1 = this.time;
+		const y0 = this.duration != -1 ? this.getValueAt(x0 / this.duration) : this.getValueAt(0);
+		const y1 = this.duration != -1 ? this.getValueAt(x1 / this.duration) : this.getValueAt(0);
+		const dx = x1 - x0;
+		const dy = y1 - y0;
+
+		this.ivalue = dy*0.5*(dx + 2*x0) + y0*dx - dy*x0;
+		this.value = y1;
 	}
 });

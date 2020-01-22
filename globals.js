@@ -27,6 +27,7 @@ const C = require('./config');
 module.exports =
 {
 	area: null,
+	viewport: null,
 
 	debugHitbox: false,
 	debugBounds: false,
@@ -76,26 +77,6 @@ if ('AudioContext' in globalThis)
 	globalThis.audioContext = new AudioContext();
 else
 	globalThis.audioContext = null;
-
-
-/**
-**	Detect if running headless (on NodeJS instead of a browser).
-*/
-
-if (!('document' in globalThis))
-	globalThis.HEADLESS = true;
-else
-	globalThis.HEADLESS = false;
-
-
-/**
-**	Do some polyfill if running headless.
-*/
-if (globalThis.HEADLESS)
-{
-	globalThis.performance = require('perf_hooks').performance;
-	globalThis.FileReader = require('filereader');
-}
 
 
 /**
@@ -418,3 +399,6 @@ globalThis.stepValue = function (value, minValue, maxValue, numSteps)
 {
 	return ((~~(numSteps * (value - minValue) / (maxValue - minValue))) / numSteps) * (maxValue - minValue) + minValue;
 };
+
+
+require('./shims');

@@ -1,5 +1,5 @@
 /*
-**	@rsthn/cherry/wrappers
+**	@rsthn/cherry/log
 **
 **	Copyright (c) 2016-2020, RedStar Technologies, All rights reserved.
 **	https://www.rsthn.com/
@@ -32,9 +32,12 @@ const Log = module.exports =
 	color: '#fff',
 	background: '#000',
 
+	/**
+	**	Writes a message to the log buffer, ensure logging has been enabled by calling enable() or any messages will be ignored.
+	*/
 	write: function (msg)
 	{
-		if (!this.enabled) this.enable();
+		if (!this.enabled) return;
 
 		this.data.push(msg);
 		this.count++;
@@ -46,12 +49,18 @@ const Log = module.exports =
 			console.debug(this.count + ": " + msg);
 	},
 
+	/**
+	**	Clears the current log buffer.
+	*/
 	clear: function ()
 	{
 		this.data = [];
 		this.count = 0;
 	},
 
+	/**
+	**	Enables on-screen logging, must be called first before any call to write() or logging messages will be ignored.
+	*/
 	enable: function (x, y, fontSize, showFps, showIndex)
 	{
 		if (this.enabled) return;

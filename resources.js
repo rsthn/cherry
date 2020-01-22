@@ -22,80 +22,6 @@ const Canvas = require('./canvas');
 const Wrappers = require('./wrappers');
 
 /**
-**	Require poly-filling when running headless.
-*/
-if (globalThis.HEADLESS)
-{
-	const sizeOf = require('image-size');
-
-	globalThis.Image = class
-	{
-		constructor() {
-			this.width = 0;
-			this.height = 0;
-			this.path = '';
-
-			this.onload = null;
-			this.onerror = null;
-		}
-
-		get src() {
-			return this.path;
-		}
-
-		set src(value) {
-			sizeOf(this.path = value.split('?')[0], (err, dimensions) => {
-				if (err) {
-					if (this.onerror) this.onerror(err);
-					return;
-				}
-
-				this.width = dimensions.width;
-				this.height = dimensions.height;
-
-				if (this.onload) this.onload();
-			});
-		}
-	};
-
-	globalThis.Audio = class
-	{
-		constructor() {
-			this.path = '';
-
-			this.oncanplaythrough = null;
-			this.onerror = null;
-			this.onended = null;
-		}
-
-		get src() {
-			return this.path;
-		}
-
-		set src(value) {
-			this.path = value.split('?')[0];
-
-			if (this.oncanplaythrough)
-				this.oncanplaythrough();
-		}
-
-		cloneNode () {
-			let m = new Audio();
-			m.src = this.path;
-			return m;
-		}
-
-		play() {
-			if (this.onended) this.onended();
-		}
-
-		pause() {
-		}
-	};
-}
-
-
-/**
 **	Provides functionality to load and manipulate resources (images, audio, etc).
 */
 
@@ -117,6 +43,7 @@ const Resources = module.exports =
 	**	{ type: "images", wrapper: "", src: "assets/ui/##.png", count: 16, width: 64, [ height: 64 ], pixelated: false }
 	**	{ type: "audio", wrapper: "", src: "assets/ui/tap.wav" }
 	**	{ type: "audios", wrapper: "", src: "assets/ui/snd-##.wav", count: 4 }
+	**	{ type: "json", wrapper: "", src: "assets/config.json" }
 	**	{ type: "object", wrapper: "" }
 	*/
 	load: function (list, callback, completeCallback, keyList, index)
@@ -164,9 +91,9 @@ const Resources = module.exports =
 						r.width = int(ratio * r.height);
 					}
 
-					if (r.data.width != r.width || r.data.height != r.height || (r.hidpi !== false && System.scaleFactor != 1))
+					if (r.data.width != r.width || r.data.height != r.height || (r.original !== true && System.scaleFactor != 1))
 					{
-						if (r.hidpi === false)
+						if (r.original === true)
 							r.data = Resources.resizeImage (r, r.width, r.height, r.pixelated, true);
 						else
 							r.data = Resources.resizeImage (r, r.width * (r.pixelated ? System.integerScaleFactor : System.scaleFactor), r.height * (r.pixelated ? System.integerScaleFactor : System.scaleFactor), r.pixelated, true);
@@ -246,9 +173,9 @@ const Resources = module.exports =
 							tmp.width = int(ratio * tmp.height);
 						}
 
-						if (tmp.data.width != tmp.width || tmp.data.height != tmp.height || (tmp.hidpi !== false && System.scaleFactor != 1))
+						if (tmp.data.width != tmp.width || tmp.data.height != tmp.height || (tmp.original !== true && System.scaleFactor != 1))
 						{
-							if (tmp.hidpi === false)
+							if (tmp.original === true)
 								tmp.data = Resources.resizeImage (tmp, tmp.width, tmp.height, r.pixelated, true);
 							else
 								tmp.data = Resources.resizeImage (tmp, tmp.width * (r.pixelated ? System.integerScaleFactor : System.scaleFactor), tmp.height * (r.pixelated ? System.integerScaleFactor : System.scaleFactor), r.pixelated, true);
@@ -427,6 +354,22 @@ const Resources = module.exports =
 				};
 
 				cb();
+
+				break;
+
+			case "json":
+
+				fetchd (r.src + "?r=" + Math.random(), { responseType: 'json' }).then(function(json)
+				{
+					r.data = json;
+
+					Resources.onLoaded (list, keyList[index]);
+					Resources.load (list, callback, completeCallback, keyList, index + 1);
+				})
+				.catch(function(err)
+				{
+					console.error("Error: Unable to load: " + r.resName + ". Error: " + err);
+				});
 
 				break;
 
@@ -610,8 +553,6 @@ const Resources = module.exports =
 	*/
 	showDownload: function (filename, dataUrl)
 	{
-		if (globalThis.HEADLESS) return;
-
 		var link = document.createElement("a");
 		link.href = dataUrl;
 
@@ -629,8 +570,6 @@ const Resources = module.exports =
 	*/
 	showFilePicker: function (allowMultiple, callback)
 	{
-		if (globalThis.HEADLESS) return;
-
 		var input = document.createElement("input");
 
 		input.type = "file";

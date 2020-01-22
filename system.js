@@ -424,7 +424,7 @@ const System = module.exports =
 					}
 
 					p.x = System.reverseRender ? ~~((touches[i].clientY-System.offsY) / System.canvasScaleFactor) : ~~((touches[i].clientX-System.offsX) / System.canvasScaleFactor);
-					p.y = System.reverseRender ? ~~(System.screenHeight - (touches[i].clientX-System.offsX) / System.canvasScaleFactor - 1) : ~~(touches[i].clientY / System.canvasScaleFactor);
+					p.y = System.reverseRender ? ~~(System.screenHeight - (touches[i].clientX-System.offsX) / System.canvasScaleFactor - 1) : ~~((touches[i].clientY-System.offsY) / System.canvasScaleFactor);
 
 					p.dx = p.x - p.sx;
 					p.dy = p.y - p.sy;

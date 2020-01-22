@@ -214,6 +214,8 @@ const Anim = module.exports = Class.extend
 					this.index = _index;
 					this.blockTime = _blockTime;
 
+					if (cmd.fn) cmd.fn.call(this);
+
 					if (i !== true) return false;
 
 					cmd.started = false;
@@ -250,6 +252,8 @@ const Anim = module.exports = Class.extend
 					this.block = _block;
 					this.index = _index;
 					this.blockTime = _blockTime;
+
+					if (cmd.fn) cmd.fn.call(this);
 
 					if (i !== true) return false;
 
@@ -458,7 +462,7 @@ const Anim = module.exports = Class.extend
 		return this;
 	},
 
-	// Ends a parallel() or serial() block.
+	// Ends a parallel(), serial() or repeat() block.
 	end: function ()
 	{
 		this.block = this.stack.pop();

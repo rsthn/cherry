@@ -1,5 +1,5 @@
 /*
-**	@rsthn/cherry/gx
+**	@rsthn/cherry
 **
 **	Copyright (c) 2013-2020, RedStar Technologies, All rights reserved.
 **	https://www.rsthn.com/
@@ -14,29 +14,42 @@
 **	USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/**
-**	The GX module contains helper classes and utilities to make games faster.
-*/
-
-module.exports =
+globalThis.Cherry =
 {
-	PriorityQueue: require('./gx/priority-queue'),
-	Boot: require('./gx/boot'),
+	G: require('./globals'),
+	C: require('./config'),
 
-	PointerHandler: require('./gx/pointer-handler'),
-	KeyboardHandler: require('./gx/keyboard-handler'),
-	ScreenControls: require('./gx/screen-controls'),
+	Matrix: require('./matrix'),
+	Rect: require('./rect'),
+	Vec2: require('./vec2'),
 
-	VisualElement: require('./gx/visual-element'),
-	VisualButton: require('./gx/visual-button'),
-	
-	DisplayList: require('./gx/display-list'),
-	Vfx: require('./gx/vfx'),
-	Layer: require('./gx/layer'),
-	Layers: require('./gx/layers'),
-	Gamepad: require('./gx/gamepad'),
-	Variable: require('./gx/variable'),
-	Sfx: require('./gx/sfx'),
+	Perf: require('./perf'),
+	Log: require('./log'),
+	Timer: require('./timer'),
 
-	Background: require('./gx/background')
+	Recycler: require('./recycler'),
+	Linkable: require('./linkable'),
+	List: require('./list'),
+
+	Canvas: require('./canvas'),
+	KeyCodes: require('./keycodes'),
+	System: require('./system'),
+
+	Wrappers: require('./wrappers'),
+	Resources: require('./resources'),
+
+	QuadTreeItem: require('./quadtree-item'),
+	QuadTreeNode: require('./quadtree-node'),
+	QuadTree: require('./quadtree'),
+
+	DisplayElement: require('./display-element'),
+	Viewport: require('./viewport'),
+	World: require('./world'),
+
+	Easing: require('./easing'),
+	Anim: require('./anim'),
+
+	Controls: require('./controls'),
+
+	GX: require('./gx')
 };
