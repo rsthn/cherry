@@ -397,7 +397,19 @@ globalThis.rotatePoint = function (angle, x, y)
 
 globalThis.stepValue = function (value, minValue, maxValue, numSteps)
 {
-	return ((~~(numSteps * (value - minValue) / (maxValue - minValue))) / numSteps) * (maxValue - minValue) + minValue;
+	return ((Math.round(numSteps * (value - minValue) / (maxValue - minValue))) / numSteps) * (maxValue - minValue) + minValue;
+};
+
+
+/**
+**	Returns a value that is a factor of the specified step.
+**
+**	float alignValue (float value, float step);
+*/
+
+globalThis.alignValue = function (value, step)
+{
+	return Math.round(value/step)*step;
 };
 
 

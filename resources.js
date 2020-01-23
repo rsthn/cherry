@@ -59,7 +59,7 @@ const Resources = module.exports =
 
 		if (index == keyList.length)
 		{
-			if (completeCallback) completeCallback();
+			if (completeCallback) completeCallback(list);
 			return;
 		}
 
@@ -77,6 +77,12 @@ const Resources = module.exports =
 				{
 					var ratio = r.data.width / r.data.height;
 
+					if (r.scale)
+					{
+						r.width = ~~(r.data.width*r.scale);
+						r.height = ~~(r.data.height*r.scale);
+					}
+
 					if (!r.width && !r.height)
 					{
 						r.width = r.data.width;
@@ -90,6 +96,9 @@ const Resources = module.exports =
 					{
 						r.width = int(ratio * r.height);
 					}
+
+					r.owidth = r.data.width;
+					r.oheight = r.data.height;
 
 					if (r.data.width != r.width || r.data.height != r.height || (r.original !== true && System.scaleFactor != 1))
 					{
@@ -149,7 +158,7 @@ const Resources = module.exports =
 						return;
 					}
 
-					var tmp = { type: "image", width: r.width, height: r.height };
+					var tmp = { type: "image", width: r.width, height: r.height, scale: r.scale };
 
 					tmp.src = r.src.substr(0, d0) + ((r._i++) / Math.pow(10,dN)).toFixed(dN).substr(2) + r.src.substr(d1+1);
 					tmp.data = new Image ();
@@ -158,6 +167,12 @@ const Resources = module.exports =
 					tmp.data.onload = function ()
 					{
 						var ratio = tmp.data.width / tmp.data.height;
+
+						if (tmp.scale)
+						{
+							tmp.width = ~~(tmp.data.width*tmp.scale);
+							tmp.height = ~~(tmp.data.height*tmp.scale);
+						}
 
 						if (!tmp.width && !tmp.height)
 						{
@@ -171,6 +186,12 @@ const Resources = module.exports =
 						else if (!tmp.width && tmp.height)
 						{
 							tmp.width = int(ratio * tmp.height);
+						}
+
+						if (r._i == 1)
+						{
+							r.owidth = tmp.data.width;
+							r.oheight = tmp.data.height;
 						}
 
 						if (tmp.data.width != tmp.width || tmp.data.height != tmp.height || (tmp.original !== true && System.scaleFactor != 1))

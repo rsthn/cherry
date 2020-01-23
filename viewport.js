@@ -373,8 +373,8 @@ Viewport.prototype.applyTransform = function (g)
 */
 Viewport.prototype.toWorldSpace = function (x, y)
 {
-	x = ((x - this.screenBounds.cx) / this.scale) + this.getX();
-	y = ((y - this.screenBounds.cy) / this.scale) + this.getY();
+	x = ((x - this.screenBounds.cx) / this.scale) + ~~this.getX();
+	y = ((y - this.screenBounds.cy) / this.scale) + ~~this.getY();
 
 	return { x: x, y: y };
 };
@@ -384,8 +384,8 @@ Viewport.prototype.toWorldSpace = function (x, y)
 */
 Viewport.prototype.toScreenSpace = function (x, y)
 {
-	x = (x - this.getX()) * this.scale + this.screenBounds.cx;
-	y = (y - this.getY()) * this.scale + this.screenBounds.cy;
+	x = (x - ~~this.getX()) * this.scale + this.screenBounds.cx;
+	y = (y - ~~this.getY()) * this.scale + this.screenBounds.cy;
 
 	return { x: x, y: y };
 };

@@ -259,9 +259,10 @@ const QuadTreeItem = module.exports = Class.extend
 /**
 **	Executed when the item is removed from the tree.
 */
-QuadTreeItem.FLAG_QUEUED		=	1;
-QuadTreeItem.FLAG_ATTACHED		=	2;
-QuadTreeItem.FLAG_SELECTED		=	4;
-QuadTreeItem.FLAG_INITIAL		=	8;
-QuadTreeItem.FLAG_ALWAYS_SELECT	=	16;
-QuadTreeItem.FLAG_USERDEF		=	32;
+QuadTreeItem.FLAG_QUEUED		=	0x01;
+QuadTreeItem.FLAG_ATTACHED		=	0x02;
+QuadTreeItem.FLAG_SELECTED		=	0x04;
+QuadTreeItem.FLAG_INITIAL		=	0x08;
+QuadTreeItem.FLAG_ALWAYS_SELECT	=	0x10;
+QuadTreeItem.FLAG_CHILD			=	0x20;
+QuadTreeItem.FLAG_USERDEF		=	0x40;

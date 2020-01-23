@@ -475,7 +475,10 @@ const System = module.exports =
 				p.x = System.reverseRender ? ~~((evt.clientY-System.offsY) / System.canvasScaleFactor) : ~~((evt.clientX-System.offsX) / System.canvasScaleFactor);
 				p.y = System.reverseRender ? ~~(System.screenHeight - (evt.clientX-System.offsX) / System.canvasScaleFactor - 1) : ~~((evt.clientY-System.offsY) / System.canvasScaleFactor);
 
-				System.onPointerEvent (p.isDragging ? System.EVT_POINTER_DRAG_STOP : System.EVT_POINTER_UP, p, System.pointerState);
+				if (p.isDragging)
+					System.onPointerEvent (System.EVT_POINTER_DRAG_STOP, p, System.pointerState);
+
+				System.onPointerEvent (System.EVT_POINTER_UP, p, System.pointerState);
 
 				p.isActive = false;
 				p.isDragging = false;

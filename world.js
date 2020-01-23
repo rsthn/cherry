@@ -78,7 +78,7 @@ const World = module.exports = Class.extend
 	/**
 	**	Indicates if a full screen clear should be performed before each frame.
 	*/
-	fullClear: false,
+	fullClear: true,
 
 	/**
 	**	Constructs a world container with the specified dimensions, number of layers and number of viewports.
