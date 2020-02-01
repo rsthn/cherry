@@ -1,11 +1,11 @@
 {
   "name": "@rsthn/cherry",
-  "version": "2.0.1",
+  "version": "2.0.3",
   "description": "Cherry JS Game Library",
   "main": "main.js",
   "scripts": {
-	"test": "echo Ok",
-	"build": "browserify main-packed.js | uglifyjs > dist/cherry.js"
+    "test": "echo Ok",
+    "build": "browserify main-packed.js | uglifyjs > dist/cherry.js"
   },
   "repository": {
     "type": "git",
@@ -22,12 +22,12 @@
     "uglify-es": "^3.3.9"
   },
   "dependencies": {
-    "@rsthn/rin": "^2.0.2-0",
+    "@rsthn/rin": "^2.0.3",
     "filereader": "^0.10.3",
     "image-size": "^0.8.3"
   },
   "browser": {
-	"./shims": false
+    "./shims": false
   },
   "files": [
     "wrappers/",

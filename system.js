@@ -18,6 +18,7 @@ require('./globals');
 
 const KeyCodes = require('./keycodes');
 const List = require('./list');
+const Linkable = require('./linkable');
 const Timer = require('./timer');
 const Canvas = require('./canvas');
 
@@ -136,6 +137,11 @@ const System = module.exports =
 	**	Last frame delta in seconds (float).
 	*/
 	frameDelta: 0,
+
+	/**
+	**	Current frame number.
+	*/
+	frameNumber: 0,
 
 	/**
 	**	Indicates if the drawing or update process is taking place.
@@ -597,6 +603,7 @@ const System = module.exports =
 		}
 
 		this.frameDelta = delta / 1000.0;
+		this.frameNumber++;
 
 		this.perf.logicalTime += delta;
 
@@ -835,6 +842,53 @@ const System = module.exports =
 			next = elem.next;
 			elem.value.draw(canvas, context);
 		}
+	},
+
+	/**
+	**	Interpolates numeric values between two objects using the specified duration and easing function.
+	*/
+	interpolate: function (src, dst, duration, easing, callback/* function(data, isFinished) */)
+	{
+		let time = { };
+		let data = { };
+		let count = 0;
+
+		for (let x in src)
+		{
+			time[x] = 0.0;
+			data[x] = src[x]
+			count++;
+		}
+
+		let interpolator =
+		{
+			update: function(dt)
+			{
+				dt /= 1000.0;
+
+				for (let x in time)
+				{
+					if (time[x] == duration[x])
+						continue;
+
+					time[x] += dt;
+					if (time[x] >= duration[x])
+					{
+						time[x] = duration[x];
+						count--;
+					}
+
+					data[x] = src[x] + (dst[x] - src[x]) * easing[x] (time[x] / duration[x]);
+				}
+
+				callback (data, count == 0);
+
+				if (count == 0)
+					System.updateQueueRemove(interpolator);
+			}
+		};
+
+		System.updateQueueAdd(interpolator);
 	},
 
 	/**

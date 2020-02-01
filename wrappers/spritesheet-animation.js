@@ -48,6 +48,8 @@ const Animation = Class.extend
 
 	fps: 0, frameMillis: 0, time: 0,
 
+	frameNumber: -1,
+
 	finished: false,
 	paused: false,
 
@@ -135,7 +137,10 @@ const Animation = Class.extend
 		if (this.time < 0)
 		{
 			if (!this.paused)
-				this.time += System.dt;
+			{
+				this.time += this.frameNumber == System.frameNumber ? 0 : System.dt;
+				this.frameNumber = System.frameNumber;
+			}
 
 			if (this.time > 0) this.time = 0;
 			return;
@@ -162,7 +167,11 @@ const Animation = Class.extend
 				g.drawFrame (this.anim, x, y, t[i]);
 		}
 
-		if (!this.paused) this.time += System.dt;
+		if (!this.paused)
+		{
+			this.time += this.frameNumber == System.frameNumber ? 0 : System.dt;
+			this.frameNumber = System.frameNumber;
+		}
 
 		if (this.time >= this.frameMillis)
 		{

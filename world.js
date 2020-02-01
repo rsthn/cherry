@@ -66,6 +66,11 @@ const World = module.exports = Class.extend
 	layers: null, /*Array*/
 
 	/**
+	**	Handler executed after each layer is drawn.
+	*/
+	onLayerDrawn: null, /*Array*/
+
+	/**
 	**	The update method of all objects will be executed when the World's update() method is called.
 	*/
 	updateQueue: null, /*List*/
@@ -107,6 +112,8 @@ const World = module.exports = Class.extend
 
 		this.updateQueue = new List();
 		this.drawQueue = new List();
+
+		this.onLayerDrawn = [ ];
 
 		for (var i = 0; i < numLayers; i++)
 			this.layers[i] = new QuadTree (minX, minY, maxX, maxY, 16);
@@ -212,19 +219,41 @@ const World = module.exports = Class.extend
 	},
 
 	/**
+	**	Adds the specified object to the extra draw and update queue.
+	*/
+	queueAdd: function (/*object*/elem)
+	{
+		this.drawQueue.push (elem);
+		this.updateQueue.push (elem);
+	},
+
+	/**
+	**	Removes the specified element from the draw and update queue.
+	*/
+	queueRemove: function (/*object*/elem)
+	{
+		this.drawQueue.remove (this.drawQueue.sgetNode(elem));
+		this.updateQueue.remove (this.updateQueue.sgetNode(elem));
+	},
+
+	/**
 	**	Draws all elements that lie inside the viewports.
 	*/
 	draw: function (g)
 	{
-		var h = this.getHeight();
-		var w = this.getWidth();
-
 		if (this.fullClear) g.clear(true);
 
 		for (var viewportIndex = 0; viewportIndex < this.numViewports; viewportIndex++)
 		{
 			var viewport = this.viewports[viewportIndex];
 			if (!viewport.isEnabled()) continue;
+
+			g.save();
+
+			let clipArea = viewport.getScreenBounds();
+			g.beginPath();
+			g.rect(clipArea.x1, clipArea.y1, clipArea.width(), clipArea.height());
+			g.clip();
 
 			g.pushMatrix();
 			viewport.applyTransform(g);
@@ -247,9 +276,13 @@ const World = module.exports = Class.extend
 					/*DEBUG*/layer.selectedCount++;
 					elem.draw(g);
 				}
+
+				if (this.onLayerDrawn[layerIndex])
+					this.onLayerDrawn[layerIndex] (g);
 			}
 
 			g.popMatrix();
+			g.restore();
 		}
 
 		for (var elem = this.drawQueue.top; elem; elem = elem.next)
@@ -266,8 +299,8 @@ const World = module.exports = Class.extend
 
 		this.updateElems(dt, dtm);
 		this.onUpdated(dt, dtm);
-		this.updateViewports(dt, dtm);
 		this.updateLayers();
+		this.updateViewports(dt, dtm);
 	},
 
 	/**

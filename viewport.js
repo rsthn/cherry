@@ -147,8 +147,8 @@ Viewport.prototype.updateBounds = function ()
 	this.bounds.set (this.x-(this.width/this.scale)+this.dx, this.y-(this.height/this.scale)+this.dy, this.x+(this.width/this.scale)+this.dx, this.y+(this.height/this.scale)+this.dy);
 
 	this.focusBounds.set (
-		this.x - this.focusFactorX*this.width + this.centerRatioX*this.width, this.y - this.focusFactorY*this.height + this.centerRatioY*this.height,
-		this.x + this.focusFactorX*this.width + this.centerRatioX*this.width, this.y + this.focusFactorY*this.height + this.centerRatioY*this.height
+		this.x - (this.focusFactorX*this.width + this.centerRatioX*this.width)/this.scale, this.y - (this.focusFactorY*this.height + this.centerRatioY*this.height)/this.scale,
+		this.x + (this.focusFactorX*this.width + this.centerRatioX*this.width)/this.scale, this.y + (this.focusFactorY*this.height + this.centerRatioY*this.height)/this.scale
 	);
 };
 
@@ -175,7 +175,7 @@ Viewport.prototype.setSize = function (width, height)
 };
 
 /**
-**	Sets the position of the viewport.
+**	Sets the position of the viewport within the world, relative to the current focus point.
 */
 Viewport.prototype.setPosition = function (x, y)
 {
@@ -211,7 +211,7 @@ Viewport.prototype.setCenter = function (rx, ry)
 };
 
 /**
-**	Moves the viewport.
+**	Moves the viewport in the world, relative to the current focus point.
 */
 Viewport.prototype.translate = function (dx, dy)
 {
@@ -247,6 +247,22 @@ Viewport.prototype.getX = function ()
 Viewport.prototype.getY = function ()
 {
 	return this.y + this.dy;
+};
+
+/**
+**	Returns the X position of the viewport inside the world relative to the current focus point.
+*/
+Viewport.prototype.getPositionX = function ()
+{
+	return this.dx;
+};
+
+/**
+**	Returns the Y position of the viewport inside the world relative to the current focus point.
+*/
+Viewport.prototype.getPositionY = function ()
+{
+	return this.dy;
 };
 
 /**
@@ -297,20 +313,19 @@ Viewport.prototype.focusOn = function (i, j, kx, ky)
 	if (kx === undefined) kx = this.focusFactorX;
 	if (ky === undefined) ky = this.focusFactorY;
 
-	let x1 = this.x - kx*this.width + this.centerRatioX*this.width;
-	let x2 = this.x + kx*this.width + this.centerRatioX*this.width;
-
-	let y1 = this.y - ky*this.height + this.centerRatioY*this.height;
-	let y2 = this.y + ky*this.height + this.centerRatioY*this.height;
+	let x1 = this.x - (kx*this.width + this.centerRatioX*this.width)/this.scale;
+	let x2 = this.x + (kx*this.width + this.centerRatioX*this.width)/this.scale;
+	let y1 = this.y - (ky*this.height + this.centerRatioY*this.height)/this.scale;
+	let y2 = this.y + (ky*this.height + this.centerRatioY*this.height)/this.scale;
 
 	let nx = this.x;
 	let ny = this.y;
 
-	if (i < x1) nx += i - x1;
-	else if (i > x2) nx += i - x2;
+	if (i < x1) nx += (i - x1);
+	else if (i > x2) nx += (i - x2);
 
-	if (j < y1) ny += j - y1;
-	else if (j > y2) ny += j - y2;
+	if (j < y1) ny += (j - y1);
+	else if (j > y2) ny += (j - y2);
 
 	x1 = nx - this.width;
 	x2 = nx + this.width;
@@ -363,7 +378,7 @@ Viewport.prototype.setFocusFactor = function (/*float*/valueX, /*float*/valueY)
 */
 Viewport.prototype.applyTransform = function (g)
 {
-	g.translate (this.screenBounds.cx, this.screenBounds.cy);
+	g.translate (~~this.screenBounds.cx, ~~this.screenBounds.cy);
 	g.scale (this.scale, this.scale);
 	g.translate (-(~~this.getX()), -(~~this.getY()));
 };
@@ -373,8 +388,8 @@ Viewport.prototype.applyTransform = function (g)
 */
 Viewport.prototype.toWorldSpace = function (x, y)
 {
-	x = ((x - this.screenBounds.cx) / this.scale) + ~~this.getX();
-	y = ((y - this.screenBounds.cy) / this.scale) + ~~this.getY();
+	x = ((x - ~~this.screenBounds.cx) / this.scale) + ~~this.getX();
+	y = ((y - ~~this.screenBounds.cy) / this.scale) + ~~this.getY();
 
 	return { x: x, y: y };
 };
@@ -384,8 +399,8 @@ Viewport.prototype.toWorldSpace = function (x, y)
 */
 Viewport.prototype.toScreenSpace = function (x, y)
 {
-	x = (x - ~~this.getX()) * this.scale + this.screenBounds.cx;
-	y = (y - ~~this.getY()) * this.scale + this.screenBounds.cy;
+	x = (x - ~~this.getX()) * this.scale + ~~this.screenBounds.cx;
+	y = (y - ~~this.getY()) * this.scale + ~~this.screenBounds.cy;
 
 	return { x: x, y: y };
 };
