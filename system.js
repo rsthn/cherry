@@ -137,6 +137,7 @@ const System = module.exports =
 	**	Last frame delta in seconds (float).
 	*/
 	frameDelta: 0,
+	dt: 0,
 
 	/**
 	**	Current frame number.
@@ -615,6 +616,7 @@ const System = module.exports =
 		}
 		catch (e) {
 			console.error("UPDATE ERROR: " + e + "\n" + e.stack);
+			System.stop();
 		}
 		this.perf.updateTime += hrnow() - tmp;
 		this.frameUpdateInProgress = false;
@@ -627,6 +629,7 @@ const System = module.exports =
 		}
 		catch (e) {
 			console.error("DRAW ERROR: \n" + e + "\n" + e.stack);
+			System.stop();
 		}	
 		this.perf.drawTime += hrnow() - tmp;
 		this.frameDrawInProgress = false;
