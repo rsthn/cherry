@@ -107,6 +107,8 @@ const QuadTreeItem = module.exports = Class.extend
 		this.flags = QuadTreeItem.FLAG_INITIAL;
 		this.type = 0;
 		this.visible = true;
+
+		this.tag = null;
 	},
 
 	/**
@@ -135,9 +137,25 @@ const QuadTreeItem = module.exports = Class.extend
 	/**
 	**	Returns the result of masking (bitwise AND) the flags by the specified flag bits.
 	*/
-	maskFlags: function (value)
+	getFlags: function (value)
 	{
 		return this.flags & value;
+	},
+
+	/**
+	**	Sets the tag of the item.
+	*/
+	setTag: function (tag)
+	{
+		this.tag = tag;
+	},
+
+	/**
+	**	Returns the tag of the item.
+	*/
+	getTag: function()
+	{
+		return this.tag;
 	},
 
 	/**

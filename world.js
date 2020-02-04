@@ -22,6 +22,7 @@ const List = require('./list');
 const QuadTree = require('./quadtree');
 const Viewport = require('./viewport');
 const System = require('./system');
+const DisplayElement = require('./display-element');
 
 /**
 **	Describes the container where all viewports and layers are stored.
@@ -84,6 +85,11 @@ const World = module.exports = Class.extend
 	**	Indicates if a full screen clear should be performed before each frame.
 	*/
 	fullClear: true,
+
+	/*
+	**	Indicates if elements marked as FLAG_HOLLOW should be drawn or not.
+	*/
+	drawHollow: false,
 
 	/**
 	**	Constructs a world container with the specified dimensions, number of layers and number of viewports.
@@ -273,6 +279,12 @@ const World = module.exports = Class.extend
 
 				while ((elem = layer.getNextSelectedItem()) != null)
 				{
+					if (elem.getFlags(DisplayElement.FLAG_FRAGMENT))
+						continue;
+
+					if (elem.getFlags(DisplayElement.FLAG_HOLLOW) && this.drawHollow !== true)
+						continue;
+
 					/*DEBUG*/layer.selectedCount++;
 					elem.draw(g);
 				}

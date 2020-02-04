@@ -15,6 +15,8 @@
 */
 
 const QuadTreeItem = require('./quadtree-item');
+const Fragment = require('./fragment');
+const List = require('./list');
 
 /**
 **	Describes a rectangular 2D display element.
@@ -28,6 +30,18 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 	className: "DisplayElement",
 
 	/**
+	**	Layer where the element is stored. Set internally by the setLayer() method, therefore using that method is required
+	**	for correct behavior of this class.
+	*/
+	layer: null, /*QuadTree*/
+
+	/**
+	**	List of alternative collision areas (fragments) of the element. By default the element's bounds are used for collision
+	**	detection, however when complex elements are needed additional collision areas can be defined using addCollisionFragment().
+	*/
+	fragments: null,
+
+	/**
 	**	Position of the element in world space.
 	*/
 	x: 0, y: 0,
@@ -36,11 +50,6 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 	**	Position of the element in screen space.
 	*/
 	scrX: 0, scrY: 0,
-
-	/**
-	**	Layer where the element is stored.
-	*/
-	layer: null, /*QuadTree*/
 
 	/**
 	**	Constructs a display element with the specified dimensions.
@@ -75,6 +84,15 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 	*/
 	__dtor: function ()
 	{
+		if (this.fragments != null && this.layer != null)
+		{
+			for (let i = this.fragments.top; i; i = i.next)
+				this.layer.removeItem(i.value);
+		}
+
+		if (this.fragments != null)
+			dispose(this.fragments);
+
 		if (this.layer != null)
 			this.layer.removeItem (this);
 
@@ -89,9 +107,72 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 		if (!layer) return this;
 
 		if (this.layer != null)
+		{
 			this.layer.removeItem (this);
 
+			if (this.fragments != null)
+			{
+				for (let i = this.fragments.top; i; i = i.next)
+					this.layer.removeItem (i.value);
+			}
+		}
+
+		if (this.fragments != null)
+		{
+			for (let i = this.fragments.top; i; i = i.next)
+				this.layer.addItem (i.value);
+		}
+
 		return (this.layer = layer).addItem (this);
+	},
+
+	/**
+	**	Sets the visibility of the display element (and all collision fragments).
+	*/
+	setVisible: function (value)
+	{
+		this._super.QuadTreeItem.setVisible (value);
+
+		if (this.fragments != null)
+		{
+			for (let i = this.fragments.top; i; i = i.next)
+				i.value.setVisible (value);
+		}
+
+		return this;
+	},
+
+	/**
+	**	Adds a collision fragment to the element.
+	*/
+	addFragment: function (dx, dy, w, h)
+	{
+		if (this.fragments == null)
+			this.fragments = new List();
+
+		let fragment = new Fragment (this, dx, dy, w, h);
+		this.fragments.push (fragment);
+
+		if (this.layer != null)
+			this.layer.addItem (fragment);
+
+		return fragment;
+	},
+
+	/**
+	**	Returns the number of collision fragments.
+	*/
+	getNumFragments: function()
+	{
+		return this.fragments != null ? this.fragments.count : 0;
+	},
+
+	/**
+	**	Returns the list of collision fragments.
+	*/
+	getFragments: function()
+	{
+		return this.fragments;
 	},
 
 	/**
@@ -115,6 +196,15 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 
 		if (this.layer != null)
 			this.layer.updateItem (this);
+
+		if (this.fragments != null && this.layer != null)
+		{
+			for (let i = this.fragments.top; i; i = i.next)
+			{
+				i.value.translate (dx, dy);
+				this.layer.updateItem (i.value);
+			}
+		}
 	},
 
 	/**
@@ -205,3 +295,8 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 	{
 	}
 });
+
+DisplayElement.FLAG_FRAGMENT	= 1*QuadTreeItem.FLAG_USERDEF;
+DisplayElement.FLAG_HOLLOW		= 2*QuadTreeItem.FLAG_USERDEF;
+
+Object.assign(exports, module.exports);
