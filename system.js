@@ -134,9 +134,10 @@ const System = module.exports =
 	drawQueue: null, /*List*/
 
 	/**
-	**	Last frame delta in seconds (float).
+	**	Last frame delta in seconds and milliseconds (float, int).
 	*/
 	frameDelta: 0,
+	frameDeltaMillis: 0,
 
 	/**
 	**	Logical system time (updated on each cycle by the calculated frameDelta).
@@ -528,7 +529,7 @@ const System = module.exports =
 	},
 
 	/**
-	**	Returns the current logical time in seconds.
+	**	Returns the current logical time in seconds (same as reading System.frameTime).
 	*/
 	time: function()
 	{
@@ -602,6 +603,7 @@ const System = module.exports =
 			this.perf.lastTime = now;
 		}
 
+		this.frameDeltaMillis = delta;
 		this.frameDelta = delta / 1000.0;
 		this.frameTime += this.frameDelta;
 		this.frameNumber++;
