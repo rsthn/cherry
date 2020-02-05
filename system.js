@@ -65,7 +65,7 @@ const System = module.exports =
 		background: "#000",
 
 		fps: 60,
-		minFps: 10,
+		minFps: 15,
 
 		context: null,
 		antialias: true,
@@ -132,6 +132,11 @@ const System = module.exports =
 	**	The draw method of all objects will be executed when the system draw() method is called.
 	*/
 	drawQueue: null, /*List*/
+
+	/*
+	**	Time scale, the frame delta is multiplied by this value before each system cycle.
+	*/
+	timeScale: 1,
 
 	/**
 	**	Last frame delta in seconds and milliseconds (float, int).
@@ -602,6 +607,8 @@ const System = module.exports =
 			this.perf.startTime = now - this.perf.frameInterval;
 			this.perf.lastTime = now;
 		}
+
+		delta *= this.timeScale;
 
 		this.frameDeltaMillis = delta;
 		this.frameDelta = delta / 1000.0;
