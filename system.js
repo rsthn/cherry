@@ -137,7 +137,11 @@ const System = module.exports =
 	**	Last frame delta in seconds (float).
 	*/
 	frameDelta: 0,
-	dt: 0,
+
+	/**
+	**	Logical system time (updated on each cycle by the calculated frameDelta).
+	*/
+	frameTime: 0,
 
 	/**
 	**	Current frame number.
@@ -180,11 +184,6 @@ const System = module.exports =
 		*/
 		numFrames: 0,
 
-		/**
-		**	Current logical time in milliseconds.
-		*/
-		logicalTime: 0,
-		
 		/**
 		**	Total time accumulated in each update and draw operation.
 		*/
@@ -529,11 +528,11 @@ const System = module.exports =
 	},
 
 	/**
-	**	Returns the current logical time in milliseconds.
+	**	Returns the current logical time in seconds.
 	*/
 	time: function()
 	{
-		return this.perf.logicalTime;
+		return this.frameTime;
 	},
 
 	/**
@@ -604,9 +603,8 @@ const System = module.exports =
 		}
 
 		this.frameDelta = delta / 1000.0;
+		this.frameTime += this.frameDelta;
 		this.frameNumber++;
-
-		this.perf.logicalTime += delta;
 
 		/* ~ */
 		this.frameUpdateInProgress = true;

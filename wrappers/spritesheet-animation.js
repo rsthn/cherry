@@ -138,7 +138,7 @@ const Animation = Class.extend
 		{
 			if (!this.paused)
 			{
-				this.time += this.frameNumber == System.frameNumber ? 0 : System.dt;
+				this.time += this.frameNumber == System.frameNumber ? 0 : System.frameDelta;
 				this.frameNumber = System.frameNumber;
 			}
 
@@ -169,7 +169,7 @@ const Animation = Class.extend
 
 		if (!this.paused)
 		{
-			this.time += this.frameNumber == System.frameNumber ? 0 : System.dt;
+			this.time += this.frameNumber == System.frameNumber ? 0 : System.frameDelta;
 			this.frameNumber = System.frameNumber;
 		}
 
