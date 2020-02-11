@@ -44,22 +44,23 @@ const Easing = module.exports =
 	{
 		k: 1.70158,
 
-		IN: function (t)
+		IN: function (t, k)
 		{
-			return t*t*((Easing.Back.k+1)*t - Easing.Back.k);
+			if (k === undefined) k = Easing.Back.k;
+			return t*t*((k+1)*t - k);
 		},
 
-		OUT: function (t)
+		OUT: function (t, k)
 		{
-			return 1 - Easing.Back.IN(1 - t);
+			return 1 - Easing.Back.IN(1 - t, k);
 		},
 
-		IN_OUT: function (t)
+		IN_OUT: function (t, k)
 		{
 			if (t < 0.5)
-				return Easing.Back.IN(t*2)/2;
+				return Easing.Back.IN(t*2, k)/2;
 			else
-				return Easing.Back.OUT((t-0.5)*2)/2 + 0.5;
+				return Easing.Back.OUT((t-0.5)*2, k)/2 + 0.5;
 		}
 	},
 

@@ -37,6 +37,8 @@ const Anim = module.exports = Class.extend
 	paused: false,
 	finished: false,
 
+	onFinishedCallback: null,
+
 	__ctor: function ()
 	{
 		this.list = [ ];
@@ -64,8 +66,10 @@ const Anim = module.exports = Class.extend
 		return a.reset();
 	},
 
-	onFinished: function ()
+	onFinished: function (callback)
 	{
+		this.onFinishedCallback = callback;
+		return this;
 	},
 
 	// Resets the animation to its initial state.
@@ -405,8 +409,8 @@ const Anim = module.exports = Class.extend
 
 		if (this.block == this.list)
 		{
-			if (!this.finished)
-				this.onFinished();
+			if (!this.finished && this.onFinishedCallback != null)
+				this.onFinishedCallback();
 
 			this.finished = true;
 		}

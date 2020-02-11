@@ -346,9 +346,14 @@ module.exports = Class.extend
 
 		if (this.anim != null)
 		{
-			g.translate (this.anim.data.dx, this.anim.data.dy);
-			g.scale (this.anim.data.sx, this.anim.data.sy);
-			g.alpha (this.anim.data.alpha);
+			if ('dx' in this.anim.data)
+				g.translate (this.anim.data.dx, this.anim.data.dy);
+
+			if ('sx' in this.anim.data)
+				g.scale (this.anim.data.sx, this.anim.data.sy);
+
+			if ('alpha' in this.anim.data)
+				g.alpha (this.anim.data.alpha);
 		}
 
 		this.applyTransforms(g);
@@ -409,10 +414,10 @@ module.exports = Class.extend
 
 	update: function (dt)
 	{
-		if (!this.getVisible() || !this.getEnabled())
+		if (!this.getEnabled())
 			return;
 
-		if (this.anim != null) this.anim.update (dt*1000);
+		if (this.anim != null) this.anim.update (dt);
 
 		for (var i = 0; i < this.children.length; i++)
 			this.children[i].update(dt);

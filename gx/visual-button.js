@@ -91,8 +91,11 @@ module.exports = VisualElement.extend
 
 	containsPoint: function(x, y)
 	{
+		if (!this.getEnabled())
+			return false;
+
 		const p = this.reverseTransform ({ x: x, y: y });
-		return this.getEnabled() ? this.button.containsPoint(p.x, p.y) : false;
+		return this.button.containsPoint(p.x, p.y);
 	},
 
 	ldraw: function (g)
