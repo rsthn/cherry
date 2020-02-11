@@ -372,8 +372,8 @@ module.exports = Class.extend
 
 			g.popMatrix();
 		}
-		else
-			this.ldraw(g);
+
+		this.ldraw(g);
 
 		for (var i = 0; i < this.children.length; i++)
 			this.children[i].draw(g);
