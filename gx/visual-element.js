@@ -341,8 +341,8 @@ module.exports = Class.extend
 		g.pushMatrix();
 		g.pushAlpha();
 
-		g.scale (this.scale, this.scale);
 		g.translate(this.x, this.y);
+		g.scale (this.scale, this.scale);
 
 		if (this.anim != null)
 		{

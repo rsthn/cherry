@@ -60,7 +60,17 @@ module.exports = Boot.Module.create
 	{
 		System.onKeyboardEvent = (action, keyCode, keyEvtArgs) =>
 		{
-			this.handlers.forEach((h) => h.onKeyboardEvent(action, keyCode, keyEvtArgs));
+			const breakError = { };
+
+			try {
+				this.handlers.forEach((h) => {
+					if (h.onKeyboardEvent(action, keyCode, keyEvtArgs) === false)
+						throw breakError;
+				});
+			}
+			catch (e) {
+				if (e !== breakError) throw e;
+			}
 		};
 	},
 

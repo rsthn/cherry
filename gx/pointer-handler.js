@@ -60,7 +60,17 @@ module.exports = Boot.Module.create
 	{
 		System.onPointerEvent = (action, p, pointers) =>
 		{
-			this.handlers.forEach((h) => h.onPointerEvent(action, p, pointers));
+			const breakError = { };
+
+			try {
+				this.handlers.forEach((h) => {
+					if (h.onPointerEvent(action, p, pointers) === false)
+						throw breakError;
+				});
+			}
+			catch (e) {
+				if (e !== breakError) throw e;
+			}
 		};
 	},
 

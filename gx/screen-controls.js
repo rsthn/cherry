@@ -42,32 +42,35 @@ const ScreenControls = module.exports =
 
 	onPointerEvent: function (action, p, pointers)
 	{
+		let _continue = true;
+
 		switch (action)
 		{
 			case System.EVT_POINTER_DOWN:
-				for (var i in this.list)
+				for (let i in this.list)
 				{
 					if (!this.list[i]) continue;
 
 					if (this.list[i] instanceof Array)
 					{
-						for (var j = 0; j < this.list[i].length; j++)
+						for (let j = 0; j < this.list[i].length; j++)
 						{
 							if (this.list[i][j].containsPoint(p.x, p.y))
 							{
 								this.list[i][j].activate(p);
-								j = -1;
+								_continue = false;
 								break;
 							}
 						}
 
-						if (j == -1) break;
+						if (!_continue) break;
 					}
 					else
 					{
 						if (this.list[i].containsPoint(p.x, p.y))
 						{
 							this.list[i].activate(p);
+							_continue = false;
 							break;
 						}
 					}
@@ -81,16 +84,18 @@ const ScreenControls = module.exports =
 					if (p._ref.containsPoint(p.x, p.y) || p._ref.focusLock == true)
 					{
 						p._ref.update (p.x, p.y);
+						_continue = false;
 					}
 					else
 					{
 						p._ref.deactivate(p);
 
-						for (var i in this.list)
+						for (let i in this.list)
 						{
 							if (this.list[i] && this.list[i].containsPoint(p.x, p.y))
 							{
 								this.list[i].activate(p);
+								_continue = false;
 								break;
 							}
 						}
@@ -98,29 +103,30 @@ const ScreenControls = module.exports =
 				}
 				else
 				{
-					for (var i in this.list)
+					for (let i in this.list)
 					{
 						if (!this.list[i]) continue;
 
 						if (this.list[i] instanceof Array)
 						{
-							for (var j = 0; j < this.list[i].length; j++)
+							for (let j = 0; j < this.list[i].length; j++)
 							{
 								if (this.list[i][j].containsPoint(p.x, p.y))
 								{
 									this.list[i][j].activate(p);
-									j = -1;
+									_continue = false;
 									break;
 								}
 							}
 
-							if (j == -1) break;
+							if (!_continue) break;
 						}
 						else
 						{
 							if (this.list[i].containsPoint(p.x, p.y))
 							{
 								this.list[i].activate(p);
+								_continue = false;
 								break;
 							}
 						}
@@ -130,9 +136,14 @@ const ScreenControls = module.exports =
 				break;
 
 			case System.EVT_POINTER_UP: case System.EVT_POINTER_DRAG_STOP:
-				if (p._ref != null) p._ref.deactivate(p);
+				if (p._ref != null) {
+					p._ref.deactivate(p);
+					_continue = false;
+				}
 				break;
 		}
+
+		return _continue;
 	},
 
 	onKeyboardEvent: function (action, keyCode, keyArgs)
