@@ -29,11 +29,14 @@ module.exports = VisualElement.extend
 
 	keyCode: 0,
 
-	init: function (x, y, img_normal, img_pressed)
+	init: function (x, y, img_normal, img_pressed, is_center=true)
 	{
 		this.img = null;
 
-		this.button = new Controls.Button (0, 0, -img_normal.width*0.5, -img_normal.height*0.5, img_normal, img_pressed);
+		if (is_center === false)
+			this.button = new Controls.Button (0, 0, 0, 0, img_normal, img_pressed);
+		else
+			this.button = new Controls.Button (0, 0, -img_normal.width*0.5, -img_normal.height*0.5, img_normal, img_pressed);
 
 		this.button.onChange = (status, pstatus) => { this.onChange (status, pstatus); if (status == 0 && pstatus == 1) this.onTap(); };
 	},
@@ -88,7 +91,8 @@ module.exports = VisualElement.extend
 
 	containsPoint: function(x, y)
 	{
-		return this.getEnabled() ? this.button.containsPoint(x - this.getX(), y - this.getY()) : false;
+		const p = this.reverseTransform ({ x: x, y: y });
+		return this.getEnabled() ? this.button.containsPoint(p.x, p.y) : false;
 	},
 
 	ldraw: function (g)

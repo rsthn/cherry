@@ -27,7 +27,7 @@ module.exports = Class.extend
 ({
 	className: "VisualElement",
 
-	x: 0, y: 0, width: 0, height: 0, img: null,
+	scale: 1, x: 0, y: 0, width: 0, height: 0, img: null,
 
 	t: 0,
 	type: 0,
@@ -133,6 +133,26 @@ module.exports = Class.extend
 	getY: function()
 	{
 		return this.y + (this.parent != null ? this.parent.getY() : 0);
+	},
+
+	reverseTransform: function (pos)
+	{
+		if (this.parent != null)
+			this.parent.reverseTransform (pos);
+
+		pos.x -= this.x;
+		pos.y -= this.y;
+
+		pos.x /= this.scale;
+		pos.y /= this.scale;
+
+		return pos;
+	},
+
+	setScale: function (value)
+	{
+		this.scale = value;
+		return this;
 	},
 
 	getEnabled: function()
@@ -321,6 +341,7 @@ module.exports = Class.extend
 		g.pushMatrix();
 		g.pushAlpha();
 
+		g.scale (this.scale, this.scale);
 		g.translate(this.x, this.y);
 
 		if (this.anim != null)

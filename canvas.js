@@ -1185,6 +1185,7 @@ Canvas.prototype.enablePointerEvents = function()
 	if (this.pointerHandler) return this;
 
 	this.pointerScale = { sx: 1, sy: 1 };
+	this.pointerOffset = { x: 0, y: 0 };
 
 	var _ = this;
 
@@ -1210,11 +1211,11 @@ Canvas.prototype.enablePointerEvents = function()
 		_evt.x = ~~(evt.clientX - rect.left - 1);
 		_evt.y = ~~(evt.clientY - rect.top - 1);
 
-		_evt.x = (_evt.x - 0.5*_.pointerScale.sx) / _.pointerScale.sx;
-		_evt.y = (_evt.y - 0.5*_.pointerScale.sy) / _.pointerScale.sy;
+		_evt.x = ((_evt.x - _.pointerOffset.x) - 0.5*_.pointerScale.sx) / _.pointerScale.sx;
+		_evt.y = ((_evt.y - _.pointerOffset.y) - 0.5*_.pointerScale.sy) / _.pointerScale.sy;
 
-		if (_evt.x < 0) _evt.x = 0;
-		if (_evt.y < 0) _evt.y = 0;
+		//if (_evt.x < 0) _evt.x = 0;
+		//if (_evt.y < 0) _evt.y = 0;
 
 		_evt.dragging = false;
 
@@ -1260,12 +1261,25 @@ Canvas.prototype.enablePointerEvents = function()
 /**
 **	Sets the pointer scaling factors.
 **
-**	>> Canvas setPointerScale (float x, float y);
+**	>> Canvas setPointerScale (float sx, float sy);
 */
 
 Canvas.prototype.setPointerScale = function (sx, sy)
 {
 	this.pointerScale = { sx: sx, sy: sy };
+	return this;
+};
+
+
+/**
+**	Sets the pointer offset that is applied after scaling.
+**
+**	>> Canvas setPointerOffset (float x, float y);
+*/
+
+Canvas.prototype.setPointerOffset = function (x, y)
+{
+	this.pointerScale = { x: x, y: y };
 	return this;
 };
 
