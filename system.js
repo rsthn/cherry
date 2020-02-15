@@ -139,6 +139,21 @@ const System = module.exports =
 	timeScale: 1,
 
 	/**
+	**	Frame interval in milliseconds.
+	*/
+	frameInterval: 0,
+
+	/**
+	**	Fixed frame interval in milliseconds, when set to non-zero value the frame delta will be set to this value.
+	*/
+	fixedFrameInterval: 0,
+
+	/**
+	**	Maximum frame interval in milliseconds, if the frameDelta exceeds this it will be truncated to this value.
+	*/
+	maxFrameInterval: 0,
+
+	/**
 	**	Last frame delta in seconds and milliseconds (float, int).
 	*/
 	frameDelta: 0,
@@ -174,16 +189,6 @@ const System = module.exports =
 		**	Time of the last frame drawn.
 		*/
 		lastTime: 0,
-
-		/**
-		**	Frame interval in milliseconds.
-		*/
-		frameInterval: 0,
-
-		/**
-		**	Maximum frame interval in milliseconds.
-		*/
-		maxFrameInterval: 0,
 
 		/**
 		**	Number of frames drawn in total since startTime.
@@ -224,12 +229,12 @@ const System = module.exports =
 		this.drawQueue = new List();
 
 		// Attach frame event handlers.
-		this.perf.frameInterval = int(1000 / o.fps);
-		this.perf.maxFrameInterval = int(1000 / o.minFps);
+		this.frameInterval = int(1000 / o.fps);
+		this.maxFrameInterval = int(1000 / o.minFps);
 
 		globalThis.onresize = function() { System.onWindowResized(); };
 
-		this.frameTimer = new Timer (this.perf.frameInterval, this.onFrame, this);
+		this.frameTimer = new Timer (this.frameInterval, this.onFrame, this);
 
 		// Setup canvas buffer.
 		this.displayBuffer = new Canvas (null, { hidden: false, antialias: o.antialias, background: o.background });
@@ -586,8 +591,11 @@ const System = module.exports =
 		var now = this.now();
 		var tmp;
 
-		if (delta > this.perf.maxFrameInterval)
-			delta = this.perf.maxFrameInterval;
+		if (delta > this.maxFrameInterval)
+			delta = this.maxFrameInterval;
+
+		if (this.fixedFrameInterval != 0)
+			delta = this.fixedFrameInterval;
 
 		if (!this.flags.renderingEnabled || this.flags.renderingPaused)
 		{
@@ -604,7 +612,7 @@ const System = module.exports =
 
 		if (this.perf.numFrames == 0)
 		{
-			this.perf.startTime = now - this.perf.frameInterval;
+			this.perf.startTime = now - this.frameInterval;
 			this.perf.lastTime = now;
 		}
 

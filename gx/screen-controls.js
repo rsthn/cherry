@@ -78,6 +78,12 @@ const ScreenControls = module.exports =
 
 				break;
 
+			case System.EVT_POINTER_DRAG_START:
+				if (p._ref != null)
+					_continue = false;
+
+				break;
+
 			case System.EVT_POINTER_DRAG_MOVE:
 				if (p._ref != null)
 				{
@@ -135,7 +141,13 @@ const ScreenControls = module.exports =
 
 				break;
 
-			case System.EVT_POINTER_UP: case System.EVT_POINTER_DRAG_STOP:
+			case System.EVT_POINTER_DRAG_STOP:
+				if (p._ref != null) {
+					_continue = false;
+				}
+				break;
+
+			case System.EVT_POINTER_UP:
 				if (p._ref != null) {
 					p._ref.deactivate(p);
 					_continue = false;

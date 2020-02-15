@@ -37,7 +37,7 @@ const Boot = module.exports =
 		{
 			Resources.integerScaling = false;
 		
-			System.init ({ antialias: false, fullscreen: false, background: '#000', targetScreenWidth: C.WIDTH, targetScreenHeight: C.HEIGHT, fps: C.FPS });
+			System.init ({ antialias: false, fullscreen: false, background: '#000', targetScreenWidth: C.WIDTH, targetScreenHeight: C.HEIGHT, fps: C.FPS, minFps: C.MIN_FPS || 15 });
 		
 			Boot.startup();
 		};

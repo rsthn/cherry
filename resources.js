@@ -594,7 +594,7 @@ const Resources = module.exports =
 		var input = document.createElement("input");
 
 		input.type = "file";
-		input.style = "visibility: hidden";
+		input.style.display = 'none';
 		input.multiple = allowMultiple;
 
 		document.body.appendChild(input);

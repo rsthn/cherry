@@ -305,14 +305,16 @@ globalThis.randitem = function (arr, a, b)
 /**
 **	Returns the parameter 't' where two line segments intersect.
 **
-**	float lineSegmentIntersects (float ls1_x1, float ls1_y1, float ls1_x2, float ls1_y2, float ls2_x1, float ls2_y1, float ls2_x2, float ls2_y2);
+**	float getLineSegmentIntersection (float ls1_x1, float ls1_y1, float ls1_x2, float ls1_y2, float ls2_x1, float ls2_y1, float ls2_x2, float ls2_y2);
 */
 
-globalThis.lineSegmentIntersects = function (ls1_x1, ls1_y1, ls1_x2, ls1_y2, ls2_x1, ls2_y1, ls2_x2, ls2_y2)
+globalThis.getLineSegmentIntersection = function (ls1_x1, ls1_y1, ls1_x2, ls1_y2, ls2_x1, ls2_y1, ls2_x2, ls2_y2)
 {
 	// Case #1: Identical segments.
 	if (ls1_x1 == ls2_x1 && ls1_y1 == ls2_y1 && ls1_x2 == ls2_x2 && ls1_y2 == ls2_y2)
-		return true;
+		return 0;
+
+	let inf = 2.0;
 
 	var dyA = ls1_y2 - ls1_y1;
 	var dxA = ls1_x2 - ls1_x1;
@@ -322,56 +324,68 @@ globalThis.lineSegmentIntersects = function (ls1_x1, ls1_y1, ls1_x2, ls1_y2, ls2
 	// Case #2: Horizontal vs. Horizontal
 	if (dyA == 0 && dyB == 0)
 	{
-		if (ls1_y1 != ls2_y1) return false;
+		if (ls1_y1 != ls2_y1) return inf;
 
 		var x1 = Math.max(ls1_x1, ls2_x1);
 		var x2 = Math.min(ls1_x2, ls2_x2);
 
-		if (x1 > x2) return false;
+		if (x1 > x2) return inf;
 
-		return true;
+		return (x1 - ls1_x1) / dxA;
 	}
 
 	// Case #3: Vertical vs. Vertical
 	if (dxA == 0 && dxB == 0)
 	{
-		if (ls1_x1 != ls2_x1) return false;
+		if (ls1_x1 != ls2_x1) return inf;
 
 		var y1 = Math.max(ls1_y1, ls2_y1);
 		var y2 = Math.min(ls1_y2, ls2_y2);
 
-		if (y1 > y2) return false;
+		if (y1 > y2) return inf;
 
-		return true;
+		return (y1 - ls1_y1) / dyA;
 	}
 
 	// Case #4: Vertical vs. Horizontal or Sloped
 	if (dxA == 0)
 	{
 		var tA = (dyB*(ls1_x1 - ls2_x1) + dxB*(ls2_y1 - ls1_y1)) / (dxB * dyA);
-		if (0 > tA || tA > 1) return false;
+		if (0 > tA || tA > 1) return inf;
 
 		var tB = (ls1_x1 - ls2_x1) / dxB; 
-		if (0 > tB || tB > 1) return false;
+		if (0 > tB || tB > 1) return inf;
 
-		return true;
+		return tA;
 	}
 
 	// Case #5: Regular line segments.
 	var a = dyA*(ls2_x1 - ls1_x1) + dxA*(ls1_y1 - ls2_y1);
 	var b = dyB*dxA - dxB*dyA;
 
-	if (b == 0) return false;
+	if (b == 0) return inf;
 
 	var tB = a / b;
-	if (0 > tB || tB > 1) return false;
+	if (0 > tB || tB > 1) return inf;
 
 	var tA = (dxB*tB + ls2_x1 - ls1_x1) / dxA;
-	if (0 > tA || tA > 1) return false;
+	if (0 > tA || tA > 1) return inf;
 
-	return true;
+	return tA;
 };
 
+
+/**
+**	Returns boolean if the line segments intersect.
+**
+**	bool lineSegmentIntersects (float ls1_x1, float ls1_y1, float ls1_x2, float ls1_y2, float ls2_x1, float ls2_y1, float ls2_x2, float ls2_y2);
+*/
+
+globalThis.lineSegmentIntersects = function (ls1_x1, ls1_y1, ls1_x2, ls1_y2, ls2_x1, ls2_y1, ls2_x2, ls2_y2)
+{
+	let t = getLineSegmentIntersection (ls1_x1, ls1_y1, ls1_x2, ls1_y2, ls2_x1, ls2_y1, ls2_x2, ls2_y2);
+	return t >= 0 && t <= 1.0;
+};
 
 /**
 **	Rotates a point (2d) by the given angle and returns an object.
