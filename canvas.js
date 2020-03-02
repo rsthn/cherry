@@ -27,19 +27,19 @@ const Canvas = module.exports = function (elem, opts)
 	// Create canvas element if required.
 	if (elem == null)
 	{
-		this.ui = globalThis.document ? globalThis.document.createElement ("canvas") : Rin.clone(Canvas.passThruCanvas);
+		this.elem = globalThis.document ? globalThis.document.createElement ("canvas") : Rin.clone(Canvas.passThruCanvas);
 
 		if (globalThis.document && opts && opts.hidden != true)
-			globalThis.document.body.appendChild (this.ui);
+			globalThis.document.body.appendChild (this.elem);
 	}
 	else
 	{
-		this.ui = elem;
+		this.elem = elem;
 	}
 
-	if (!this.ui.getContext) return;
+	if (!this.elem.getContext) return;
 
-	this.context = this.ui.getContext ("2d");
+	this.context = this.elem.getContext ("2d");
 
 	this.antialias = opts && opts.antialias === false ? false : true;
 	this.setBackground (opts && opts.background != null ? opts.background : "#000");
@@ -60,9 +60,7 @@ const Canvas = module.exports = function (elem, opts)
 	this.strokeStyle("#fff");
 	this.fillStyle("#fff");
 
-	this.width = this.ui.width;
-	this.height = this.ui.height;
-	this.applyConfig();
+	this.resize();
 };
 
 Canvas.passThruCanvas = 
@@ -189,7 +187,7 @@ Canvas.prototype.applyConfig = function ()
 	if (this.antialias == false)
 	{
 		this.context.imageSmoothingEnabled = false;
-		this.ui.style.imageRendering = "crisp-edges";
+		this.elem.style.imageRendering = "crisp-edges";
 	}
 };
 
@@ -202,14 +200,14 @@ Canvas.prototype.applyConfig = function ()
 
 Canvas.prototype.dispose = function ()
 {
-	if (this.ui.parentNode)
-		this.ui.parentNode.removeChild (this.ui);
+	if (this.elem.parentNode)
+		this.elem.parentNode.removeChild (this.elem);
 
 	this.matrixStack = null;
 	this.alphaStack = null;
 	this.matr = null;
 	this.context = null;
-	this.ui = null;
+	this.elem = null;
 };
 
 
@@ -221,7 +219,7 @@ Canvas.prototype.dispose = function ()
 
 Canvas.prototype.setBackground = function (color, canvasColor)
 {
-	this.ui.style.background = color;
+	this.elem.style.background = color;
 	this.backgroundColor = canvasColor ? canvasColor : color;
 };
 
@@ -234,11 +232,16 @@ Canvas.prototype.setBackground = function (color, canvasColor)
 
 Canvas.prototype.resize = function (width, height)
 {
-	this.ui.width = width;
-	this.ui.height = height;
+	let rect = this.elem.getBoundingClientRect();
 
-	this.width = this.ui.width;
-	this.height = this.ui.height;
+	if (!width) width = rect.width;
+	if (!height) height = rect.height;
+
+	this.elem.width = width;
+	this.elem.height = height;
+
+	this.width = this.elem.width;
+	this.height = this.elem.height;
 
 	this._width = ~~(this.width / this._globalScale);
 	this._height = ~~(this.height / this._globalScale);
@@ -325,7 +328,7 @@ Canvas.prototype.restore = function ()
 
 Canvas.prototype.toDataUrl = function (mime, params)
 {
-	return this.ui.toDataURL (mime, params);
+	return this.elem.toDataURL (mime, params);
 };
 
 
@@ -337,7 +340,7 @@ Canvas.prototype.toDataUrl = function (mime, params)
 
 Canvas.prototype.toPng64 = function ()
 {
-	return this.ui.toDataURL ("image/png").substr(22);
+	return this.elem.toDataURL ("image/png").substr(22);
 };
 
 
@@ -932,7 +935,7 @@ Canvas.prototype.clear = function (backgroundColor)
 	}
 	else
 	{
-		this.ui.width = this.width;
+		this.elem.width = this.width;
 		this.applyConfig();
 	}
 
@@ -1204,18 +1207,15 @@ Canvas.prototype.enablePointerEvents = function()
 
 	this.pointerHandler = function (code, evt)
 	{
-		var rect = this.ui.getBoundingClientRect();
+		var rect = this.elem.getBoundingClientRect();
 
 		_evt.action = code;
 		_evt.buttons = evt.buttons;
-		_evt.x = ~~(evt.clientX - rect.left - 1);
-		_evt.y = ~~(evt.clientY - rect.top - 1);
+		_evt.x = _evt.rx = ~~(evt.clientX - rect.left);
+		_evt.y = _evt.ry = ~~(evt.clientY - rect.top);
 
-		_evt.x = ((_evt.x - _.pointerOffset.x) - 0.5*_.pointerScale.sx) / _.pointerScale.sx;
-		_evt.y = ((_evt.y - _.pointerOffset.y) - 0.5*_.pointerScale.sy) / _.pointerScale.sy;
-
-		//if (_evt.x < 0) _evt.x = 0;
-		//if (_evt.y < 0) _evt.y = 0;
+		_evt.x = ((_evt.x - _.pointerOffset.x) - 0.0*_.pointerScale.sx) / _.pointerScale.sx;
+		_evt.y = ((_evt.y - _.pointerOffset.y) - 0.0*_.pointerScale.sy) / _.pointerScale.sy;
 
 		_evt.dragging = false;
 
@@ -1250,9 +1250,9 @@ Canvas.prototype.enablePointerEvents = function()
 		}
 	};
 
-	this.ui.onmousedown = function(evt) {  _.pointerHandler('DOWN', evt); };
-	this.ui.onmouseup = function(evt) { _.pointerHandler('UP', evt); };
-	this.ui.onmousemove = function(evt) { _.pointerHandler('MOVE', evt); };
+	this.elem.onmousedown = function(evt) {  _.pointerHandler('DOWN', evt); };
+	this.elem.onmouseup = function(evt) { _.pointerHandler('UP', evt); };
+	this.elem.onmousemove = function(evt) { _.pointerHandler('MOVE', evt); };
 
 	return this;
 };
@@ -1279,7 +1279,7 @@ Canvas.prototype.setPointerScale = function (sx, sy)
 
 Canvas.prototype.setPointerOffset = function (x, y)
 {
-	this.pointerScale = { x: x, y: y };
+	this.pointerOffset = { x: x, y: y };
 	return this;
 };
 

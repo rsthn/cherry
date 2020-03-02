@@ -240,7 +240,7 @@ const System = module.exports =
 		this.displayBuffer = new Canvas (null, { hidden: false, antialias: o.antialias, background: o.background });
 		this.tempDisplayBuffer = new Canvas (null, { hidden: true, antialias: o.antialias }).resize(320, 240);
 
-		var display0 = this.displayBuffer.ui;
+		var display0 = this.displayBuffer.elem;
 
 		// Obtain device display ratios.
 		this.devicePixelRatio = globalThis.devicePixelRatio || 1;
@@ -735,19 +735,19 @@ const System = module.exports =
 			{
 				this.displayBuffer.resize (this.screenWidth*this.scaleFactor, this.screenHeight*this.scaleFactor);
 
-				this.displayBuffer.ui.style.width = (this.screenWidth*this.canvasScaleFactor) + "px";
-				this.displayBuffer.ui.style.height = (this.screenHeight*this.canvasScaleFactor) + "px";
+				this.displayBuffer.elem.style.width = (this.screenWidth*this.canvasScaleFactor) + "px";
+				this.displayBuffer.elem.style.height = (this.screenHeight*this.canvasScaleFactor) + "px";
 			}
 			else
 			{
 				this.displayBuffer.resize (this.screenHeight*this.scaleFactor, this.screenWidth*this.scaleFactor);
 
-				this.displayBuffer.ui.style.width = (this.screenHeight*this.canvasScaleFactor) + "px";
-				this.displayBuffer.ui.style.height = (this.screenWidth*this.canvasScaleFactor) + "px";
+				this.displayBuffer.elem.style.width = (this.screenHeight*this.canvasScaleFactor) + "px";
+				this.displayBuffer.elem.style.height = (this.screenWidth*this.canvasScaleFactor) + "px";
 			}
 
-			this.displayBuffer.ui.style.marginLeft = this.offsX + "px";
-			this.displayBuffer.ui.style.marginTop = this.offsY + "px";
+			this.displayBuffer.elem.style.marginLeft = this.offsX + "px";
+			this.displayBuffer.elem.style.marginTop = this.offsY + "px";
 
 			this.displayBuffer.loadIdentity();
 

@@ -498,7 +498,7 @@ const Resources = module.exports =
 					break;
 
 				var output = new Canvas (null, { hidden: true, antialias: pixelated }).resize (tw, th);
-				output.drawImage (temp.ui, 0, 0, tw, th);
+				output.drawImage (temp.elem, 0, 0, tw, th);
 				temp.dispose ();
 
 				sw = tw;
@@ -508,13 +508,13 @@ const Resources = module.exports =
 			}
 
 			var output = new Canvas (null, { hidden: true, antialias: pixelated }).resize (dw, dh);
-			output.drawImage (temp.ui, 0, 0, dw, dh);
+			output.drawImage (temp.elem, 0, 0, dw, dh);
 			temp.dispose ();
 
 			if (discardOriginal)
 				dispose (image.data);
 
-			return output.ui;
+			return output.elem;
 		}
 		else
 		{
@@ -547,7 +547,7 @@ const Resources = module.exports =
 
 				temp.dispose();
 
-				return output.ui;
+				return output.elem;
 			}
 
 			return this.resizeImage (image, dw, dh, null, discardOriginal);
@@ -566,7 +566,7 @@ const Resources = module.exports =
 
 		temp.drawImage (image.data, 0, 0);
 
-		return temp.ui;
+		return temp.elem;
 	},
 
 	/**
@@ -577,7 +577,7 @@ const Resources = module.exports =
 		var link = document.createElement("a");
 		link.href = dataUrl;
 
-		link.style = "visibility: hidden";
+		link.style.display = 'none';
 		link.download = filename;
 		link.target = "_blank";
 
