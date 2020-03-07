@@ -56,6 +56,7 @@ const System = module.exports =
 	DEFAULT:	0,
 	LANDSCAPE:	1,
 	PORTRAIT:	2,
+	AUTOMATIC:	3,
 
 	/**
 	**	Default options of the rendering system.
@@ -216,7 +217,7 @@ const System = module.exports =
 		this.options = o;
 
 		// Set default orientation if both target sizes were specified.
-		if (o.targetScreenWidth && o.targetScreenHeight && !o.orientation)
+		if (o.targetScreenWidth && o.targetScreenHeight && o.orientation == System.DEFAULT)
 		{
 			o.orientation = o.targetScreenWidth > o.targetScreenHeight ? System.LANDSCAPE : System.PORTRAIT;
 		}
@@ -232,7 +233,7 @@ const System = module.exports =
 		this.frameInterval = int(1000 / o.fps);
 		this.maxFrameInterval = int(1000 / o.minFps);
 
-		globalThis.onresize = function() { System.onWindowResized(); };
+		globalThis.onresize = this.onWindowResized.bind(this);
 
 		this.frameTimer = new Timer (this.frameInterval, this.onFrame, this);
 
@@ -694,24 +695,36 @@ const System = module.exports =
 			this.reverseRender = false;
 		}
 
-		if (this.options.targetScreenWidth && this.options.targetScreenHeight)
+		let targetScreenWidth = this.options.targetScreenWidth;
+		let targetScreenHeight = this.options.targetScreenHeight;
+
+		if (this.orientation == System.AUTOMATIC && targetScreenWidth && targetScreenHeight)
 		{
-			this.canvasScaleFactor = Math.min (this.screenWidth / this.options.targetScreenWidth, this.screenHeight / this.options.targetScreenHeight);
+			if ((targetScreenWidth > targetScreenHeight && this.screenWidth < this.screenHeight) || (targetScreenWidth < targetScreenHeight && this.screenWidth > this.screenHeight))
+			{
+				targetScreenWidth = targetScreenHeight;
+				targetScreenHeight = this.options.targetScreenWidth;
+			}
 		}
-		else if (this.options.targetScreenWidth)
+
+		if (targetScreenWidth && targetScreenHeight)
 		{
-			this.canvasScaleFactor = this.screenWidth / this.options.targetScreenWidth;
+			this.canvasScaleFactor = Math.min (this.screenWidth / targetScreenWidth, this.screenHeight / targetScreenHeight);
 		}
-		else if (this.options.targetScreenHeight)
+		else if (targetScreenWidth)
 		{
-			this.canvasScaleFactor = this.screenHeight / this.options.targetScreenHeight;
+			this.canvasScaleFactor = this.screenWidth / targetScreenWidth;
+		}
+		else if (targetScreenHeight)
+		{
+			this.canvasScaleFactor = this.screenHeight / targetScreenHeight;
 		}
 
 		var _screenWidth = this.screenWidth;
 		var _screenHeight = this.screenHeight;
 
-		if (this.options.targetScreenWidth) this.screenWidth = this.options.targetScreenWidth;
-		if (this.options.targetScreenHeight) this.screenHeight = this.options.targetScreenHeight;
+		if (targetScreenWidth) this.screenWidth = targetScreenWidth;
+		if (targetScreenHeight) this.screenHeight = targetScreenHeight;
 
 		this.offsX = int((_screenWidth - this.screenWidth*this.canvasScaleFactor)*0.5);
 		this.offsY = int((_screenHeight - this.screenHeight*this.canvasScaleFactor)*0.5);
@@ -768,7 +781,17 @@ const System = module.exports =
 		this.resetPerf();
 
 		if (notRendering != true)
+		{
 			this.flags.renderingEnabled = true;
+			this.onCanvasResized (this.screenWidth, this.screenHeight);
+		}
+	},
+
+	/**
+	**	Event triggered when the canvas was resized by the system.
+	*/
+	onCanvasResized: function (screenWidth, screenHeight)
+	{
 	},
 
 	/**

@@ -22,6 +22,7 @@ module.exports =
 {
 	FPS:					60,
 
+	ORIENTATION:			0,
 	WIDTH: 					360,
 	HEIGHT: 				640,
 
