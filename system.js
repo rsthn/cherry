@@ -94,6 +94,11 @@ const System = module.exports =
 	*/
 	devicePixelRatio: 1, backingStoreRatio: 1, canvasPixelRatio: 1, canvasScaleFactor: 1, scaleFactor: 1,
 
+	/*
+	**	Initial transformation matrix. Should be used (if needed) instead of loadIdentity() since the System does some transformations first.
+	*/
+	initialMatrix: null,
+
 	/**
 	**	Display buffer for the renderer.
 	*/
@@ -779,6 +784,8 @@ const System = module.exports =
 
 		this.integerScaleFactor = ~~(this.scaleFactor + 0.9);
 		this.resetPerf();
+
+		this.initialMatrix = this.displayBuffer.getMatrix();
 
 		if (notRendering != true)
 		{

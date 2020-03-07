@@ -1038,8 +1038,20 @@ Canvas.prototype.loadIdentity = function ()
 
 Canvas.prototype.loadMatrix = function (matr)
 {
-	this.matr.identity ().append (matr);
+	this.matr.identity().append(matr);
 	return this.transform ();
+};
+
+
+/**
+**	Returns a copy of the current transformation matrix object.
+**
+**	>> Matrix getMatrix();
+*/
+
+Canvas.prototype.getMatrix = function ()
+{
+	return this.matr.clone();
 };
 
 
