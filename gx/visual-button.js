@@ -29,16 +29,26 @@ module.exports = VisualElement.extend
 
 	keyCode: 0,
 
-	init: function (x, y, img_normal, img_pressed, is_center=true)
+	init: function (x, y, unpressedImg, pressedImg=null, is_center=true)
 	{
 		this.img = null;
 
+		if (!pressedImg) pressedImg = unpressedImg;
+
 		if (is_center === false)
-			this.button = new Controls.Button (0, 0, 0, 0, img_normal, img_pressed);
+			this.button = new Controls.Button (0, 0, 0, 0, unpressedImg, pressedImg);
 		else
-			this.button = new Controls.Button (0, 0, -img_normal.width*0.5, -img_normal.height*0.5, img_normal, img_pressed);
+			this.button = new Controls.Button (0, 0, -unpressedImg.width*0.5, -unpressedImg.height*0.5, unpressedImg, pressedImg);
 
 		this.button.onChange = (status, pstatus) => { this.onChange (status, pstatus); if (status == 0 && pstatus == 1) this.onTap(); };
+	},
+
+	setImage: function (unpressedImg, pressedImg)
+	{
+		if (!pressedImg) pressedImg = unpressedImg;
+
+		this.button.unpressedImg = unpressedImg;
+		this.button.pressedImg = pressedImg;
 	},
 
 	resizeHitboxBy: function(dx, dy)

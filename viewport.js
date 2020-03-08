@@ -175,12 +175,21 @@ Viewport.prototype.setSize = function (width, height)
 };
 
 /**
-**	Sets the position of the viewport within the world, relative to the current focus point.
+**	Sets the position of the viewport within the world, relative to the current focus point if 'absolute' is not true.
 */
-Viewport.prototype.setPosition = function (x, y)
+Viewport.prototype.setPosition = function (x, y, absolute=false)
 {
-	this.dx = x;
-	this.dy = y;
+	if (absolute === true)
+	{
+		this.x = x;
+		this.y = y;
+		this.dx = this.dy = 0;
+	}
+	else
+	{
+		this.dx = x;
+		this.dy = y;
+	}
 
 	this.updateBounds();
 	return this;

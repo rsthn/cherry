@@ -937,6 +937,7 @@ const System = module.exports =
 		};
 
 		System.updateQueueAdd(interpolator);
+		interpolator.update(0);
 	},
 
 	/**
