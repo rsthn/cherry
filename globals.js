@@ -138,12 +138,45 @@ globalThis.fetchAudioBuffer = function (url)
 /**
 **	Returns the value as an integer.
 **
-**	float int (float value);
+**	int int (T value);
 */
 
 globalThis.int = function (value)
 {
 	return ~~value;
+};
+
+
+/**
+**	Returns the value as a boolean.
+**
+**	bool bool (T value);
+*/
+
+globalThis.bool = function (value)
+{
+	if (value === true || value === false)
+		return value;
+
+	if (value == 'true')
+		return true;
+
+	if (value == 'false')
+		return false;
+
+	return !(!value);
+};
+
+
+/**
+**	Returns the value as a floating point number.
+**
+**	float float (T value);
+*/
+
+globalThis.float = function (value)
+{
+	return parseFloat(value);
 };
 
 
