@@ -189,6 +189,11 @@ Canvas.prototype.applyConfig = function ()
 		this.context.imageSmoothingEnabled = false;
 		this.elem.style.imageRendering = "crisp-edges";
 	}
+	else
+	{
+		this.context.imageSmoothingEnabled = true;
+		this.elem.style.imageRendering = "auto";
+	}
 };
 
 
