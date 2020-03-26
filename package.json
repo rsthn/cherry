@@ -1,6 +1,6 @@
 {
   "name": "@rsthn/cherry",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "Cherry Gamedev Library (JS)",
   "main": "main.js",
   "scripts": {
@@ -22,7 +22,7 @@
     "uglify-es": "^3.3.9"
   },
   "dependencies": {
-    "@rsthn/rin": "^2.0.7",
+    "@rsthn/rin": "^2.0.8",
     "filereader": "^0.10.3",
     "image-size": "^0.8.3"
   },

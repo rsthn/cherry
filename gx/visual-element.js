@@ -45,7 +45,9 @@ module.exports = Class.extend
 
 	parent: null, /* Set by addRelated() or addChild() */
 	children: null, /* Array of directly related Tiles (same container). Drawn after the parent, position is relative to parent. */
+
 	related: null, /* Array of other directly related Tiles (possibly on other containers), position is absolute. */
+	isRelated: false,
 
 	hitbox: null,
 	sensebox: null,
@@ -137,7 +139,7 @@ module.exports = Class.extend
 
 	reverseTransform: function (pos)
 	{
-		if (this.parent != null)
+		if (this.parent != null && this.isRelated == false)
 			this.parent.reverseTransform (pos);
 
 		pos.x -= this.x;
@@ -226,6 +228,8 @@ module.exports = Class.extend
 			this.related = [];
 
 		elem.parent = this;
+		elem.isRelated = true;
+
 		this.related.push (elem);
 
 		return elem;
@@ -237,6 +241,8 @@ module.exports = Class.extend
 			return elem;
 
 		elem.parent = this;
+		elem.isRelated = false;
+
 		this.children.push (elem);
 
 		elem.setEnabled (this.getEnabled(), true);

@@ -37,7 +37,7 @@ const ScreenControls = module.exports =
 	remove: function (c)
 	{
 		var i = this.list.indexOf(c);
-		if (i !== -1) this.list[i].splice(i, 1);
+		if (i !== -1) this.list.splice(i, 1);
 	},
 
 	findTarget: function (x, y, filter)
