@@ -40,48 +40,55 @@ const ScreenControls = module.exports =
 		if (i !== -1) this.list[i].splice(i, 1);
 	},
 
+	findTarget: function (x, y, filter)
+	{
+		for (let i in this.list)
+		{
+			if (!this.list[i]) continue;
+
+			if (this.list[i] instanceof Array)
+			{
+				for (let j = 0; j < this.list[i].length; j++)
+				{
+					if (filter != null && filter(this.list[i][j]) == false)
+						continue;
+
+					if (this.list[i][j].containsPoint(x, y))
+						return this.list[i][j];
+				}
+			}
+			else
+			{
+				if (filter != null && filter(this.list[i]) == false)
+					continue;
+
+				if (this.list[i].containsPoint(x, y))
+					return this.list[i];
+			}
+		}
+
+		return null;
+	},
+
 	onPointerEvent: function (action, p, pointers)
 	{
 		let _continue = true;
+		let tmp = null;
 
 		switch (action)
 		{
 			case System.EVT_POINTER_DOWN:
-				for (let i in this.list)
+				let tmp = this.findTarget(p.x, p.y);
+				if (tmp != null)
 				{
-					if (!this.list[i]) continue;
-
-					if (this.list[i] instanceof Array)
-					{
-						for (let j = 0; j < this.list[i].length; j++)
-						{
-							if (this.list[i][j].containsPoint(p.x, p.y))
-							{
-								this.list[i][j].activate(p);
-								_continue = false;
-								break;
-							}
-						}
-
-						if (!_continue) break;
-					}
-					else
-					{
-						if (this.list[i].containsPoint(p.x, p.y))
-						{
-							this.list[i].activate(p);
-							_continue = false;
-							break;
-						}
-					}
+					(p._ref = tmp).activate(p);
+					_continue = false;
 				}
 
 				break;
 
 			case System.EVT_POINTER_DRAG_START:
-				if (p._ref != null)
-					_continue = false;
-
+				if (p._ref != null) _continue = false;
 				break;
 
 			case System.EVT_POINTER_DRAG_MOVE:
@@ -89,69 +96,47 @@ const ScreenControls = module.exports =
 				{
 					if (p._ref.containsPoint(p.x, p.y) || p._ref.focusLock == true)
 					{
-						p._ref.update (p.x, p.y);
+						p._ref.update (p.x, p.y, p);
 						_continue = false;
 					}
 					else
 					{
 						p._ref.deactivate(p);
+						p._ref = null;
 
-						for (let i in this.list)
+						tmp = this.findTarget(p.x, p.y);
+						if (tmp != null)
 						{
-							if (this.list[i] && this.list[i].containsPoint(p.x, p.y))
-							{
-								this.list[i].activate(p);
-								_continue = false;
-								break;
-							}
+							(p._ref = tmp).activate(p);
+							_continue = false;
 						}
 					}
 				}
 				else
 				{
-					for (let i in this.list)
+					let tmp = this.findTarget(p.x, p.y);
+					if (tmp != null)
 					{
-						if (!this.list[i]) continue;
-
-						if (this.list[i] instanceof Array)
-						{
-							for (let j = 0; j < this.list[i].length; j++)
-							{
-								if (this.list[i][j].containsPoint(p.x, p.y))
-								{
-									this.list[i][j].activate(p);
-									_continue = false;
-									break;
-								}
-							}
-
-							if (!_continue) break;
-						}
-						else
-						{
-							if (this.list[i].containsPoint(p.x, p.y))
-							{
-								this.list[i].activate(p);
-								_continue = false;
-								break;
-							}
-						}
+						(p._ref = tmp).activate(p);
+						_continue = false;
 					}
 				}
 
 				break;
 
 			case System.EVT_POINTER_DRAG_STOP:
-				if (p._ref != null) {
-					_continue = false;
-				}
+				if (p._ref != null) _continue = false;
 				break;
 
 			case System.EVT_POINTER_UP:
-				if (p._ref != null) {
+				if (p._ref != null)
+				{
 					p._ref.deactivate(p);
+					p._ref = null;
+
 					_continue = false;
 				}
+
 				break;
 		}
 

@@ -37,7 +37,7 @@ const Boot = module.exports =
 		{
 			Resources.integerScaling = false;
 		
-			System.init ({ antialias: false, fullscreen: false, background: '#000', targetScreenWidth: C.WIDTH, targetScreenHeight: C.HEIGHT, orientation: C.ORIENTATION, fps: C.FPS, minFps: C.MIN_FPS || 15 });
+			System.init ({ antialias: C.ANTIALIAS, fullscreen: false, background: C.BACKGROUND, targetScreenWidth: C.WIDTH, targetScreenHeight: C.HEIGHT, orientation: C.ORIENTATION, fps: C.FPS, minFps: C.MIN_FPS || 15 });
 		
 			Boot.startup();
 		};
@@ -80,10 +80,16 @@ Boot.Module = Class.extend
 		Boot.register(this);
 	},
 
+	/*
+	**	Should return false if the method is async and when finished should call next().
+	*/
 	onStartup: function (next)
 	{
 	},
 
+	/*
+	**	Should return false if the method is async and when finished should call next().
+	*/
 	onShutdown: function (next)
 	{
 	}

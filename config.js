@@ -21,6 +21,8 @@
 module.exports =
 {
 	FPS:					60,
+	ANTIALIAS:				false,
+	BACKGROUND:				'#000',
 
 	ORIENTATION:			0,
 	WIDTH: 					360,
