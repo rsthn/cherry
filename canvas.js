@@ -27,10 +27,10 @@ const Canvas = module.exports = function (elem, opts)
 	// Create canvas element if required.
 	if (elem == null)
 	{
-		this.elem = globalThis.document ? globalThis.document.createElement ("canvas") : Rin.clone(Canvas.passThruCanvas);
+		this.elem = global.document ? global.document.createElement ("canvas") : Rin.clone(Canvas.passThruCanvas);
 
-		if (globalThis.document && opts && opts.hidden != true)
-			globalThis.document.body.appendChild (this.elem);
+		if (global.document && opts && opts.hidden != true)
+			global.document.body.appendChild (this.elem);
 	}
 	else
 	{

@@ -14,7 +14,7 @@
 **	USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-globalThis.Cherry =
+global.cherry = global.Cherry =
 {
 	G: require('./globals'),
 	C: require('./config'),
@@ -51,5 +51,5 @@ globalThis.Cherry =
 
 	Controls: require('./controls'),
 
-	GX: require('./gx')
+	Gx: require('./gx')
 };

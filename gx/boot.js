@@ -33,7 +33,7 @@ const Boot = module.exports =
 	{
 		this.modules = new PriorityQueue();
 
-		globalThis.main = function()
+		global.main = function()
 		{
 			Resources.integerScaling = false;
 		

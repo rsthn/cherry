@@ -28,6 +28,17 @@ const ScreenControls = module.exports =
 
 	list: [ ],
 
+	hoverEnabled: false,
+
+	/*
+	**	Adds an item to the ScreenControls control list. The item should be an object with the following mandatory methods:
+	**
+	**		bool containsPoint (float x, float y)
+	**		void activate (Object pointer)
+	**		void deactivate (Object pointer)
+	**		void update (float x, float y, Object pointer)
+	**		void hover (bool status, Object pointer)
+	*/
 	add: function (c)
 	{
 		if (this.list.indexOf(c) === -1)
@@ -38,6 +49,11 @@ const ScreenControls = module.exports =
 	{
 		var i = this.list.indexOf(c);
 		if (i !== -1) this.list.splice(i, 1);
+	},
+
+	setHoverEnabled: function (value)
+	{
+		this.hoverEnabled = value;
 	},
 
 	findTarget: function (x, y, filter)
@@ -78,7 +94,14 @@ const ScreenControls = module.exports =
 		switch (action)
 		{
 			case System.EVT_POINTER_DOWN:
-				let tmp = this.findTarget(p.x, p.y);
+
+				if (p._ref != null)
+				{
+					tmp = p._ref; p._ref = null;
+					tmp.deactivate(p);
+				}
+
+				tmp = this.findTarget(p.x, p.y);
 				if (tmp != null)
 				{
 					(p._ref = tmp).activate(p);
@@ -92,6 +115,31 @@ const ScreenControls = module.exports =
 				break;
 
 			case System.EVT_POINTER_DRAG_MOVE:
+				if (this.hoverEnabled)
+				{
+					if (p._refh != null)
+					{
+						if (p._refh.containsPoint(p.x, p.y))
+						{
+						}
+						else
+						{
+							tmp = p._refh; p._refh = null;
+							tmp.hover(false, p);
+		
+							tmp = this.findTarget(p.x, p.y, i => 'hover' in i);
+							if (tmp != null)
+								(p._refh = tmp).hover(true, p);
+						}
+					}
+					else
+					{
+						tmp = this.findTarget(p.x, p.y, i => 'hover' in i);
+						if (tmp != null)
+							(p._refh = tmp).hover(true, p);
+					}
+				}
+
 				if (p._ref != null)
 				{
 					if (p._ref.containsPoint(p.x, p.y) || p._ref.focusLock == true)
@@ -101,9 +149,9 @@ const ScreenControls = module.exports =
 					}
 					else
 					{
-						p._ref.deactivate(p);
-						p._ref = null;
-
+						tmp = p._ref; p._ref = null;
+						tmp.deactivate(p);
+	
 						tmp = this.findTarget(p.x, p.y);
 						if (tmp != null)
 						{
@@ -114,12 +162,53 @@ const ScreenControls = module.exports =
 				}
 				else
 				{
-					let tmp = this.findTarget(p.x, p.y);
+					tmp = this.findTarget(p.x, p.y);
 					if (tmp != null)
 					{
 						(p._ref = tmp).activate(p);
 						_continue = false;
 					}
+				}
+
+				break;
+
+			case System.EVT_POINTER_MOVE:
+				if (this.hoverEnabled)
+				{
+					if (p._refh != null)
+					{
+						if (p._refh.containsPoint(p.x, p.y))
+						{
+						}
+						else
+						{
+							tmp = p._refh; p._refh = null;
+							tmp.hover(false, p);
+		
+							tmp = this.findTarget(p.x, p.y, i => 'hover' in i);
+							if (tmp != null)
+								(p._refh = tmp).hover(true, p);
+						}
+					}
+					else
+					{
+						tmp = this.findTarget(p.x, p.y, i => 'hover' in i);
+						if (tmp != null)
+							(p._refh = tmp).hover(true, p);
+					}
+				}
+
+				if (p._ref == null) break;
+
+				if (p._ref.containsPoint(p.x, p.y) || p._ref.focusLock == true)
+				{
+					p._ref.update (p.x, p.y, p);
+					_continue = false;
+				}
+				else
+				{
+					tmp = p._ref; p._ref = null;
+					tmp.deactivate(p);
 				}
 
 				break;
@@ -131,8 +220,8 @@ const ScreenControls = module.exports =
 			case System.EVT_POINTER_UP:
 				if (p._ref != null)
 				{
-					p._ref.deactivate(p);
-					p._ref = null;
+					tmp = p._ref; p._ref = null;
+					tmp.deactivate(p);
 
 					_continue = false;
 				}

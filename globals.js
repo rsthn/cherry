@@ -41,7 +41,7 @@ module.exports =
 **	>> float px (float value);
 */
 
-globalThis.px = function(value)
+global.px = function(value)
 {
 	return value*C.SCALE;
 };
@@ -55,7 +55,7 @@ globalThis.px = function(value)
 **	>> dispose (object obj);
 */
 
-globalThis.dispose = function (obj, reason)
+global.dispose = function (obj, reason)
 {
 	if (!obj) return;
 
@@ -73,10 +73,10 @@ globalThis.dispose = function (obj, reason)
 **	Creates a global AudioContext if supported.
 */
 
-if ('AudioContext' in globalThis)
-	globalThis.audioContext = new AudioContext();
+if ('AudioContext' in global)
+	global.audioContext = new AudioContext();
 else
-	globalThis.audioContext = null;
+	global.audioContext = null;
 
 
 /**
@@ -86,7 +86,7 @@ else
 **	>> Promise fetchd (string url);
 */
 
-globalThis.fetchd = function (url, options)
+global.fetchd = function (url, options)
 {
 	return new Promise ((resolve, reject) =>
 	{
@@ -117,11 +117,11 @@ globalThis.fetchd = function (url, options)
 **	>> Promise fetchAudioBuffer (string url);
 */
 
-globalThis.fetchAudioBuffer = function (url)
+global.fetchAudioBuffer = function (url)
 {
 	return new Promise((resolve, reject) =>
 	{
-		if (!globalThis.audioContext)
+		if (!global.audioContext)
 		{
 			reject ('AudioContext is not available.');
 			return;
@@ -141,7 +141,7 @@ globalThis.fetchAudioBuffer = function (url)
 **	int int (T value);
 */
 
-globalThis.int = function (value)
+global.int = function (value)
 {
 	return ~~value;
 };
@@ -153,7 +153,7 @@ globalThis.int = function (value)
 **	bool bool (T value);
 */
 
-globalThis.bool = function (value)
+global.bool = function (value)
 {
 	if (value === true || value === false)
 		return value;
@@ -174,7 +174,7 @@ globalThis.bool = function (value)
 **	float float (T value);
 */
 
-globalThis.float = function (value)
+global.float = function (value)
 {
 	return parseFloat(value);
 };
@@ -186,7 +186,7 @@ globalThis.float = function (value)
 **	float float2 (float value);
 */
 
-globalThis.float2 = function (value)
+global.float2 = function (value)
 {
 	return (~~(value*100))/100;
 };
@@ -198,7 +198,7 @@ globalThis.float2 = function (value)
 **	float float3 (float value);
 */
 
-globalThis.float3 = function (value)
+global.float3 = function (value)
 {
 	return (~~(value*1000))/1000;
 };
@@ -210,7 +210,7 @@ globalThis.float3 = function (value)
 **	float float4 (float value);
 */
 
-globalThis.float4 = function (value)
+global.float4 = function (value)
 {
 	return (~~(value*10000))/10000;
 };
@@ -222,7 +222,7 @@ globalThis.float4 = function (value)
 **	float rad (float value);
 */
 
-globalThis.rad = function (value)
+global.rad = function (value)
 {
 	return value*Math.PI / 180;
 };
@@ -234,7 +234,7 @@ globalThis.rad = function (value)
 **	int rand ();
 */
 
-globalThis.rand = function ()
+global.rand = function ()
 {
 	return int(Math.random()*0x10000);
 };
@@ -246,7 +246,7 @@ globalThis.rand = function ()
 **	float randf ();
 */
 
-globalThis.randf = function ()
+global.randf = function ()
 {
 	return Math.random();
 };
@@ -258,7 +258,7 @@ globalThis.randf = function ()
 **	float randrf (float a, float b);
 */
 
-globalThis.randrf = function (a, b)
+global.randrf = function (a, b)
 {
 	return Math.random()*(b-a) + a;
 };
@@ -270,7 +270,7 @@ globalThis.randrf = function (a, b)
 **	int randr (int a, int b);
 */
 
-globalThis.randr = function (a, b)
+global.randr = function (a, b)
 {
 	return ~~(Math.random()*(b-a+1) + a);
 };
@@ -282,7 +282,7 @@ globalThis.randr = function (a, b)
 **	array randtf (float a, float b, int n);
 */
 
-globalThis.randtf = function (a, b, n)
+global.randtf = function (a, b, n)
 {
 	var list = [ ];
 
@@ -299,7 +299,7 @@ globalThis.randtf = function (a, b, n)
 **	int hrnow();
 */
 
-globalThis.hrnow = function ()
+global.hrnow = function ()
 {
 	return ~~performance.now();
 };
@@ -311,7 +311,7 @@ globalThis.hrnow = function ()
 **	function randvar (int a, int b);
 */
 
-globalThis.randvar = function (a, b)
+global.randvar = function (a, b)
 {
 	return function() { return randr(a, b); };
 };
@@ -326,7 +326,7 @@ globalThis.randvar = function (a, b)
 **	function randitem (array arr);
 */
 
-globalThis.randitem = function (arr, a, b)
+global.randitem = function (arr, a, b)
 {
 	if (!a) a = 0;
 	if (!b) b = arr.length - 1;
@@ -341,7 +341,7 @@ globalThis.randitem = function (arr, a, b)
 **	float getLineSegmentIntersection (float ls1_x1, float ls1_y1, float ls1_x2, float ls1_y2, float ls2_x1, float ls2_y1, float ls2_x2, float ls2_y2);
 */
 
-globalThis.getLineSegmentIntersection = function (ls1_x1, ls1_y1, ls1_x2, ls1_y2, ls2_x1, ls2_y1, ls2_x2, ls2_y2)
+global.getLineSegmentIntersection = function (ls1_x1, ls1_y1, ls1_x2, ls1_y2, ls2_x1, ls2_y1, ls2_x2, ls2_y2)
 {
 	// Case #1: Identical segments.
 	if (ls1_x1 == ls2_x1 && ls1_y1 == ls2_y1 && ls1_x2 == ls2_x2 && ls1_y2 == ls2_y2)
@@ -414,7 +414,7 @@ globalThis.getLineSegmentIntersection = function (ls1_x1, ls1_y1, ls1_x2, ls1_y2
 **	bool lineSegmentIntersects (float ls1_x1, float ls1_y1, float ls1_x2, float ls1_y2, float ls2_x1, float ls2_y1, float ls2_x2, float ls2_y2);
 */
 
-globalThis.lineSegmentIntersects = function (ls1_x1, ls1_y1, ls1_x2, ls1_y2, ls2_x1, ls2_y1, ls2_x2, ls2_y2)
+global.lineSegmentIntersects = function (ls1_x1, ls1_y1, ls1_x2, ls1_y2, ls2_x1, ls2_y1, ls2_x2, ls2_y2)
 {
 	let t = getLineSegmentIntersection (ls1_x1, ls1_y1, ls1_x2, ls1_y2, ls2_x1, ls2_y1, ls2_x2, ls2_y2);
 	return t >= 0 && t <= 1.0;
@@ -427,7 +427,7 @@ globalThis.lineSegmentIntersects = function (ls1_x1, ls1_y1, ls1_x2, ls1_y2, ls2
 **	>> Object{x,y} rotatePoint (float angle, x, y);
 */
 
-globalThis.rotatePoint = function (angle, x, y)
+global.rotatePoint = function (angle, x, y)
 {
 	if (Rin.typeOf(angle) == "object")
 		return { x: x*angle.x + y*angle.y, y: y*angle.x - x*angle.y };
@@ -442,7 +442,7 @@ globalThis.rotatePoint = function (angle, x, y)
 **	float stepValue (float value, float minValue, float maxValue, int numSteps);
 */
 
-globalThis.stepValue = function (value, minValue, maxValue, numSteps)
+global.stepValue = function (value, minValue, maxValue, numSteps)
 {
 	return ((Math.round(numSteps * (value - minValue) / (maxValue - minValue))) / numSteps) * (maxValue - minValue) + minValue;
 };
@@ -454,7 +454,7 @@ globalThis.stepValue = function (value, minValue, maxValue, numSteps)
 **	float alignValue (float value, float step);
 */
 
-globalThis.alignValue = function (value, step)
+global.alignValue = function (value, step)
 {
 	return Math.round(value/step)*step;
 };

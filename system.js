@@ -238,7 +238,7 @@ const System = module.exports =
 		this.frameInterval = int(1000 / o.fps);
 		this.maxFrameInterval = int(1000 / o.minFps);
 
-		globalThis.onresize = this.onWindowResized.bind(this);
+		global.onresize = this.onWindowResized.bind(this);
 
 		this.frameTimer = new Timer (this.frameInterval, this.onFrame, this);
 
@@ -249,7 +249,7 @@ const System = module.exports =
 		var display0 = this.displayBuffer.elem;
 
 		// Obtain device display ratios.
-		this.devicePixelRatio = globalThis.devicePixelRatio || 1;
+		this.devicePixelRatio = global.devicePixelRatio || 1;
 
 		this.backingStoreRatio = this.displayBuffer.context.webkitBackingStorePixelRatio ||
 									this.displayBuffer.context.mozBackingStorePixelRatio ||
@@ -267,9 +267,9 @@ const System = module.exports =
 
 		var _this = this;
 
-		globalThis.onkeydown = function (evt)
+		global.onkeydown = function (evt)
 		{
-			if (evt.target !== globalThis.document.body)
+			if (evt.target !== global.document.body)
 				return;
 
 			if (_this.keyState[evt.keyCode])
@@ -305,9 +305,9 @@ const System = module.exports =
 				return false;
 		};
 
-		globalThis.onkeyup = function (evt)
+		global.onkeyup = function (evt)
 		{
-			if (evt.target !== globalThis.document.body)
+			if (evt.target !== global.document.body)
 				return;
 
 			if (!_this.keyState[evt.keyCode])
@@ -337,7 +337,7 @@ const System = module.exports =
 		};
 
 		// Attach pointer event handlers if pointer-events are available.
-		if ("ontouchstart" in globalThis)
+		if ("ontouchstart" in global)
 		{
 			display0.ontouchstart = function (evt)
 			{
@@ -351,7 +351,7 @@ const System = module.exports =
 					{
 						System.pointerState[touches[i].identifier] = {
 								id: touches[i].identifier, isActive: false, isDragging: false,
-								sx: 0, sy: 0, x: 0, y: 0, dx: 0, dy: 0,
+								sx: 0, sy: 0, x: 0, y: 0, dx: 0, dy: 0, button: 0
 							};
 					}
 
@@ -359,6 +359,7 @@ const System = module.exports =
 
 					p.isActive = true;
 					p.isDragging = false;
+					p.button = 1;
 
 					p.startTime = System.now(true);
 
@@ -397,6 +398,7 @@ const System = module.exports =
 
 					p.isActive = false;
 					p.isDragging = false;
+					p.button = 0;
 				}
 
 				return false;
@@ -422,6 +424,7 @@ const System = module.exports =
 
 					p.isActive = false;
 					p.isDragging = false;
+					p.button = 0;
 				}
 
 				return false;
@@ -468,7 +471,7 @@ const System = module.exports =
 				if (!System.pointerState[0])
 				{
 					System.pointerState[0] = {
-							id: 0, isActive: false, isDragging: false,
+							id: 0, isActive: false, isDragging: false, button: 0,
 							sx: 0, sy: 0, x: 0, y: 0, dx: 0, dy: 0,
 						};
 				}
@@ -477,6 +480,7 @@ const System = module.exports =
 
 				p.isActive = true;
 				p.isDragging = false;
+				p.button = evt.which;
 
 				p.x = p.sx = System.reverseRender ? ~~((evt.clientY-System.offsY) / System.canvasScaleFactor) : ~~((evt.clientX-System.offsX) / System.canvasScaleFactor);
 				p.y = p.sy = System.reverseRender ? ~~(System.screenHeight - (evt.clientX-System.offsX) / System.canvasScaleFactor - 1) : ~~((evt.clientY-System.offsY) / System.canvasScaleFactor);
@@ -505,6 +509,7 @@ const System = module.exports =
 
 				p.isActive = false;
 				p.isDragging = false;
+				p.button = 0;
 			};
 
 			display0.onmousemove = function (evt)
@@ -664,17 +669,17 @@ const System = module.exports =
 	*/
 	onWindowResized: function(notRendering)
 	{
-		if ('document' in globalThis)
+		if ('document' in global)
 		{
 			if (this.options.fullscreen)
 			{
-				this._screenWidth = int(globalThis.screen.width);
-				this._screenHeight = int(globalThis.screen.height);
+				this._screenWidth = int(global.screen.width);
+				this._screenHeight = int(global.screen.height);
 			}
 			else
 			{
-				this._screenWidth = globalThis.innerWidth;
-				this._screenHeight = globalThis.innerHeight;
+				this._screenWidth = global.innerWidth;
+				this._screenHeight = global.innerHeight;
 			}
 		}
 		else
@@ -746,8 +751,8 @@ const System = module.exports =
 
 		this.flags.renderingEnabled = false;
 
-		if ('document' in globalThis)
-			globalThis.document.body.style.backgroundColor = this.displayBuffer.backgroundColor;
+		if ('document' in global)
+			global.document.body.style.backgroundColor = this.displayBuffer.backgroundColor;
 
 			if (!this.reverseRender)
 			{

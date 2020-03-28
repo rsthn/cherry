@@ -21,12 +21,12 @@
 const sizeOf = require('image-size');
 const fs = require('fs');
 
-globalThis.performance = require('perf_hooks').performance;
-globalThis.FileReader = require('filereader');
+global.performance = require('perf_hooks').performance;
+global.FileReader = require('filereader');
 
 
 
-globalThis.Image = class
+global.Image = class
 {
 	constructor() {
 		this.width = 0;
@@ -57,7 +57,7 @@ globalThis.Image = class
 };
 
 
-globalThis.Audio = class
+global.Audio = class
 {
 	constructor() {
 		this.path = '';
@@ -93,7 +93,7 @@ globalThis.Audio = class
 };
 
 
-globalThis.fetchd = function (url, options)
+global.fetchd = function (url, options)
 {
 	return new Promise ((resolve, reject) =>
 	{

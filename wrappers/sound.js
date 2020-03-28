@@ -321,7 +321,7 @@ Rin.override(Sound,
 				node.pause = false;
 
 				try {
-					globalThis.plugins.NativeAudio.play (node.snd.r.data, null, null, function() { Sound.onended_nativeaudio(node); } );
+					global.plugins.NativeAudio.play (node.snd.r.data, null, null, function() { Sound.onended_nativeaudio(node); } );
 				}
 				catch (e) {
 					Sound.free_nativeaudio(node);
@@ -344,7 +344,7 @@ Rin.override(Sound,
 				node.pause = false;
 
 				Sound.unregister(node);
-				globalThis.plugins.NativeAudio.stop (node.snd.r.data, null);
+				global.plugins.NativeAudio.stop (node.snd.r.data, null);
 
 				Sound.free_nativeaudio(node);
 

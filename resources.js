@@ -231,12 +231,12 @@ const Resources = module.exports =
 
 				if (!r.track) r.track = "sfx";
 
-				if (globalThis.plugins && globalThis.plugins.NativeAudio && r.track == "sfx")
+				if (global.plugins && global.plugins.NativeAudio && r.track == "sfx")
 				{
 					r.engine = Wrappers.Sound.ENGINE_NATIVEAUDIO;
 					r.data = "snd_" + index;
 
-					globalThis.plugins.NativeAudio.preloadSimple(r.data, r.src,
+					global.plugins.NativeAudio.preloadSimple(r.data, r.src,
 						function() {
 							Resources.onLoaded (list, keyList[index]);
 							Resources.load (list, callback, completeCallback, keyList, index + 1);		
@@ -249,7 +249,7 @@ const Resources = module.exports =
 					break;
 				}
 
-				if (globalThis.audioContext)
+				if (global.audioContext)
 				{
 					r.engine = Wrappers.Sound.ENGINE_WEBAUDIO;
 
@@ -322,12 +322,12 @@ const Resources = module.exports =
 
 					if (!tmp.track) tmp.track = "sfx";
 
-					if (globalThis.plugins && globalThis.plugins.NativeAudio && tmp.track == "sfx")
+					if (global.plugins && global.plugins.NativeAudio && tmp.track == "sfx")
 					{
 						tmp.engine = Wrappers.Sound.ENGINE_NATIVEAUDIO;
 						tmp.data = "snd_" + index + "_" + r._i;
 	
-						globalThis.plugins.NativeAudio.preloadSimple(tmp.data, tmp.src,
+						global.plugins.NativeAudio.preloadSimple(tmp.data, tmp.src,
 							function() {
 								r.data.push(tmp);
 								cb();
@@ -340,7 +340,7 @@ const Resources = module.exports =
 						return;
 					}
 
-					if (globalThis.audioContext)
+					if (global.audioContext)
 					{
 						tmp.engine = Wrappers.Sound.ENGINE_WEBAUDIO;
 
@@ -429,12 +429,12 @@ const Resources = module.exports =
 			{
 				case "audio":
 					// violet: unload audio if using NativeAudio
-					// globalThis.plugins.NativeAudio.unload
+					// global.plugins.NativeAudio.unload
 					break;
 
 				case "audios":
 					// violet: unload audio if using NativeAudio
-					// globalThis.plugins.NativeAudio.unload
+					// global.plugins.NativeAudio.unload
 					break;
 
 				case "images":
