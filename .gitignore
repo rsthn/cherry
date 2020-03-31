@@ -1,4 +1,5 @@
 node_modules/
+samples/
 .svn
 .svnignore
 .svn-revision

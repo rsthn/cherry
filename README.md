@@ -2,7 +2,7 @@
 
 ## Installation
 
-You can use npm to install the library, or download the standalone `cherry.js` file form the `dist` folder and include it in your index.html file.
+You can use npm to install the library, or download the standalone `cherry.js` file from the `dist` folder and include it in your index.html file.
 
 ```sh
 npm i @rsthn/cherry
