@@ -115,7 +115,7 @@ const System = module.exports =
 	context: null,
 
 	/**
-	**	Status of all keys.
+	**	Map with the status of all keys.
 	*/
 	keyState: { },
 
@@ -125,7 +125,8 @@ const System = module.exports =
 	keyEvtArgs: { shift: false, ctrl: false, alt: false, keyCode: 0, keyState: null },
 
 	/**
-	**	Current status of all pointers.
+	**	Current status of all pointers. The related object is known as the Pointer State, and has the following fields:
+	**	id, isActive, isDragging, sx, sy, x, y, dx, dy, button
 	*/
 	pointerState: { },
 
@@ -541,12 +542,12 @@ const System = module.exports =
 	},
 
 	/**
-	**	Returns the current time in milliseconds or seconds (if the notmillis is set to true).
+	**	Returns the current time in milliseconds or seconds if asSeconds is set to true.
 	*/
-	now: function(notmillis)
+	now: function(asSeconds)
 	{
 		var value = hrnow();
-		return notmillis ? (value / 1000) : value;
+		return asSeconds ? (value / 1000) : value;
 	},
 
 	/**
@@ -558,7 +559,7 @@ const System = module.exports =
 	},
 
 	/**
-	**	Enables rendering.
+	**	Starts the system and enables rendering and updates.
 	*/
 	start: function()
 	{
@@ -569,7 +570,7 @@ const System = module.exports =
 	},
 
 	/**
-	**	Stops rendering and update (full system stop).
+	**	Stops the system by disabling both rendering and updates.
 	*/
 	stop: function()
 	{
@@ -578,7 +579,7 @@ const System = module.exports =
 	},
 
 	/**
-	**	Temporarily stops rendering.
+	**	Disables updates, but continues to render.
 	*/
 	pause: function()
 	{
@@ -586,7 +587,7 @@ const System = module.exports =
 	},
 
 	/**
-	**	Resumes rendering.
+	**	Resumes updates if previously stopped with `pause()`.
 	*/
 	resume: function()
 	{
@@ -815,60 +816,60 @@ const System = module.exports =
 	},
 
 	/**
-	**	Adds the specified element to the periodic update queue.
+	**	Adds the specified object to the update queue. Must have method update (deltaTime: int).
 	*/
-	updateQueueAdd: function (/*object*/elem)
+	updateQueueAdd: function (/*object*/obj)
 	{
-		this.updateQueue.push (elem);
+		this.updateQueue.push (obj);
 		return this.updateQueue.bottom;
 	},
 
 	/**
-	**	Removes the specified element from the periodic update queue.
+	**	Removes the specified object from the update queue.
 	*/
-	updateQueueRemove: function (/*object*/elem)
+	updateQueueRemove: function (/*object*/obj)
 	{
-		this.updateQueue.remove (elem instanceof Linkable ? elem : this.updateQueue.sgetNode(elem));
+		this.updateQueue.remove (obj instanceof Linkable ? obj : this.updateQueue.sgetNode(obj));
 	},
 
 	/**
-	**	Adds the specified object to the extra draw queue.
+	**	Adds the specified object to the draw queue. Must have method draw (canvas: Canvas).
 	*/
-	drawQueueAdd: function (/*object*/elem)
+	drawQueueAdd: function (/*object*/obj)
 	{
-		this.drawQueue.push (elem);
+		this.drawQueue.push (obj);
 		return this.drawQueue.bottom;
 	},
 
 	/**
-	**	Removes the specified element from the periodic update queue.
+	**	Removes the specified object from the draw queue.
 	*/
-	drawQueueRemove: function (/*object*/elem)
+	drawQueueRemove: function (/*object*/obj)
 	{
-		this.drawQueue.remove (elem instanceof Linkable ? elem : this.drawQueue.sgetNode(elem));
+		this.drawQueue.remove (obj instanceof Linkable ? obj : this.drawQueue.sgetNode(obj));
 	},
 
 	/**
-	**	Adds the specified element to update and draw queues.
+	**	Adds the specified object to the update and draw queues. Must have both update (deltaTime: int) and draw (canvas: Canvas) methods. Returns `obj`.
 	*/
-	queueAdd: function (/*object*/elem)
+	queueAdd: function (/*object*/obj)
 	{
-		this.updateQueue.push (elem);
-		this.drawQueue.push (elem);
-		return elem;
+		this.updateQueue.push (obj);
+		this.drawQueue.push (obj);
+		return obj;
 	},
 
 	/**
-	**	Removes the specified element from the update and draw queues.
+	**	Removes the specified object from the update and draw queues.
 	*/
-	queueRemove: function (/*object*/elem)
+	queueRemove: function (/*object*/obj)
 	{
-		this.updateQueue.remove (this.updateQueue.sgetNode(elem));
-		this.drawQueue.remove (this.drawQueue.sgetNode(elem));
+		this.updateQueue.remove (this.updateQueue.sgetNode(obj));
+		this.drawQueue.remove (this.drawQueue.sgetNode(obj));
 	},
 
 	/**
-	**	Updates the context. Note that dt is in milliseconds.
+	**	Runs an update cycle, all objects in the updateQueue will be updated.
 	*/
 	update: function (dt, context)
 	{
@@ -884,7 +885,7 @@ const System = module.exports =
 	},
 
 	/**
-	**	Draws a frame.
+	**	Runs a rendering cycle, all objects in the drawQueue will be drawn.
 	*/
 	draw: function (canvas, context)
 	{
@@ -898,7 +899,7 @@ const System = module.exports =
 	},
 
 	/**
-	**	Interpolates numeric values between two objects using the specified duration and easing function.
+	**	Interpolates numeric values between two objects (`src` and `dst`) using the specified `duration` and `easing` function.
 	*/
 	interpolate: function (src, dst, duration, easing, callback/* function(data, isFinished) */)
 	{
@@ -946,14 +947,16 @@ const System = module.exports =
 	},
 
 	/**
-	**	Keyboard event handler.
+	**	Event triggered when a keyboard event is detected by the system, `action` is one of the EVT_KEY_* constants,
+	**	`keyCode` is one of the `KeyCodes` constants and `keys` a reference to `System.keyEvtArgs`.
 	*/
 	onKeyboardEvent: function (action, keyCode, keys)
 	{
 	},
 
 	/**
-	**	Pointer event handler.
+	**	Event triggered when a pointer event is detected by the system, `action` is one of the EVT_POINTER_* constants,
+	**	`pointer` contains the pointer state, and `pointers` a reference to `System.pointerState`.
 	*/
 	onPointerEvent: function (action, pointer, pointers)
 	{
