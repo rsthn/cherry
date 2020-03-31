@@ -42,7 +42,7 @@ const Linkable = module.exports = Class.extend
 	value: null,
 
 	/**
-	**	Constructs the linkable wrapper.
+	**	Constructs the linkable to wrap the specified value.
 	*/
 	__ctor: function (value)
 	{
@@ -69,7 +69,7 @@ const Linkable = module.exports = Class.extend
 	},
 
 	/**
-	**	Sets the previous/next connection pointers to null.
+	**	Sets the previous/next connection pointers to null. Returns `this`.
 	*/
 	clear: function () /*Linkable*/
 	{
@@ -108,7 +108,7 @@ const Linkable = module.exports = Class.extend
 	},
 
 	/**
-	**	Unlinks the item from its neighbors.
+	**	Unlinks the item by linking the `prev` and `next` together (when available) and returns `this`.
 	*/
 	unlink: function () /*Linkable*/
 	{
