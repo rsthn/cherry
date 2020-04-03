@@ -106,20 +106,23 @@ module.exports = Class.extend
 		this.r.wrapper = this;
 	},
 
-	drawFrame: function (g, x, y, frame)
+	drawFrame: function (g, x, y, frame, width, height)
 	{
 		if (frame < 0 || frame >= this.numFrames)
 			return;
+
+		if (!width) width = this.width;
+		if (!height) height = this.height;
 
 		if (this.numCols != 0)
 		{
 			var j = ~~(frame / this.numCols) * this.r_frameHeight;
 			var i =  (frame % this.numCols) * this.r_frameWidth;
 
-			g.drawImage (this.r.data, i, j, this.r_frameWidth, this.r_frameHeight, x, y, this.width, this.height);
+			g.drawImage (this.r.data, i, j, this.r_frameWidth, this.r_frameHeight, x, y, width, height);
 		}
 		else
-			g.drawImage (this.r.data[frame].data, 0, 0, this.r_frameWidth, this.r_frameHeight, x, y, this.width, this.height);
+			g.drawImage (this.r.data[frame].data, 0, 0, this.r_frameWidth, this.r_frameHeight, x, y, width, height);
 	},
 
 	getDrawable: function (frameIndex)
@@ -138,9 +141,9 @@ module.exports = Class.extend
 				frameIndex: frameIndex,
 				r: this,
 
-				draw: function (g, x, y)
+				draw: function (g, x, y, width, height)
 				{
-					g.drawFrame (this.r, x, y, this.frameIndex);
+					g.drawFrame (this.r, x, y, this.frameIndex, width, height);
 				}
 			};
 		}
@@ -149,7 +152,7 @@ module.exports = Class.extend
 	}
 });
 
-Canvas.prototype.drawFrame = function (r, x, y, frameIndex)
+Canvas.prototype.drawFrame = function (r, x, y, frameIndex, width, height)
 {
-	r.drawFrame (this, x, y, frameIndex);
+	r.drawFrame (this, x, y, frameIndex, width, height);
 };

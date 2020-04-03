@@ -170,6 +170,7 @@ const System = module.exports =
 	**	Logical system time (updated on each cycle by the calculated frameDelta).
 	*/
 	frameTime: 0,
+	frameTimeMillis: 0,
 
 	/**
 	**	Current frame number.
@@ -632,6 +633,7 @@ const System = module.exports =
 
 		this.frameDeltaMillis = delta;
 		this.frameDelta = delta / 1000.0;
+		this.frameTimeMillis += this.frameDeltaMillis;
 		this.frameTime += this.frameDelta;
 		this.frameNumber++;
 

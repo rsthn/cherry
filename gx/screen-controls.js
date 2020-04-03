@@ -29,6 +29,8 @@ const ScreenControls = module.exports =
 	list: [ ],
 
 	hoverEnabled: false,
+	zindexEnabled: false,
+	lastFrame: 0,
 
 	/*
 	**	Adds an item to the ScreenControls control list. The item should be an object with the following mandatory methods:
@@ -41,6 +43,9 @@ const ScreenControls = module.exports =
 	*/
 	add: function (c)
 	{
+		if (this.zindexEnabled && !('zindex' in c))
+			c.zindex = 0;
+
 		if (this.list.indexOf(c) === -1)
 			this.list.push(c);
 	},
@@ -56,14 +61,38 @@ const ScreenControls = module.exports =
 		this.hoverEnabled = value;
 	},
 
+	setZIndexEnabled: function (value)
+	{
+		this.zindexEnabled = value;
+	},
+
 	findTarget: function (x, y, filter)
 	{
+		if (this.zindexEnabled && this.lastFrame != System.frameNumber)
+		{
+			let zindex = this.list[0].zindex;
+
+			for (let item of this.list)
+			{
+				if (item.zindex > zindex)
+				{
+					this.list = this.list.sort((a,b) => b.zindex - a.zindex);
+					break;
+				}
+
+				zindex = item.zindex;
+			}
+
+			this.lastFrame = System.frameNumber;
+		}
+
 		for (let i in this.list)
 		{
 			if (!this.list[i]) continue;
 
 			if (this.list[i] instanceof Array)
 			{
+				alert('SHOULDN BE SUPPORTED');
 				for (let j = 0; j < this.list[i].length; j++)
 				{
 					if (filter != null && filter(this.list[i][j]) == false)
