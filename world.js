@@ -67,6 +67,11 @@ const World = module.exports = Class.extend
 	layers: null, /*Array*/
 
 	/**
+	**	Array with booleans indicating if the element lbounds should be drawn on that layer.
+	*/
+	debugLBounds: null, /*Array*/
+
+	/**
 	**	Handler executed after each layer is drawn.
 	*/
 	onLayerDrawn: null, /*Array*/
@@ -113,8 +118,9 @@ const World = module.exports = Class.extend
 		var minY = -halfY;
 		var maxY = halfY;
 
-		this.layers = new Array();
-		this.viewports = new Array();
+		this.layers = [];
+		this.viewports = [];
+		this.debugLBounds = [];
 
 		this.updateQueue = new List();
 		this.drawQueue = new List();
@@ -122,7 +128,10 @@ const World = module.exports = Class.extend
 		this.onLayerDrawn = [ ];
 
 		for (var i = 0; i < numLayers; i++)
+		{
 			this.layers[i] = new QuadTree (minX, minY, maxX, maxY, 16);
+			this.debugLBounds[i] = false;
+		}
 
 		for (var i = 0; i < numViewports; i++)
 			this.viewports[i] = new Viewport (0, 0, System.screenWidth, System.screenHeight, worldWidth, worldHeight, focusFactor);
@@ -287,6 +296,12 @@ const World = module.exports = Class.extend
 
 					/*DEBUG*/layer.selectedCount++;
 					elem.draw(g);
+
+					if (this.debugLBounds[layerIndex])
+					{
+						g.fillStyle('rgba(255,0,255,0.25)');
+						g.fillRect(elem.lbounds.x1, elem.lbounds.y1, elem.lbounds.width(), elem.lbounds.height());
+					}
 				}
 
 				if (this.onLayerDrawn[layerIndex])
@@ -327,26 +342,30 @@ const World = module.exports = Class.extend
 	*/
 	updateElems: function (dt, dtm)
 	{
-		var elem_next;
-
 		for (var elem = this.updateQueue.top; elem; elem = elem.next)
-			elem._used = false;
+			elem.value._used = false;
 
-		for (var elem = this.updateQueue.top; elem; elem = elem_next)
+		let n = this.updateQueue.count;
+
+		for (var elem = this.updateQueue.top; elem; )
 		{
-			elem_next = elem.next;
-			if (elem._used) continue;
-
-			var eId = elem.objectId;
-			elem._used = true;
-
-			elem.value.update(dt, dtm);
-
-			if (elem.objectId != eId)
+			if (elem.value._used === true)
 			{
+				elem = elem.next;
+				continue;
+			}
+
+			elem.value._used = true;
+			elem.value.update (dt, dtm);
+
+			if (this.updateQueue.count != n)
+			{
+				n = this.updateQueue.count;
 				elem = this.updateQueue.top;
 				continue;
 			}
+
+			elem = elem.next;
 		}
 	},
 
