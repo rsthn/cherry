@@ -1342,10 +1342,13 @@ Canvas.prototype.removePointerHandler = function (id)
 /**
 **	Draws an image resource on the canvas (as obtained by Resources.load).
 **
-**	>> Canvas drawImageEx (Resource image, float x, float y);
+**	>> Canvas drawImageEx (Resource image, float x, float y, [float width, float height]);
 */
 
-Canvas.prototype.drawImageResource = function (image, x, y)
+Canvas.prototype.drawImageResource = function (image, x, y, width, height)
 {
-	return this.drawImage (image.data, 0, 0, image.data.width, image.data.height, x, y, image.width, image.height);
+	if (width == null)
+		return this.drawImage (image.data, 0, 0, image.data.width, image.data.height, x, y, image.width, image.height);
+
+	return this.drawImage (image.data, 0, 0, image.data.width, image.data.height, x, y, width, height);
 };

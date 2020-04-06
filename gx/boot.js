@@ -22,25 +22,20 @@ const Resources = require('../resources');
 const C = require('../config');
 
 /**
-**
+**	
 */
 
 const Boot = module.exports =
 {
-	modules: null,
+	modules: new PriorityQueue(),
 
 	init: function ()
 	{
-		this.modules = new PriorityQueue();
-
-		global.main = function()
-		{
-			Resources.integerScaling = false;
-		
-			System.init ({ antialias: C.ANTIALIAS, fullscreen: false, background: C.BACKGROUND, targetScreenWidth: C.WIDTH, targetScreenHeight: C.HEIGHT, orientation: C.ORIENTATION, fps: C.FPS, minFps: C.MIN_FPS || 15 });
-		
-			Boot.startup();
-		};
+		Resources.integerScaling = false;
+	
+		System.init ({ antialias: C.ANTIALIAS, fullscreen: false, background: C.BACKGROUND, targetScreenWidth: C.WIDTH, targetScreenHeight: C.HEIGHT, orientation: C.ORIENTATION, fps: C.FPS, minFps: C.MIN_FPS || 15 });
+	
+		Boot.startup();
 	},
 
 	register: function (module)
@@ -94,6 +89,3 @@ Boot.Module = Class.extend
 	{
 	}
 });
-
-// Initialize boot module.
-Boot.init();

@@ -100,6 +100,14 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 	},
 
 	/**
+	**	More user-friendly function to destroy the display element. Same as calling __dtor() directly.
+	*/
+	dispose: function ()
+	{
+		this.__dtor();
+	},
+
+	/**
 	**	Sets the layer of the element.
 	*/
 	setLayer: function (layer)

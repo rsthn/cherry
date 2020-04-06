@@ -74,6 +74,11 @@ const QuadTreeItem = module.exports = Class.extend
 	numRefNodes: 0,
 
 	/**
+	**	Tag of the item.
+	*/
+	tag: null,
+
+	/**
 	**	Executed when the item is created.
 	*/
 	__ctor: function ()
@@ -87,7 +92,6 @@ const QuadTreeItem = module.exports = Class.extend
 		this.zindex = 0;
 
 		this.flags = QuadTreeItem.FLAG_INITIAL;
-		this.type = 0;
 		this.visible = true;
 	},
 
@@ -105,9 +109,9 @@ const QuadTreeItem = module.exports = Class.extend
 		this.zindex = 0;
 
 		this.flags = QuadTreeItem.FLAG_INITIAL;
-		this.type = 0;
 		this.visible = true;
 
+		this.type = 0;
 		this.tag = null;
 	},
 

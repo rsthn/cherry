@@ -113,18 +113,25 @@ module.exports = Class.extend
 	{
 	},
 
-	resizeHitbox: function (dx, dy, normalized)
+	resize: function (width, height)
+	{
+		this.width = width;
+		this.height = height;
+		this.resizeHitbox (width, height);
+	},
+
+	resizeHitbox: function (width, height, normalized)
 	{
 		if (normalized === true)
 		{
-			dx *= this.width;
-			dy *= this.height;
+			width *= this.width;
+			height *= this.height;
 		}
 
 		this.hitbox.zero();
 		this.hitbox.translate (this.x, this.y);
 		this.hitbox.translate (0.5*this.width, 0.5*this.height);
-		this.hitbox.resize (dx, dy);
+		this.hitbox.resize (width, height);
 	},
 
 	getX: function()

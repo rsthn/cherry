@@ -35,9 +35,12 @@ module.exports = Class.extend
 		this.height = this.r.height;
 	},
 
-	draw: function (g, x, y)
+	draw: function (g, x, y, width, height)
 	{
-		g.drawImageResource (this.r, x, y);
+		if (width == null)
+			g.drawImageResource (this.r, x, y);
+		else
+			g.drawImageResource (this.r, x, y, width, height);
 	},
 
 	getDrawable: function ()
