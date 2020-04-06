@@ -84,7 +84,11 @@ module = Class.extend
 		if (t0 == null && t1 == null)
 		{
 			for (let i = 0; i < src.t.length; i++)
-				this.set(src.t[i], src.y[i], src.f[i]);
+			{
+				this.t.push(src.t[i]);
+				this.y.push(src.y[i]);
+				this.f.push(src.f[i]);
+			}
 
 			return this;
 		}
@@ -234,20 +238,23 @@ module = Class.extend
 	**
 	**	@param t0:float Initial time value.
 	**	@param t1:float Final time value.
+	**	@param c0:float Constant of integration, default is 0.
 	**
 	**	@returns float Definite integral of t-function from t0 to t1.
 	*/
-	integral: function (t0, t1)
+	integral: function (t0=null, t1=null, c0=0)
 	{
 		if (t0 == null) t0 = this.t[0];
 		if (t1 == null) t1 = this.t[this.t.length-1];
 
+		let sign = 1;
+
 		if (t0 > t1) {
-			let tmp;
-			tmp = t0; t0 = t1; t1 = tmp;
+			let tmp; tmp = t0; t0 = t1; t1 = tmp;
+			sign = -1;
 		}
 
-		let accum = 0;
+		let accum = c0;
 
 		for (let time = t0; time < t1; )
 		{
@@ -269,7 +276,27 @@ module = Class.extend
 			time += dx;
 		}
 
-		return accum;
+		return sign*accum;
+	},
+
+	/**
+	**	Returns the approximate definite second integral of the t-function for the given time range.
+	**
+	**	@param t0:float Initial time value.
+	**	@param t1:float Final time value.
+	**	@param c0:float Constant of integration, default is 0.
+	**
+	**	@returns float Definite second integral of t-function from t0 to t1.
+	*/
+	second_integral: function (t0=null, t1=null, c0=0)
+	{
+		if (t0 == null) t0 = this.t[0];
+		if (t1 == null) t1 = this.t[this.t.length-1];
+
+		let a0 = TFunction.Temp1.copyFrom(this, this.t[0], t0).integrate(c0).integral();
+		let a1 = TFunction.Temp2.copyFrom(this, this.t[0], t1).integrate(c0).integral();
+
+		return a1 - a0;
 	},
 
 	/**
@@ -358,3 +385,6 @@ module = Class.extend
 		return s;
 	}
 });
+
+TFunction.Temp1 = new TFunction();
+TFunction.Temp2 = new TFunction();
