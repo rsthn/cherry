@@ -21,7 +21,7 @@ const { Class } = require('@rsthn/rin');
 **	provides methods to access any value for a given time, or the integral of a time range.
 */
 
-module = Class.extend
+const TFunction = module.exports = Class.extend
 ({
 	className: 'TFunction',
 

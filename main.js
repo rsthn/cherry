@@ -22,6 +22,7 @@ module.exports =
 	Matrix: require('./matrix'),
 	Rect: require('./rect'),
 	Vec2: require('./vec2'),
+	TFunction: require('./tfunction'),
 
 	Perf: require('./perf'),
 	Log: require('./log'),
