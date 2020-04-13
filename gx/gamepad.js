@@ -56,10 +56,22 @@ module.exports = Layer.extend
 		dispose(this.gamepad);
 	},
 
+	resize: function (width, height)
+	{
+		this.width = width;
+		this.height = height;
+
+		for (let btn of this.gamepad.children)
+			btn.setPosition((btn.__dx < 0 ? this.width : 0) + btn.__dx*this.spacing, (btn.__dy < 0 ? this.height : 0) + btn.__dy*this.spacing);
+	},
+
 	addButton: function (code, dx, dy, indexOff, indexOn, keyCode)
 	{
 		var btn = new VisualButton ((dx < 0 ? this.width : 0) + dx*this.spacing, (dy < 0 ? this.height : 0) + dy*this.spacing,
 									this.spritesheet.getDrawable(indexOff), this.spritesheet.getDrawable(indexOn));
+
+		btn.__dx = dx;
+		btn.__dy = dy;
 
 		btn.onChange = (state, pstate) => { this.onButton(code, state, pstate); };
 		btn.resizeHitboxBy (this.paddingH, this.paddingV);
