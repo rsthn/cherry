@@ -122,7 +122,7 @@ const System = module.exports =
 	/**
 	**	Event arguments for the keyboard events.
 	*/
-	keyEvtArgs: { shift: false, ctrl: false, alt: false, keyCode: 0, keyState: null },
+	keyEvtArgs: { time: 0, shift: false, ctrl: false, alt: false, keyCode: 0, keyState: null },
 
 	/**
 	**	Current status of all pointers. The related object is known as the Pointer State, and has the following fields:
@@ -280,6 +280,7 @@ const System = module.exports =
 			_this.keyState[evt.keyCode] = true;
 
 			_this.keyEvtArgs.keyCode = evt.keyCode;
+			_this.keyEvtArgs.startTime = System.now(true);
 
 			switch (evt.keyCode)
 			{
@@ -316,6 +317,7 @@ const System = module.exports =
 				return false;
 
 			_this.keyState[evt.keyCode] = false;
+			_this.keyEvtArgs.endTime = System.now(true);
 
 			_this.keyEvtArgs.keyCode = evt.keyCode;
 
@@ -934,7 +936,8 @@ const System = module.exports =
 						count--;
 					}
 
-					data[x] = src[x] + (dst[x] - src[x]) * easing[x] (time[x] / duration[x]);
+					let t = easing[x] (time[x] / duration[x]);
+					data[x] = (1-t)*src[x] + t*dst[x];
 				}
 
 				callback (data, count == 0);

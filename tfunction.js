@@ -340,11 +340,25 @@ const TFunction = module.exports = Class.extend
 	**
 	**	@returns TFunction
 	*/
-	truncate: function (i)
+	chopLeft: function (i)
 	{
 		this.t.splice(0, i);
 		this.f.splice(0, i);
 		this.y.splice(0, i);
+
+		return this;
+	},
+
+	/**
+	**	Removes all sampling-points located after the given index.
+	**
+	**	@returns TFunction
+	*/
+	chopRight: function (i)
+	{
+		this.t.splice(i+1, this.t.length-i-1);
+		this.f.splice(i+1, this.f.length-i-1);
+		this.y.splice(i+1, this.y.length-i-1);
 
 		return this;
 	},

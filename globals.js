@@ -260,7 +260,8 @@ global.randf = function ()
 
 global.randrf = function (a, b)
 {
-	return Math.random()*(b-a) + a;
+	let t = Math.random();
+	return t*b + (1-t)*a;
 };
 
 
@@ -272,7 +273,8 @@ global.randrf = function (a, b)
 
 global.randr = function (a, b)
 {
-	return ~~(Math.random()*(b-a+1) + a);
+	let t = Math.random();
+	return ~~(t*b + (1-t)*a);
 };
 
 
