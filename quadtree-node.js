@@ -160,7 +160,7 @@ const QuadTreeNode = module.exports = Class.extend
 			return true;
 		}
 
-		if (this.extents.width() < 16 || this.extents.height() < 16)
+		if (this.extents.width() < 1 && this.extents.height() < 1)
 		{
 			console.log("Error: Unable to split node any further. Current size is "+this.extents.width()+" x "+this.extents.height());
 			return false;

@@ -96,6 +96,8 @@ const TFunction = module.exports = Class.extend
 		if (t0 == null) t0 = src.t[0];
 		if (t1 == null) t1 = src.t[src.t.length-1];
 
+		if (t0 < src.t[0]) t0 = src.t[0];
+
 		let i0 = src.find(t0);
 		let i1 = src.find(t1);
 
@@ -111,8 +113,22 @@ const TFunction = module.exports = Class.extend
 			this.set(src.t[i], src.y[i], src.f[i]);
 
 		if (src.t[i1] != t1)
-			this.set(t1, src.getAt(t1), src.f[i1]);
+		{
+			let dt = (t1 - src.t[i1]) / Math.ceil(Math.log(t1 - src.t[i1]));
+			let t = this.t[this.t.length-1];
 
+			if (dt <= 0) dt = 1;
+dt = t1-t; // Force just one step.
+			while (t != t1)
+			{
+				if (t+dt > t1)
+					dt = t1 - t;
+
+				t += dt;
+				this.set(float4(t), src.getAt(t), src.f[i1]);
+			}
+		}
+	
 		return this;
 	},
 
@@ -129,15 +145,26 @@ const TFunction = module.exports = Class.extend
 		return (new TFunction()).copyFrom(this, t0, t1);
 	},
 
-	/**
+		/**
 	**	Returns the maximum time value in the t-function plus the given delta.
 	**
 	**	@param delta:float Delta value to add to the result.
 	**	@returns float
 	*/
-	time: function (delta=0)
+	endTime: function (delta=0)
 	{
 		return this.t[this.t.length-1] + delta;
+	},
+
+	/**
+	**	Returns the start time of the t-function plus the given delta.
+	**
+	**	@param delta:float Delta value to add to the result.
+	**	@returns float
+	*/
+	startTime: function (delta=0)
+	{
+		return this.t[0] + delta;
 	},
 
 	/**
@@ -216,7 +243,10 @@ const TFunction = module.exports = Class.extend
 
 		let i1 = i0 + 1;
 
-		if (this.t[i0] == t || i1 >= this.t.length || this.y[i0] == this.y[i1])
+		if (this.t[i0] == t || i1 >= this.t.length || this.y[i0] == this.y[i1] || this.f[i0] == null)
+			return this.y[i0];
+
+		if (this.f[i0] == null)
 			return this.y[i0];
 
 		let x = t;
@@ -226,9 +256,7 @@ const TFunction = module.exports = Class.extend
 		let y1 = this.y[i1];
 
 		t = (x - x0) / (x1 - x0);
-
-		if (this.f[i0] != null)
-			t = this.f[i0](t);
+		t = this.f[i0](t);
 
 		return t*y1 + (1-t)*y0;
 	},
@@ -246,6 +274,8 @@ const TFunction = module.exports = Class.extend
 	{
 		if (t0 == null) t0 = this.t[0];
 		if (t1 == null) t1 = this.t[this.t.length-1];
+
+		if (t0 < this.t[0]) t0 = this.t[0];
 
 		let sign = 1;
 
@@ -272,7 +302,11 @@ const TFunction = module.exports = Class.extend
 			let dx = x1 - x0;
 			let dy = y1 - y0;
 
-			accum += 0.5*dy*(x1+x0) - x0*dy + y0*dx;
+			if (this.f[i0] == null)
+				accum += y0*dx;
+			else
+				accum += 0.5*dy*(x1+x0) - x0*dy + y0*dx;
+
 			time += dx;
 		}
 
@@ -364,13 +398,28 @@ const TFunction = module.exports = Class.extend
 	},
 
 	/**
+	**	Maps the Y-value to other Y-values using the specified mapping function. The mapping function will receive four
+	**	parameters: y, t, and i where 'y' is the y-value, 't' the t-value, 'i' the index.
+	**
+	**	@returns TFunction
+	*/
+	map: function (fn)
+	{
+		for (let i = 0; i < this.y.length; i++)
+			this.y[i] = fn (this.y[i], this.t[i], i);
+
+		return this;
+	},
+
+	/**
 	**	Returns a string representation of the variable state.
 	**
 	**	@returns string
 	*/
-	toString: function(n)
+	toString: function(c0=0)
 	{
 		let s = '';
+		let n = 10;
 
 		const pad = function (value, n, char)
 		{
@@ -385,15 +434,13 @@ const TFunction = module.exports = Class.extend
 			return value;
 		};
 
-		n = n != null ? n : 10;
-
 		s += '\n';
 		s += pad(' Time', n) + ' ' + pad(' Value', n) + ' ' + pad(' Integral', n) + '\n';
 		s += pad('', n, '-') + ' ' + pad('', n, '-') + ' ' + pad('', n, '-') + '\n';
 
 		for (let i = 0; i < this.t.length; i++)
 		{
-			s += pad(' '+this.t[i], n) + ' ' + pad(' '+this.y[i], n) + ' ' + pad(' '+this.integral(this.t[0], this.t[i]), n) + '\n';
+			s += pad(' '+float4(this.t[i]), n) + ' ' + pad(' '+float4(this.y[i]), n) + ' ' + pad(' '+float4(this.integral(this.t[0], this.t[i], c0)), n) + '\n';
 		}
 
 		return s;
