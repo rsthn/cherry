@@ -142,6 +142,9 @@ const List = module.exports = Class.extend
 	*/
 	remove: function (/*Linkable*/item) /*any*/
 	{
+		if (item != null && !('isInstanceOf' in item && item.isInstanceOf(Linkable)))
+			item = this.sgetNode(item);
+
 		if (!item) return null;
 
 		if (!item.prev) this.top = item.next;

@@ -52,6 +52,16 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 	scrX: 0, scrY: 0,
 
 	/**
+	**	Related element. That is, the element whose position will be modified by this element.
+	*/
+	related: null,
+
+	/**
+	**	When the element is related, this is the parent of the element.
+	*/
+	parent: null,
+
+	/**
 	**	Constructs a display element with the specified dimensions.
 	*/
 	__ctor: function (width, height)
@@ -92,6 +102,9 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 
 		if (this.fragments != null)
 			dispose(this.fragments);
+
+		if (this.related != null)
+			dispose(this.related);
 
 		if (this.layer != null)
 			this.layer.removeItem (this);
@@ -151,6 +164,16 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 	},
 
 	/**
+	**	Sets the related element.
+	*/
+	setRelated: function (elem)
+	{
+		this.related = elem;
+		this.related.parent = this;
+		return this;
+	},
+
+	/**
 	**	Adds a collision fragment to the element.
 	*/
 	addFragment: function (dx, dy, w, h)
@@ -164,7 +187,7 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 		if (this.layer != null)
 			this.layer.addItem (fragment);
 
-		return fragment;
+		return this;
 	},
 
 	/**
@@ -213,6 +236,9 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 				this.layer.updateItem (i.value);
 			}
 		}
+
+		if (this.related != null)
+			this.related.translate(dx, dy);
 	},
 
 	/**

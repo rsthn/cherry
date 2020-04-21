@@ -120,6 +120,15 @@ Vec2.prototype.neg = function ()
 };
 
 /**
+**	Inverts the vector by changing each component to its reciprocal.
+*/
+Vec2.prototype.inv = function ()
+{
+	this.x = 1 / this.x; this.y = 1 / this.y;
+	return this;
+};
+
+/**
 **	Changes the components of the vector to their absolute value.
 */
 Vec2.prototype.abs = function ()

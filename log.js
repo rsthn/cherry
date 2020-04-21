@@ -69,13 +69,14 @@ const Log = module.exports =
 		if (!x) x = 0;
 		if (!y) y = 0;
 
-		if (!fontSize) fontSize = 12;
+		if (!fontSize) fontSize = 8.5;
 
 		if (showFps === false) y -= 16;
 
 		System.drawQueueAdd ({ draw: function (g)
 		{
-			g.font("normal "+fontSize+"px 'Bitstream Vera Sans Mono', monospace");
+			g.font("normal "+fontSize+"pt 'Bitstream Vera Sans Mono', monospace");
+			g.textBaseline('top');
 
 			var _time = ((System.perf.lastTime - System.perf.startTime) / 1000);
 			var _frames = System.perf.numFrames;
@@ -87,11 +88,11 @@ const Log = module.exports =
 
 				if (Log.background) {
 					g.fillStyle(Log.background);
-					g.fillRect (x+10-2, y+10-2, g.measureText(s)+4, fontSize+4);
+					g.fillRect (x+8 - 3, y+10-1, g.measureText(s) + 6, fontSize+4);
 				}
 
 				g.fillStyle(Log.color);
-				g.fillText(s, x+10, y+20);
+				g.fillText(s, x+8, y+10);
 			}
 
 			for (var i = 0; i < Log.data.length; i++)
@@ -100,11 +101,11 @@ const Log = module.exports =
 
 				if (Log.background) {
 					g.fillStyle(Log.background);
-					g.fillRect (x+10-2, y+10+16*(i+1)-2, g.measureText(s)+4, fontSize+4);
+					g.fillRect (x+8 - 3, y+16 + (fontSize+4)*(i+1) - 1, g.measureText(s) + 6, fontSize+4);
 				}
 
 				g.fillStyle(Log.color);
-				g.fillText(s, x+10, y+20+16*(i+1));
+				g.fillText(s, x+8, y+16 + (fontSize+4)*(i+1));
 			}
 		}});
 	}
