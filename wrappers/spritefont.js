@@ -19,7 +19,7 @@ const Canvas = require('../canvas');
 
 /*
 	font: {
-		sheetWidth, sheetHeight, charWidth, charHeight, charset, widths
+		sheetWidth: int, sheetHeight: int, charWidth: int, charHeight: int, charset: string, widths: [char, width, ...]
 	}
 */
 

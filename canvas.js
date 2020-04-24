@@ -39,7 +39,16 @@ const Canvas = module.exports = function (elem, opts)
 
 	if (!this.elem.getContext) return;
 
-	this.context = this.elem.getContext ("2d");
+	if (opts.gl === true)
+	{
+		this.gl = this.elem.getContext("webgl") || this.elem.getContext("experimental-webgl");
+		this.context = null;
+	}
+	else
+	{
+		this.context = this.elem.getContext ("2d");
+		this.gl = null;
+	}
 
 	this.antialias = opts && opts.antialias === false ? false : true;
 	this.setBackground (opts && opts.background != null ? opts.background : "#000");
@@ -55,10 +64,12 @@ const Canvas = module.exports = function (elem, opts)
 
 	// Set initial transformation matrix.
 	this.matr.identity();
-	this.transform();
 
-	this.strokeStyle("#fff");
-	this.fillStyle("#fff");
+	if (this.context != null) {
+		this.transform();
+		this.strokeStyle("#fff");
+		this.fillStyle("#fff");
+	}
 
 	this.resize();
 };
@@ -186,12 +197,16 @@ Canvas.prototype.applyConfig = function ()
 {
 	if (this.antialias == false)
 	{
-		this.context.imageSmoothingEnabled = false;
+		if (this.context != null)
+			this.context.imageSmoothingEnabled = false;
+
 		this.elem.style.imageRendering = "crisp-edges";
 	}
 	else
 	{
-		this.context.imageSmoothingEnabled = true;
+		if (this.context != null)
+			this.context.imageSmoothingEnabled = true;
+
 		this.elem.style.imageRendering = "auto";
 	}
 };
@@ -250,6 +265,10 @@ Canvas.prototype.resize = function (width, height)
 
 	this._width = ~~(this.width / this._globalScale);
 	this._height = ~~(this.height / this._globalScale);
+
+	if (this.gl != null) {
+		this.gl.viewport (0, 0, width, height);
+	}
 
 	this.applyConfig();
 	return this;
@@ -591,6 +610,9 @@ Canvas.prototype.globalCompositeOperation = function (value)
 
 Canvas.prototype.transform = function (a, b, c, d, e, f)
 {
+	if (this.context == null)
+		return this;
+
 	if (!arguments.length)
 	{
 		this.context.setTransform (this.matr.data[0], this.matr.data[3], this.matr.data[1], this.matr.data[4], this.matr.data[2], this.matr.data[5]);

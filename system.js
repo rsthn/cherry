@@ -64,6 +64,7 @@ const System = module.exports =
 	defaultOptions:
 	{
 		background: "#000",
+		gl: false,
 
 		fps: 60,
 		minFps: 15,
@@ -245,7 +246,7 @@ const System = module.exports =
 		this.frameTimer = new Timer (this.frameInterval, this.onFrame, this);
 
 		// Setup canvas buffer.
-		this.displayBuffer = new Canvas (null, { hidden: false, antialias: o.antialias, background: o.background });
+		this.displayBuffer = new Canvas (null, { gl: o.gl, hidden: false, antialias: o.antialias, background: o.background });
 		this.tempDisplayBuffer = new Canvas (null, { hidden: true, antialias: o.antialias }).resize(320, 240);
 
 		var display0 = this.displayBuffer.elem;
@@ -253,11 +254,11 @@ const System = module.exports =
 		// Obtain device display ratios.
 		this.devicePixelRatio = global.devicePixelRatio || 1;
 
-		this.backingStoreRatio = this.displayBuffer.context.webkitBackingStorePixelRatio ||
+		this.backingStoreRatio = o.gl == true ? 1 : (this.displayBuffer.context.webkitBackingStorePixelRatio ||
 									this.displayBuffer.context.mozBackingStorePixelRatio ||
 									this.displayBuffer.context.msBackingStorePixelRatio ||
 									this.displayBuffer.context.oBackingStorePixelRatio ||
-									this.displayBuffer.context.backingStorePixelRatio || 1;
+									this.displayBuffer.context.backingStorePixelRatio || 1);
 
 		this.canvasPixelRatio = this.devicePixelRatio / this.backingStoreRatio;
 

@@ -200,20 +200,23 @@ Matrix.prototype.applyTo = function (x, y)
 
 
 /**
-**	Returns the transpose of the matrix as a new matrix.
+**	Returns the transpose of the matrix.
 **
 **	>> Matrix transpose();
 */
 
 Matrix.prototype.transpose = function ()
 {
-	var t = new Matrix ();
+	var temp = [0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 	for (var j = 0; j < 3; j++)
 	for (var i = 0; i < 3; i++)
-		t.data[j*3+i] = this.data[i*3+j];
+		temp[j*3+i] = this.data[i*3+j];
 
-	return t;
+	for (let i = 0; i < 9; i++)
+		this.data[i] = temp[i];
+
+	return this;
 };
 
 /**

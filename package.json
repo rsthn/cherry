@@ -2,7 +2,13 @@
   "name": "@rsthn/cherry",
   "version": "2.0.11",
   "description": "Cherry Gamedev Library (JS)",
-  "main": "main.js",
+  "main": "./main.js",
+  "exports": {
+	  ".": {
+		  "require": "./main.js",
+		  "default": "./main.mjs"
+	  }
+  },
   "scripts": {
     "test": "echo Ok",
     "build": "browserify main-packed.js | uglifyjs > dist/cherry.js"
