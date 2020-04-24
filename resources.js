@@ -113,6 +113,7 @@ const Resources = module.exports =
 					// Used to prevent a delay when rendering an image for the first time on some browsers.
 					System.tempDisplayBuffer.drawImage(r.data, 0, 0);
 
+					System.displayBuffer.prepareImage(r.data);
 					Resources.onLoaded (list, keyList[index]);
 
 					Resources.load (list, callback, completeCallback, keyList, index+1);
@@ -212,6 +213,7 @@ const Resources = module.exports =
 						}
 
 						System.tempDisplayBuffer.drawImage(tmp.data, 0, 0);
+						System.displayBuffer.prepareImage(tmp.data);
 
 						r.data.push(tmp);
 						cb();

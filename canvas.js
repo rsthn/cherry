@@ -43,6 +43,8 @@ const Canvas = module.exports = function (elem, opts)
 	{
 		this.gl = this.elem.getContext("webgl") || this.elem.getContext("experimental-webgl");
 		this.context = null;
+
+		this.initGl();
 	}
 	else
 	{
@@ -188,6 +190,168 @@ Canvas.passThruCanvas =
 
 
 /**
+**	Compiles a shader and attaches it to the program.
+*/
+
+Canvas.prototype.buildShader = function (program, type, source)
+{
+	const gl = this.gl;
+
+	const shader = gl.createShader(type);
+	gl.shaderSource(shader, source);
+	gl.compileShader(shader);
+
+	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))
+		throw new Error ('compilerShader: ' + gl.getShaderInfoLog(shader));
+
+	gl.attachShader(program, shader);
+};
+
+
+/**
+**	Initializes the OpenGL ES context.
+*/
+Canvas.prototype.initGl = function ()
+{
+	let gl = this.gl;
+
+	this.gl_array_buffer = gl.createBuffer();
+	gl.bindBuffer (gl.ARRAY_BUFFER, this.gl_array_buffer);
+	gl.bufferData (gl.ARRAY_BUFFER, new Float32Array ([0, 0, 0, 1, 1, 0, 1, 1]), gl.STATIC_DRAW);
+
+	this.gl_program = gl.createProgram();
+
+	this.buildShader (this.gl_program, gl.VERTEX_SHADER,
+	`
+		#version 100
+		attribute vec2 location;
+		uniform vec2 screen_size;
+		uniform vec2 texture_size;
+		uniform mat3 matrix;
+		uniform mat3 texture_matrix;
+		uniform sampler2D texture;
+		varying highp vec2 f_texcoords;
+
+		void main() {
+			gl_Position = vec4(((vec2(matrix*vec3(location, 1.0))/screen_size)*2.0-vec2(1.0, 1.0))*vec2(1.0, -1.0), 0.0, 1.0);
+			f_texcoords = vec2(texture_matrix*vec3(location, 1.0))/texture_size;
+		}
+	`);
+
+	this.buildShader (this.gl_program, gl.FRAGMENT_SHADER,
+	`
+		uniform sampler2D texture;
+		varying highp vec2 f_texcoords;
+
+		void main() {
+			gl_FragColor = texture2D(texture, f_texcoords);
+		}
+	`);
+
+	gl.linkProgram (this.gl_program);
+
+	if (!gl.getProgramParameter(this.gl_program, gl.LINK_STATUS))
+		throw new Error ('linkProgram: ' + gl.getProgramInfoLog(program));
+
+	gl.useProgram (this.gl_program);
+
+	/* **** */
+	gl.clearColor (0, 0, 0, 0);
+
+	gl.disable (gl.DEPTH_TEST);
+	gl.clearDepth (0.0);
+	gl.depthFunc (gl.GEQUAL);
+
+	gl.enable (gl.BLEND);
+	gl.blendFunc (gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+	/* **** */
+	this.gl_attrib_location = gl.getAttribLocation(this.gl_program, 'location');
+	this.gl_uniform_screen_size = gl.getUniformLocation(this.gl_program, 'screen_size');
+	this.gl_uniform_texture_size = gl.getUniformLocation(this.gl_program, 'texture_size');
+	this.gl_uniform_texture = gl.getUniformLocation(this.gl_program, 'texture');
+	this.gl_uniform_matrix = gl.getUniformLocation(this.gl_program, 'matrix');
+	this.gl_uniform_texture_matrix = gl.getUniformLocation(this.gl_program, 'texture_matrix');
+
+	gl.enableVertexAttribArray (this.gl_attrib_location);
+	gl.vertexAttribPointer (this.gl_attrib_location, 2, gl.FLOAT, gl.FALSE, 2*Float32Array.BYTES_PER_ELEMENT, 0*Float32Array.BYTES_PER_ELEMENT);
+
+	/* *** */
+	this.location_matrix = new Matrix();
+	this.texture_matrix = new Matrix();
+
+	// drawImage (Image img, float x, float y);
+	// drawImage (Image img, float x, float y, float w, float h);
+	// drawImage (Image img, float sx, float sy, float sw, float sh, float dx, float dy, float dw, float dh);
+	this.drawImage = function (...args)
+	{
+		const img = args[0];
+		const sx = args[1];
+		const sy = args[2];
+
+		if (this.gl_active_texture != img.gl_texture)
+		{
+			this.gl.activeTexture(gl.TEXTURE0);
+			this.gl.bindTexture(gl.TEXTURE_2D, img.gl_texture);
+			this.gl.uniform1i(this.gl_uniform_texture, 0);
+			this.gl.uniform2fv(this.gl_uniform_texture_size, [img.width-1, img.height-1]);
+
+			this.gl_active_texture = img.gl_texture;
+		}
+
+		if (args.length == 3)
+			return;
+
+		const sw = args[3];
+		const sh = args[4];
+
+		if (args.length == 5)
+			return;
+
+		const dx = args[5];
+		const dy = args[6];
+		const dw = args[7];
+		const dh = args[8];
+
+		this.location_matrix.identity();
+		this.location_matrix.translate(dx, dy);
+		this.location_matrix.scale(dw-1, dh-1);
+		this.location_matrix.transpose();
+
+		this.texture_matrix.identity();
+		this.texture_matrix.translate(sx, sy);
+		this.texture_matrix.scale(sw-1, sh-1);
+		this.texture_matrix.transpose();
+
+		this.gl.uniformMatrix3fv(this.gl_uniform_matrix, false, this.location_matrix.data);
+		this.gl.uniformMatrix3fv(this.gl_uniform_texture_matrix, false, this.texture_matrix.data);
+		this.gl.drawArrays (gl.TRIANGLE_STRIP, 0, 4);
+	};
+};
+
+/**
+**	Prepares an image to use it on the canvas. Used only if gl is not null.
+*/
+Canvas.prototype.prepareImage = function (image)
+{
+	let gl = this.gl;
+	if (gl == null) return;
+
+	let texture = gl.createTexture();
+	gl.bindTexture(gl.TEXTURE_2D, texture);
+
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+	image.gl_texture = texture;
+	image.gl_ready = true;
+};
+
+/**
 **	Applies the current config to the canvas (usually called after a reset on the canvas).
 **
 **	>> void applyConfig();
@@ -266,8 +430,12 @@ Canvas.prototype.resize = function (width, height)
 	this._width = ~~(this.width / this._globalScale);
 	this._height = ~~(this.height / this._globalScale);
 
-	if (this.gl != null) {
+	if (this.gl != null)
+	{
 		this.gl.viewport (0, 0, width, height);
+
+		if (this.gl_uniform_screen_size)
+			this.gl.uniform2fv (this.gl_uniform_screen_size, [width-1, height-1]);
 	}
 
 	this.applyConfig();
@@ -956,6 +1124,12 @@ Canvas.prototype.drawImage = function (...args)
 
 Canvas.prototype.clear = function (backgroundColor)
 {
+	if (this.gl != null)
+	{
+		this.gl.clear(this.gl.DEPTH_BUFFER_BIT | this.gl.COLOR_BUFFER_BIT);
+		return this;
+	}
+
 	if (backgroundColor)
 	{
 		this.globalCompositeOperation("source-over").globalAlpha(1.0).fillStyle(backgroundColor !== true ? backgroundColor : this.backgroundColor).fillRect(0, 0, this._width, this._height);
