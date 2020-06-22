@@ -16,7 +16,7 @@
 
 require('./globals');
 
-const Rin = require('@rsthn/rin/alpha');
+const { Rin } = require('@rsthn/rin');
 const System = require('./system');
 const Canvas = require('./canvas');
 const Wrappers = require('./wrappers');

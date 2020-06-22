@@ -14,7 +14,7 @@
 **	USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-const Rin = require('@rsthn/rin/alpha');
+const { Rin } = require('@rsthn/rin');
 const Matrix = require('./Matrix');
 
 /**

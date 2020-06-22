@@ -16,8 +16,7 @@
 
 require('../globals');
 
-const Rin = require('@rsthn/rin/alpha');
-const Class = require('@rsthn/rin/class');
+const { Rin, Class } = require('@rsthn/rin');
 const Sound = require('./sound');
 
 /*

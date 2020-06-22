@@ -16,7 +16,7 @@
 
 require('./globals');
 
-const Class = require('@rsthn/rin/class');
+const { Class } = require('@rsthn/rin');
 const Rect = require('./rect');
 const QuadTreeItem = require('./quadtree-item');
 

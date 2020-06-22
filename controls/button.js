@@ -14,7 +14,7 @@
 **	USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-const Class = require('@rsthn/rin/class');
+const { Class } = require('@rsthn/rin');
 const Controls = require('../controls');
 const Rect = require('../rect');
 

@@ -14,7 +14,7 @@
 **	USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-const Class = require('@rsthn/rin/class');
+const { Class } = require('@rsthn/rin');
 const Recycler = require('./recycler');
 
 /**

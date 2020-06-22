@@ -14,8 +14,7 @@
 **	USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-const Rin = require('@rsthn/rin/alpha');
-const Class = require('@rsthn/rin/class');
+const { Rin, Class } = require('@rsthn/rin');
 
 /**
 **	Class to animate properties using different
