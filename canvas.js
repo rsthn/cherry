@@ -227,13 +227,14 @@ Canvas.prototype.initGl = function ()
 		attribute vec2 location;
 		uniform vec2 screen_size;
 		uniform vec2 texture_size;
-		uniform mat3 matrix;
+		uniform mat3 location_matrix;
 		uniform mat3 texture_matrix;
+		uniform mat3 current_matrix;
 		uniform sampler2D texture;
 		varying highp vec2 f_texcoords;
 
 		void main() {
-			gl_Position = vec4(((vec2(matrix*vec3(location, 1.0))/screen_size)*2.0-vec2(1.0, 1.0))*vec2(1.0, -1.0), 0.0, 1.0);
+			gl_Position = vec4(((vec2(current_matrix*location_matrix*vec3(location, 1.0))/screen_size)*2.0-vec2(1.0, 1.0))*vec2(1.0, -1.0), 0.0, 1.0);
 			f_texcoords = vec2(texture_matrix*vec3(location, 1.0))/texture_size;
 		}
 	`);
@@ -270,7 +271,8 @@ Canvas.prototype.initGl = function ()
 	this.gl_uniform_screen_size = gl.getUniformLocation(this.gl_program, 'screen_size');
 	this.gl_uniform_texture_size = gl.getUniformLocation(this.gl_program, 'texture_size');
 	this.gl_uniform_texture = gl.getUniformLocation(this.gl_program, 'texture');
-	this.gl_uniform_matrix = gl.getUniformLocation(this.gl_program, 'matrix');
+	this.gl_uniform_matrix = gl.getUniformLocation(this.gl_program, 'location_matrix');
+	this.gl_uniform_current_matrix = gl.getUniformLocation(this.gl_program, 'current_matrix');
 	this.gl_uniform_texture_matrix = gl.getUniformLocation(this.gl_program, 'texture_matrix');
 
 	gl.enableVertexAttribArray (this.gl_attrib_location);
@@ -279,6 +281,7 @@ Canvas.prototype.initGl = function ()
 	/* *** */
 	this.location_matrix = new Matrix();
 	this.texture_matrix = new Matrix();
+	this.current_matrix = new Matrix();
 
 	// drawImage (Image img, float x, float y);
 	// drawImage (Image img, float x, float y, float w, float h);
@@ -313,6 +316,9 @@ Canvas.prototype.initGl = function ()
 		const dw = args[7];
 		const dh = args[8];
 
+		this.current_matrix.set(this.matr);
+		this.current_matrix.transpose();
+
 		this.location_matrix.identity();
 		this.location_matrix.translate(dx, dy);
 		this.location_matrix.scale(dw-1, dh-1);
@@ -323,6 +329,7 @@ Canvas.prototype.initGl = function ()
 		this.texture_matrix.scale(sw-1, sh-1);
 		this.texture_matrix.transpose();
 
+		this.gl.uniformMatrix3fv(this.gl_uniform_current_matrix, false, this.current_matrix.data);
 		this.gl.uniformMatrix3fv(this.gl_uniform_matrix, false, this.location_matrix.data);
 		this.gl.uniformMatrix3fv(this.gl_uniform_texture_matrix, false, this.texture_matrix.data);
 		this.gl.drawArrays (gl.TRIANGLE_STRIP, 0, 4);
@@ -750,7 +757,10 @@ Canvas.prototype.globalAlpha = function (value)
 Canvas.prototype.alpha = function (value)
 {
 	this._alpha *= value;
-	this.context.globalAlpha = this._alpha;
+
+	if (this.context)
+		this.context.globalAlpha = this._alpha;
+
 	return this;
 };
 
@@ -1127,6 +1137,8 @@ Canvas.prototype.clear = function (backgroundColor)
 	if (this.gl != null)
 	{
 		this.gl.clear(this.gl.DEPTH_BUFFER_BIT | this.gl.COLOR_BUFFER_BIT);
+		this.gl_active_texture = null;
+
 		return this;
 	}
 
