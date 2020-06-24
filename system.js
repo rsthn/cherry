@@ -111,11 +111,6 @@ const System = module.exports =
 	tempDisplayBuffer: null,
 
 	/**
-	**	Context for the update and draw handlers.
-	*/
-	context: null,
-
-	/**
 	**	Map with the status of all keys.
 	*/
 	keyState: { },
@@ -230,8 +225,6 @@ const System = module.exports =
 			o.orientation = o.targetScreenWidth > o.targetScreenHeight ? System.LANDSCAPE : System.PORTRAIT;
 		}
 
-		// Load some options into the system.
-		this.context = o.context;
 		this.orientation = o.orientation;
 
 		this.updateQueue = new List();
@@ -617,7 +610,7 @@ const System = module.exports =
 		{
 			this.frameDrawInProgress = true;
 			try {
-				this.draw (this.displayBuffer, this.context);
+				this.draw (this.displayBuffer);
 			}
 			catch (e) {
 				console.error("DRAW ERROR: \n" + e + "\n" + e.stack);
@@ -644,7 +637,7 @@ const System = module.exports =
 		this.frameUpdateInProgress = true;
 		tmp = hrnow();
 		try {
-			this.update (delta, this.context);
+			this.update (this.frameDelta, this.frameDeltaMillis);
 		}
 		catch (e) {
 			console.error("UPDATE ERROR: " + e + "\n" + e.stack);
@@ -657,7 +650,7 @@ const System = module.exports =
 		this.frameDrawInProgress = true;
 		tmp = hrnow();
 		try {
-			this.draw (this.displayBuffer, this.context);
+			this.draw (this.displayBuffer);
 		}
 		catch (e) {
 			console.error("DRAW ERROR: \n" + e + "\n" + e.stack);
@@ -876,30 +869,28 @@ const System = module.exports =
 	/**
 	**	Runs an update cycle, all objects in the updateQueue will be updated.
 	*/
-	update: function (dt, context)
+	update: function (dts, dtm)
 	{
-		this.dt = dt;
-
 		var next;
 
 		for (var elem = this.updateQueue.top; elem; elem = next)
 		{
 			next = elem.next;
-			elem.value.update(dt, context);
+			elem.value.update(dts, dtm);
 		}
 	},
 
 	/**
 	**	Runs a rendering cycle, all objects in the drawQueue will be drawn.
 	*/
-	draw: function (canvas, context)
+	draw: function (canvas)
 	{
 		var next;
 
 		for (var elem = this.drawQueue.top; elem; elem = next)
 		{
 			next = elem.next;
-			elem.value.draw(canvas, context);
+			elem.value.draw(canvas);
 		}
 	},
 
@@ -923,8 +914,6 @@ const System = module.exports =
 		{
 			update: function(dt)
 			{
-				dt /= 1000.0;
-
 				for (let x in time)
 				{
 					if (time[x] == duration[x])

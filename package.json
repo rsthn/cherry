@@ -1,6 +1,6 @@
 {
     "name": "@rsthn/cherry",
-    "version": "2.0.15",
+    "version": "2.0.16",
     "description": "Cherry Gamedev Library (JS)",
     "main": "./main.js",
     "exports": {

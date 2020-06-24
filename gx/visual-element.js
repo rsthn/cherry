@@ -56,8 +56,8 @@ module.exports = Class.extend
 
 	__ctor: function (x, y, drawable)
 	{
-		this.x = x;
-		this.y = y;
+		this.x = x || 0;
+		this.y = y || 0;
 		this.img = drawable || null;
 
 		if (this.img)

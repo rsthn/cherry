@@ -16,7 +16,7 @@
 
 const { Class } = require('@rsthn/rin');
 
-/**
+/*
 **
 */
 
@@ -44,19 +44,19 @@ module.exports = Class.extend
 		/* USER-DEFINED */
 	},
 
-	layerDraw: function(g)
+	draw: function(g)
 	{
 		if (!this.visible) return;
 
-		this.draw(g);
+		this._draw(g);
 	},
 
-	layerUpdate: function(dt)
+	update: function(dt, dtm)
 	{
 		if (!this.active) return;
 
 		this.time += dt;
-		this.update(dt);
+		this._update(dt, dtm);
 	},
 
 	activate: function ()
@@ -69,11 +69,11 @@ module.exports = Class.extend
 		/* USER-DEFINED */
 	},
 
-	draw: function(g) {
+	_draw: function(g) {
 		/* USER-DEFINED */
 	},
 
-	update: function(dt) {
+	_update: function(dt, dtm) {
 		/* USER-DEFINED */
 	}
 });

@@ -15,7 +15,7 @@
 */
 
 const { Rin } = require('@rsthn/rin');
-const Matrix = require('./Matrix');
+const Matrix = require('./matrix');
 
 /**
 **	Constructs a canvas object. If the Canvas DOM element is not provided a new element will be created and attached to the page.

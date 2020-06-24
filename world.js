@@ -319,11 +319,8 @@ const World = module.exports = Class.extend
 	/**
 	**	Performs an update cycle. Note that dt is passed to the sub-update methods in seconds NOT milliseconds.
 	*/
-	update: function (dt)
+	update: function (dt, dtm)
 	{
-		var dtm = dt;
-		dt /= 1000;
-
 		this.updateElems(dt, dtm);
 		this.onUpdated(dt, dtm);
 		this.updateLayers();

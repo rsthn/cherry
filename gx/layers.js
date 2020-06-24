@@ -14,33 +14,28 @@
 **	USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-const { Class } = require('@rsthn/rin');
+const Layer = require('./layer');
 
-/**
-**
+/*
+**	The layers class is a layer that also serves as a container for multiple layers.
 */
 
-const Layers = module.exports = Class.extend
+const Layers = module.exports = Layer.extend
 ({
-	list: null,
+	className: 'Layers',
 
-	__ctor: function()
+	list: null,
+	clear: false,
+
+	init: function(clear)
 	{
 		this.list = [];
-
-		for (var i = 0; i < Layers.NUM_LAYERS; i++)
-			this.list.push (null);
-	},
-
-	__dtor: function()
-	{
+		this.clear = clear;
 	},
 
 	set: function (index, layer)
 	{
-		if (index < 0 || index >= this.list.length)
-			return;
-
+		if (index < 0) return;
 		this.list[index] = layer;
 	},
 
@@ -49,35 +44,28 @@ const Layers = module.exports = Class.extend
 		return index < 0 || index >= this.list.length ? null : this.list[index];
 	},
 
-	draw: function (g)
+	_draw: function (g)
 	{
-		g.clear();
+		if (this.clear) g.clear();
 
-		try
-		{
+		try {
 			for (var i = 0; i < this.list.length; i++)
-				if (this.list[i]) this.list[i].layerDraw(g);
+				if (this.list[i]) this.list[i].draw(g);
 		}
-		catch (e)
-		{
-			if (e.message != "FRAME_END")
-			{
+		catch (e) {
+			if (e.message != "FRAME_END") {
 				throw e;
 			}
 		}
 	},
 
-	update: function (dt)
+	_update: function (dt, dtm)
 	{
-		dt /= 1000.0;
-
-		try
-		{
+		try {
 			for (var i = 0; i < this.list.length; i++)
-				if (this.list[i]) this.list[i].layerUpdate(dt);
+				if (this.list[i]) this.list[i].update(dt, dtm);
 		}
-		catch (e)
-		{
+		catch (e) {
 			if (e.message != "FRAME_END")
 				throw e;
 		}
@@ -85,7 +73,7 @@ const Layers = module.exports = Class.extend
 });
 
 /**
-**	Layer constants.
+**	Some layer index constants for consistency.
 */
 
 Layers.INDEX_BACK0 		= 0;
@@ -94,7 +82,5 @@ Layers.INDEX_MAIN0 		= 2;
 Layers.INDEX_MAIN1 		= 3;
 Layers.INDEX_FRONT0 	= 4;
 Layers.INDEX_FRONT1 	= 5;
-Layers.INDEX_HUD0 		= 6;
-Layers.INDEX_HUD1 		= 7;
-
-Layers.NUM_LAYERS		= Layers.INDEX_HUD1+1;
+Layers.INDEX_UI0 		= 6;
+Layers.INDEX_UI1 		= 7;
