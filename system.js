@@ -101,9 +101,14 @@ const System = module.exports =
 	initialMatrix: null,
 
 	/**
-	**	Display buffer for the renderer.
+	**	Display buffer for the renderer (either 2d or webgl).
 	*/
 	displayBuffer: null,
+
+	/**
+	**	Secondry display buffer (always 2d).
+	*/
+	displayBuffer2: null,
 
 	/**
 	**	Small (320x240) temporal display buffer.
@@ -239,7 +244,9 @@ const System = module.exports =
 		this.frameTimer = new Timer (this.frameInterval, this.onFrame, this);
 
 		// Setup canvas buffer.
-		this.displayBuffer = new Canvas (null, { gl: o.gl, hidden: false, antialias: o.antialias, background: o.background });
+		this.displayBuffer = new Canvas (null, { gl: o.gl, absolute: true, hidden: false, antialias: o.antialias, background: o.background });
+		this.displayBuffer2 = new Canvas (null, { gl: false, absolute: true, hidden: false, antialias: o.antialias, background: 'none' });
+
 		this.tempDisplayBuffer = new Canvas (null, { hidden: true, antialias: o.antialias }).resize(320, 240);
 
 		var display0 = this.displayBuffer.elem;
@@ -610,7 +617,7 @@ const System = module.exports =
 		{
 			this.frameDrawInProgress = true;
 			try {
-				this.draw (this.displayBuffer);
+				this.draw (this.displayBuffer, this.displayBuffer2);
 			}
 			catch (e) {
 				console.error("DRAW ERROR: \n" + e + "\n" + e.stack);
@@ -650,7 +657,7 @@ const System = module.exports =
 		this.frameDrawInProgress = true;
 		tmp = hrnow();
 		try {
-			this.draw (this.displayBuffer);
+			this.draw (this.displayBuffer, this.displayBuffer2);
 		}
 		catch (e) {
 			console.error("DRAW ERROR: \n" + e + "\n" + e.stack);
@@ -756,32 +763,47 @@ const System = module.exports =
 			if (!this.reverseRender)
 			{
 				this.displayBuffer.resize (this.screenWidth*this.scaleFactor, this.screenHeight*this.scaleFactor);
-
 				this.displayBuffer.elem.style.width = (this.screenWidth*this.canvasScaleFactor) + "px";
 				this.displayBuffer.elem.style.height = (this.screenHeight*this.canvasScaleFactor) + "px";
+
+				this.displayBuffer2.resize (this.screenWidth*this.scaleFactor, this.screenHeight*this.scaleFactor);
+				this.displayBuffer2.elem.style.width = (this.screenWidth*this.canvasScaleFactor) + "px";
+				this.displayBuffer2.elem.style.height = (this.screenHeight*this.canvasScaleFactor) + "px";
 			}
 			else
 			{
 				this.displayBuffer.resize (this.screenHeight*this.scaleFactor, this.screenWidth*this.scaleFactor);
-
 				this.displayBuffer.elem.style.width = (this.screenHeight*this.canvasScaleFactor) + "px";
 				this.displayBuffer.elem.style.height = (this.screenWidth*this.canvasScaleFactor) + "px";
+
+				this.displayBuffer2.resize (this.screenHeight*this.scaleFactor, this.screenWidth*this.scaleFactor);
+				this.displayBuffer2.elem.style.width = (this.screenHeight*this.canvasScaleFactor) + "px";
+				this.displayBuffer2.elem.style.height = (this.screenWidth*this.canvasScaleFactor) + "px";
 			}
 
 			this.displayBuffer.elem.style.marginLeft = this.offsX + "px";
 			this.displayBuffer.elem.style.marginTop = this.offsY + "px";
 
-			this.displayBuffer.loadIdentity();
+			this.displayBuffer2.elem.style.marginLeft = this.offsX + "px";
+			this.displayBuffer2.elem.style.marginTop = this.offsY + "px";
 
-			if (this.scaleFactor != 1)
+			this.displayBuffer.loadIdentity();
+			this.displayBuffer2.loadIdentity();
+
+			if (this.scaleFactor != 1) {
 				this.displayBuffer.globalScale(this.scaleFactor);
+				this.displayBuffer2.globalScale(this.scaleFactor);
+			}
 
 			if (this.reverseRender)
 			{
 				this.displayBuffer.rotate(-Math.PI / 2);
 				this.displayBuffer.translate(0, -this.screenHeight);
-
 				this.displayBuffer.flipped(true);
+
+				this.displayBuffer2.rotate(-Math.PI / 2);
+				this.displayBuffer2.translate(0, -this.screenHeight);
+				this.displayBuffer2.flipped(true);
 			}
 
 		this.scaleFactor *= this.options.extraScaleFactor;
@@ -883,14 +905,14 @@ const System = module.exports =
 	/**
 	**	Runs a rendering cycle, all objects in the drawQueue will be drawn.
 	*/
-	draw: function (canvas)
+	draw: function (canvas, canvas2)
 	{
 		var next;
 
 		for (var elem = this.drawQueue.top; elem; elem = next)
 		{
 			next = elem.next;
-			elem.value.draw(canvas);
+			elem.value.draw(canvas, canvas2);
 		}
 	},
 

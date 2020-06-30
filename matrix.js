@@ -61,7 +61,22 @@ Matrix.prototype.zero = function ()
 
 Matrix.prototype.set = function (value)
 {
-	for (var i = 0; i < 9; i++) this.data[i] = value;
+	if (value instanceof Matrix)
+	{
+		for (let i = 0; i < 9; i++)
+			this.data[i] = value.data[i];
+	}
+	else if (value instanceof Array)
+	{
+		for (let i = 0; i < 9; i++)
+			this.data[i] = value[i];
+	}
+	else
+	{
+		for (let i = 0; i < 9; i++)
+			this.data[i] = value;
+	}
+
 	return this;
 };
 

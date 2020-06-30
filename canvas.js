@@ -30,7 +30,15 @@ const Canvas = module.exports = function (elem, opts)
 		this.elem = global.document ? global.document.createElement ("canvas") : Rin.clone(Canvas.passThruCanvas);
 
 		if (global.document && opts && opts.hidden != true)
+		{
 			global.document.body.appendChild (this.elem);
+
+			if (opts.absolute === true) {
+				this.elem.style.position = 'absolute';
+				this.elem.style.left = '0px';
+				this.elem.style.top = '0px';
+			}
+		}
 	}
 	else
 	{
@@ -297,7 +305,7 @@ Canvas.prototype.initGl = function ()
 			this.gl.activeTexture(gl.TEXTURE0);
 			this.gl.bindTexture(gl.TEXTURE_2D, img.gl_texture);
 			this.gl.uniform1i(this.gl_uniform_texture, 0);
-			this.gl.uniform2fv(this.gl_uniform_texture_size, [img.width-1, img.height-1]);
+			this.gl.uniform2fv(this.gl_uniform_texture_size, [img.width, img.height]);
 
 			this.gl_active_texture = img.gl_texture;
 		}
@@ -321,12 +329,12 @@ Canvas.prototype.initGl = function ()
 
 		this.location_matrix.identity();
 		this.location_matrix.translate(dx, dy);
-		this.location_matrix.scale(dw-1, dh-1);
+		this.location_matrix.scale(dw, dh);
 		this.location_matrix.transpose();
 
 		this.texture_matrix.identity();
 		this.texture_matrix.translate(sx, sy);
-		this.texture_matrix.scale(sw-1, sh-1);
+		this.texture_matrix.scale(sw, sh);
 		this.texture_matrix.transpose();
 
 		this.gl.uniformMatrix3fv(this.gl_uniform_current_matrix, false, this.current_matrix.data);
@@ -442,7 +450,7 @@ Canvas.prototype.resize = function (width, height)
 		this.gl.viewport (0, 0, width, height);
 
 		if (this.gl_uniform_screen_size)
-			this.gl.uniform2fv (this.gl_uniform_screen_size, [width-1, height-1]);
+			this.gl.uniform2fv (this.gl_uniform_screen_size, [width, height]);
 	}
 
 	this.applyConfig();

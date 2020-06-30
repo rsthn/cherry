@@ -73,8 +73,10 @@ const Log = module.exports =
 
 		if (showFps === false) y -= 16;
 
-		System.drawQueueAdd ({ draw: function (g)
+		System.drawQueueAdd ({ draw: function (tmp, g)
 		{
+			g.clear();
+
 			g.font("normal "+fontSize+"pt 'Bitstream Vera Sans Mono', monospace");
 			g.textBaseline('top');
 
