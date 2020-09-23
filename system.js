@@ -66,6 +66,9 @@ const System = module.exports =
 		background: "#000",
 		gl: false,
 
+		canvas: null,
+		canvas2: null,
+
 		fps: 60,
 		minFps: 15,
 
@@ -74,6 +77,7 @@ const System = module.exports =
 
 		targetScreenWidth: null,
 		targetScreenHeight: null,
+
 		orientation: 0,
 
 		extraScaleFactor: 1,
@@ -244,8 +248,10 @@ const System = module.exports =
 		this.frameTimer = new Timer (this.frameInterval, this.onFrame, this);
 
 		// Setup canvas buffer.
-		this.displayBuffer = new Canvas (null, { gl: o.gl, absolute: true, hidden: false, antialias: o.antialias, background: o.background });
-		this.displayBuffer2 = new Canvas (null, { gl: false, absolute: true, hidden: false, antialias: o.antialias, background: 'none' });
+		this.displayBuffer = new Canvas (null, { gl: o.gl, elem: o.canvas, absolute: true, hidden: false, antialias: o.antialias, background: o.background });
+		this.displayBuffer2 = new Canvas (null, { gl: false, elem: o.canvas2, absolute: true, hidden: false, antialias: o.antialias, background: 'none' });
+
+		this.displayBuffer2.elem.style.pointerEvents = 'none';
 
 		this.tempDisplayBuffer = new Canvas (null, { hidden: true, antialias: o.antialias }).resize(320, 240);
 
