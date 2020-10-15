@@ -42,7 +42,7 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 	fragments: null,
 
 	/**
-	**	Position of the element in world space.
+	**	Position of the element in world space (top-left corner).
 	*/
 	x: 0, y: 0,
 
@@ -70,9 +70,7 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 
 		this.layer = null;
 		this.setPosition (0, 0);
-
-		this.bounds.resize (width, height);
-		this.lbounds.resize (width, height);
+		this.resize (width, height);
 	},
 
 	/**
@@ -84,9 +82,7 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 
 		this.layer = null;
 		this.setPosition (0, 0);
-
-		this.bounds.resize (width, height);
-		this.lbounds.resize (width, height);
+		this.resize(width, height);
 	},
 
 	/**
@@ -118,6 +114,15 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 	dispose: function ()
 	{
 		this.__dtor();
+	},
+
+	/**
+	**	Resizes both bounds and lbounds of the display element.
+	*/
+	resize: function (width, height)
+	{
+		this.bounds.resize (width, height, false, true);
+		this.lbounds.resize (width, height, false, true);
 	},
 
 	/**
@@ -211,8 +216,8 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 	*/
 	onPositionChanged: function (x, y, zi)
 	{
-		var dx = x - this.bounds.cx;
-		var dy = y - this.bounds.cy;
+		var dx = x - this.bounds.x1;
+		var dy = y - this.bounds.y1;
 		var dzi = zi - this.zindex;
 
 		this.x += dx;
@@ -244,12 +249,12 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 	/**
 	**	Sets the position of the element.
 	*/
-	setPosition: function (x, y, dontUseCenter)
+	setPosition: function (x, y, centerRelative=false)
 	{
-		if (dontUseCenter === true)
+		if (centerRelative == true)
 		{
-			x += this.bounds.cx - this.bounds.x1;
-			y += this.bounds.cy - this.bounds.y1;
+			x += this.bounds.x1 - this.bounds.cx;
+			y += this.bounds.y1 - this.bounds.cy;
 		}
 
 		this.onPositionChanged(x, y, this.zindex);
@@ -277,7 +282,7 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 	*/
 	setX: function (x)
 	{
-		this.onPositionChanged(x, this.bounds.cy, this.zindex);
+		this.onPositionChanged(x, this.bounds.y1, this.zindex);
 		return this;
 	},
 
@@ -286,7 +291,7 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 	*/
 	setY: function (y)
 	{
-		this.onPositionChanged(this.bounds.cx, y, this.zindex);
+		this.onPositionChanged(this.bounds.x1, y, this.zindex);
 		return this;
 	},
 
@@ -311,7 +316,7 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 	*/
 	translate: function (dx, dy, dzi=0)
 	{
-		this.onPositionChanged(this.bounds.cx+dx, this.bounds.cy+dy, this.zindex+dzi);
+		this.onPositionChanged(this.bounds.x1+dx, this.bounds.y1+dy, this.zindex+dzi);
 		return this;
 	},
 

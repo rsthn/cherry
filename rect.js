@@ -136,9 +136,9 @@ Rect.prototype.translate = function (dx, dy)
 /**
 **	Moves the center of the rectangle to the specified position.	 
 */
-Rect.prototype.centerAt = function (x, y, relative/*false*/)
+Rect.prototype.centerAt = function (x, y, relative=false)
 {
-	if (relative === true)
+	if (relative == true)
 	{
 		x = this.x1 + x*(this.x2 - this.x1);
 		y = this.y1 + y*(this.y2 - this.y1);
@@ -344,33 +344,49 @@ Rect.prototype.setAsIntersection4 = function (x1, y1, x2, y2)
 };
 
 /**
-**	Resizes the rect to the given size using center as reference.	 
+**	Resizes the rect to the given size using center or top-left as reference.	 
 */
-Rect.prototype.resize = function (w, h, relative/*false*/)
+Rect.prototype.resize = function (w, h, relative=false, topLeftRelative=false)
 {
-	if (relative === true)
+	if (relative == true)
 	{
 		w *= (this.x2 - this.x1);
 		h *= (this.y2 - this.y1);
 	}
 
-	w /= 2; h /= 2;
+	if (topLeftRelative == true)
+	{
+		this.x2 = this.x1 + w;
+		this.y2 = this.y1 + h;
+	}
+	else
+	{
+		w /= 2; h /= 2;
 
-	this.x1 = this.cx - w; this.y1 = this.cy - h;
-	this.x2 = this.cx + w; this.y2 = this.cy + h;
+		this.x1 = this.cx - w; this.y1 = this.cy - h;
+		this.x2 = this.cx + w; this.y2 = this.cy + h;
+	}
 
 	return this;
 };
 
 /**
-**	Resizes the rect using the specified deltas.	 
+**	Resizes the rect using the specified deltas (relative to center or top-left).
 */
-Rect.prototype.resizeBy = function (dw, dh)
+Rect.prototype.resizeBy = function (dw, dh, topLeftRelative=false)
 {
-	dw /= 2; dh /= 2;
+	if (topLeftRelative == true)
+	{
+		this.x2 += dw;
+		this.y2 += dh;
+	}
+	else
+	{
+		dw /= 2; dh /= 2;
 
-	this.x1 -= dw; this.y1 -= dh;
-	this.x2 += dw; this.y2 += dh;
+		this.x1 -= dw; this.y1 -= dh;
+		this.x2 += dw; this.y2 += dh;
+	}
 
 	return this;
 };

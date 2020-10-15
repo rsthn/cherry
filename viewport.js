@@ -163,7 +163,7 @@ Viewport.prototype.updateScreenBounds = function ()
 /**
 **	Sets the dimensions of the viewport.
 */
-Viewport.prototype.setSize = function (width, height)
+Viewport.prototype.resize = function (width, height)
 {
 	this.width = width >> 1;
 	this.height = height >> 1;

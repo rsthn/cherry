@@ -46,8 +46,8 @@ const Fragment = module.exports = QuadTreeItem.extend
 		this.bounds.translate (dx, dy);
 		this.lbounds.translate (dx, dy);
 
-		this.bounds.resize (width, height);
-		this.lbounds.resize (width, height);
+		this.bounds.resize (width, height, false, true);
+		this.lbounds.resize (width, height, false, true);
 	},
 
 	/**
