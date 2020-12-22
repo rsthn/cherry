@@ -1,6 +1,6 @@
 {
     "name": "@rsthn/cherry",
-    "version": "2.0.21",
+    "version": "2.0.22",
     "description": "Cherry Gamedev Library (JS)",
     "main": "./main.js",
     "exports": {
@@ -15,7 +15,8 @@
     },
     "scripts": {
         "test": "echo Ok",
-        "deploy": "node ./scripts/deploy.js"
+        "deploy": "node ./scripts/deploy.js",
+        "build": "parcel build ./main.js -o cherry.js --global cherry"
     },
     "repository": {
         "type": "git",
@@ -27,8 +28,11 @@
         "url": "https://github.com/rsthn/cherryjs/issues"
     },
     "homepage": "https://github.com/rsthn/cherryjs#readme",
+    "browserslist": [
+        "since 2019-01"
+    ],
     "dependencies": {
-        "@rsthn/rin": "^2.0.19",
+        "@rsthn/rin": "^2.0.21",
         "filereader": "^0.10.3",
         "image-size": "^0.8.3"
     },
