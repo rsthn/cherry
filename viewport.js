@@ -175,7 +175,7 @@ Viewport.prototype.resize = function (width, height)
 };
 
 /**
-**	Sets the position of the viewport within the world, relative to the current focus point if 'absolute' is not true.
+**	Sets the position of the viewport within the world, relative to the current focus point. When `absolute` is true, the focus point will be updated.
 */
 Viewport.prototype.setPosition = function (x, y, absolute=false)
 {
@@ -243,19 +243,19 @@ Viewport.prototype.setScreenPosition = function (sx, sy)
 };
 
 /**
-**	Returns the X position of the viewport inside the world.
+**	Returns the X position of the viewport inside the world. When `absolute` is true, the focus point X (without offset) will be returned.
 */
-Viewport.prototype.getX = function ()
+Viewport.prototype.getX = function (absolute=false)
 {
-	return this.x + this.dx;
+	return this.x + (absolute ? 0 : this.dx);
 };
 
 /**
-**	Returns the Y position of the viewport inside the world.
+**	Returns the Y position of the viewport inside the world. When `absolute` is true, the focus point Y (without offset) will be returned.
 */
-Viewport.prototype.getY = function ()
+Viewport.prototype.getY = function (absolute=false)
 {
-	return this.y + this.dy;
+	return this.y + (absolute ? 0 : this.dy);
 };
 
 /**

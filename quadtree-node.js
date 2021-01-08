@@ -71,21 +71,36 @@ const QuadTreeNode = module.exports = Class.extend
 	},
 
 	/**
-	**	Destroys the node and all contents.
+	**	Destroys the node and all child nodes. Items are not removed, use clear() to properly remove items.
 	*/
 	__dtor: function ()
-	{
-	},
-
-	/**
-	**	Destroys the node and all contents.
-	*/
-	destroy: function (/*List<QuadTreeItem>*/list)
 	{
 		if (this.subNode != null)
 		{
 			for (var i = 0; i < 4; i++)
-				this.subNode[i].destroy(list);
+				dispose(this.subNode[i]);
+
+			this.subNode = null;
+		}
+
+		this.extents.dispose();
+	},
+
+	/**
+	**	Removes all items and child nodes.
+	*/
+	clear: function (/*List<QuadTreeItem>*/list)
+	{
+		if (this.subNode != null)
+		{
+			for (var i = 0; i < 4; i++)
+			{
+				this.subNode[i].clear(list);
+				dispose(this.subNode[i]);
+			}
+
+			this.subNode = null;
+			this.numItems = 0;
 		}
 		else
 		{
@@ -103,9 +118,10 @@ const QuadTreeNode = module.exports = Class.extend
 				if (k.numRefNodes == 0)
 					dispose(k);
 			}
-		}
 
-		dispose(this);
+			this.insertionPoint = null;
+			this.numItems = 0;
+		}
 	},
 
 	/**

@@ -82,7 +82,7 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 
 		this.layer = null;
 		this.setPosition (0, 0);
-		this.resize(width, height);
+		this.resize (width, height);
 	},
 
 	/**
@@ -244,6 +244,17 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 
 		if (this.related != null)
 			this.related.translate(dx, dy);
+	},
+
+	/**
+	**	Sets the position of the element.
+	*/
+	setBounds: function (bounds)
+	{
+		this.onPositionChanged(bounds.x1, bounds.y1, this.zindex);
+		this.resize(bounds.width(), bounds.height());
+
+		return this;
 	},
 
 	/**

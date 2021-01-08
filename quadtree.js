@@ -100,7 +100,8 @@ const QuadTree = module.exports = Class.extend
 	*/
 	__dtor: function ()
 	{
-		this.root.destroy (this.items);
+		this.root.clear (this.items);
+		dispose(this.root);
 
 		dispose(this.items);
 		dispose(this.orderedItems);
@@ -130,6 +131,17 @@ const QuadTree = module.exports = Class.extend
 	getVisible: function ()
 	{
 		return this.visible;
+	},
+
+	/**
+	**	Removes (and destroys) all items and all nodes from the tree.
+	*/
+	clear: function ()
+	{
+		this.root.clear (this.items);
+
+		this.orderedItems.reset();
+		this.updateQueue.reset();
 	},
 
 	/**

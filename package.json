@@ -1,6 +1,6 @@
 {
     "name": "@rsthn/cherry",
-    "version": "2.0.22",
+    "version": "2.0.24",
     "description": "Cherry Gamedev Library (JS)",
     "main": "./main.js",
     "exports": {
@@ -15,6 +15,7 @@
     },
     "scripts": {
         "test": "echo Ok",
+        "requirements": "yarn global add --ignore-optional parcel-bundler",
         "deploy": "node ./scripts/deploy.js",
         "build": "parcel build ./main.js -o cherry.js --global cherry"
     },
