@@ -86,7 +86,7 @@ const QuadTree = module.exports = Class.extend
 		this.orderedItems = new List ();
 		this.updateQueue = new List ();
 
-		this.root = new QuadTreeNode (x1, y1, x2, y2);
+		this.root = new QuadTreeNode (this, x1, y1, x2, y2);
 		this.nodeCapacity = nodeCapacity;
 
 		this.isReverse = false;
@@ -100,7 +100,7 @@ const QuadTree = module.exports = Class.extend
 	*/
 	__dtor: function ()
 	{
-		this.root.clear (this.items);
+		this.root.clear();
 		dispose(this.root);
 
 		dispose(this.items);
@@ -138,7 +138,7 @@ const QuadTree = module.exports = Class.extend
 	*/
 	clear: function ()
 	{
-		this.root.clear (this.items);
+		this.root.clear();
 
 		this.orderedItems.reset();
 		this.updateQueue.reset();
@@ -279,7 +279,7 @@ const QuadTree = module.exports = Class.extend
 	*/
 	addItem: function (/*QuadTreeItem*/item) /*bool*/
 	{
-		if (this.root.addItem (item, this.items, this.nodeCapacity))
+		if (this.root.addItem (item, this.nodeCapacity))
 		{
 			this.addItemOrdered (item);
 			return true;
@@ -296,7 +296,7 @@ const QuadTree = module.exports = Class.extend
 		if (!(item.flags & QuadTreeItem.FLAG_ATTACHED))
 			return true;
 
-		if (!this.root.removeItem (item, this.items))
+		if (!this.root.removeItem (item))
 			return false;
 
 		this.orderedItems.remove (this.orderedItems.sgetNode (item));

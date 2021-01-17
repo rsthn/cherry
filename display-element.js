@@ -30,8 +30,7 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 	className: "DisplayElement",
 
 	/**
-	**	Layer where the element is stored. Set internally by the setLayer() method, therefore using that method is required
-	**	for correct behavior of this class.
+	**	Layer where the element is stored. Set internally when the element is added to a QuadTree.
 	*/
 	layer: null, /*QuadTree*/
 
@@ -128,11 +127,12 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 	/**
 	**	Sets the layer of the element.
 	*/
-	setLayer: function (layer)
+	notifyInserted: function (layer)
 	{
-		if (!layer) return this;
+		this._super.QuadTreeItem.notifyInserted(layer);
+		if (!layer) return;
 
-		if (this.layer != null)
+		if (this.layer != null && this.layer !== layer)
 		{
 			this.layer.removeItem (this);
 
@@ -143,13 +143,47 @@ const DisplayElement = module.exports = QuadTreeItem.extend
 			}
 		}
 
+		this.layer = layer;
+
 		if (this.fragments != null)
 		{
 			for (let i = this.fragments.top; i; i = i.next)
 				this.layer.addItem (i.value);
 		}
+	},
 
-		return (this.layer = layer).addItem (this);
+	/**
+	**	Clears the layer of the element.
+	*/
+	notifyRemoved: function (layer)
+	{
+		if (this.fragments != null)
+		{
+			for (let i = this.fragments.top; i; i = i.next)
+				this.layer.removeItem (i.value);
+		}
+
+		this.layer = null;
+	},
+
+	/**
+	**	Sets the layer of the element.
+	*/
+	setLayer: function (layer)
+	{
+		layer.addItem(this);
+		return this;
+	},
+
+	/*
+	**	Removes the item from the layer. Returns the item.
+	*/
+	remove: function ()
+	{
+		if (!this.layer) return this;
+
+		this.layer.removeItem(this);
+		return this;
 	},
 
 	/**

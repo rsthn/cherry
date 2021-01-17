@@ -57,10 +57,17 @@ const QuadTreeNode = module.exports = Class.extend
 	isDirty: false,
 
 	/**
+	**	Tree containing this node.
+	*/
+	tree: null,
+
+	/**
 	**	Constructs the tree node with the specified extents.
 	*/
-	__ctor: function (x1, y1, x2, y2)
+	__ctor: function (tree, x1, y1, x2, y2)
 	{
+		this.tree = tree;
+
 		this.numItems = 0;
 		this.isDirty = false;
 
@@ -89,13 +96,13 @@ const QuadTreeNode = module.exports = Class.extend
 	/**
 	**	Removes all items and child nodes.
 	*/
-	clear: function (/*List<QuadTreeItem>*/list)
+	clear: function ()
 	{
 		if (this.subNode != null)
 		{
 			for (var i = 0; i < 4; i++)
 			{
-				this.subNode[i].clear(list);
+				this.subNode[i].clear(this.tree.items);
 				dispose(this.subNode[i]);
 			}
 
@@ -110,13 +117,14 @@ const QuadTreeNode = module.exports = Class.extend
 			{
 				j = i.next;
 
-				var k = list.remove(i);
-
-				k.notifyRemoved();
+				var k = this.tree.items.remove(i);
 				k.numRefNodes--;
 
 				if (k.numRefNodes == 0)
+				{
+					k.notifyRemoved(this.tree);
 					dispose(k);
+				}
 			}
 
 			this.insertionPoint = null;
@@ -136,7 +144,7 @@ const QuadTreeNode = module.exports = Class.extend
 	**	Adds an item to the node or any of its sub-nodes. If the node exceeds the given capacity the node will be split in four sub-nodes.
 	**	Returns false if the item could not added because (a) it is outside the extents of the tree or (b) the node cannot be split.
 	*/
-	addItem: function (/*QuadTreeItem*/item, /*List<QuadTreeItem>*/list, /*int*/capacity) /* bool */
+	addItem: function (/*QuadTreeItem*/item, /*int*/capacity) /* bool */
 	{
 		if (!item.getBounds().intersects(this.extents))
 			return false;
@@ -146,7 +154,7 @@ const QuadTreeNode = module.exports = Class.extend
 			var result = false;
 
 			for (var i = 0; i < 4; i++)
-				result |= this.subNode[i].addItem (item, list, capacity);
+				result |= this.subNode[i].addItem (item, capacity);
 
 			if (result)
 			{
@@ -161,18 +169,19 @@ const QuadTreeNode = module.exports = Class.extend
 		{
 			if (this.insertionPoint == null)
 			{
-				list.push (item);
-				this.insertionPoint = list.bottom;
+				this.tree.items.push (item);
+				this.insertionPoint = this.tree.items.bottom;
 			}
 			else
-				list.insertAfter (this.insertionPoint, item);
+				this.tree.items.insertAfter (this.insertionPoint, item);
 
 			this.isDirty = true;
 			this.numItems++;
 
-			item.numRefNodes++;
+			if (item.numRefNodes == 0)
+				item.notifyInserted(this.tree);
 
-			item.notifyInserted();
+			item.numRefNodes++;
 			return true;
 		}
 
@@ -183,39 +192,40 @@ const QuadTreeNode = module.exports = Class.extend
 		}
 
 		this.subNode = [
-			new QuadTreeNode (this.extents.x1, this.extents.y1, this.extents.cx, this.extents.cy),
-			new QuadTreeNode (this.extents.cx, this.extents.y1, this.extents.x2, this.extents.cy),
-			new QuadTreeNode (this.extents.x1, this.extents.cy, this.extents.cx, this.extents.y2),
-			new QuadTreeNode (this.extents.cx, this.extents.cy, this.extents.x2, this.extents.y2)
+			new QuadTreeNode (this.tree, this.extents.x1, this.extents.y1, this.extents.cx, this.extents.cy),
+			new QuadTreeNode (this.tree, this.extents.cx, this.extents.y1, this.extents.x2, this.extents.cy),
+			new QuadTreeNode (this.tree, this.extents.x1, this.extents.cy, this.extents.cx, this.extents.y2),
+			new QuadTreeNode (this.tree, this.extents.cx, this.extents.cy, this.extents.x2, this.extents.y2)
 		];
 
-		var n = this.numItems;
+		let n = this.numItems;
 		this.numItems = 0;
 
-		for (var i = 0; i < n; i++)
+		for (let i = 0; i < n; i++)
 		{
-			var tmp = this.insertionPoint.next;
+			let tmp = this.insertionPoint.next;
+			let cur = this.insertionPoint.value;
 
-			this.insertionPoint.value.numRefNodes--;
+			cur.numRefNodes--;
 
-			if (!this.addItem (this.insertionPoint.value, list, capacity))
+			if (!this.addItem (cur, capacity))
 			{
 				console.log ("Error: Shouldn't have happened. Unable to insert item on a sub-node of a just-split node.");
 			}
 
-			list.remove (this.insertionPoint);
+			this.tree.items.remove (this.insertionPoint);
 			this.insertionPoint = tmp;
 		}
 
 		this.insertionPoint = null;
 
-		return this.addItem (item, list, capacity);
+		return this.addItem (item, capacity);
 	},
 
 	/**
 	**	Removes an item from the node and/or its sub-nodes. Returns false if the node was not found.
 	*/
-	removeItem: function (/*QuadTreeItem*/item, /*List(QuadTreeItem)*/list)
+	removeItem: function (/*QuadTreeItem*/item)
 	{
 		if (!item.getInsertionBounds().intersects(this.extents))
 			return false;
@@ -225,7 +235,7 @@ const QuadTreeNode = module.exports = Class.extend
 			var result = false;
 
 			for (var i = 0; i < 4; i++)
-				result |= this.subNode[i].removeItem (item, list);
+				result |= this.subNode[i].removeItem (item);
 
 			if (result)
 			{
@@ -254,8 +264,10 @@ const QuadTreeNode = module.exports = Class.extend
 		if (i === this.insertionPoint)
 			this.insertionPoint = this.numItems ? i.next : null;
 
-		list.remove (i);
-		item.notifyRemoved();
+		this.tree.items.remove(i);
+
+		if (item.numRefNodes == 0)
+			item.notifyRemoved(this.tree);
 
 		return true;
 	},

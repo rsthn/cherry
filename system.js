@@ -120,14 +120,9 @@ const System = module.exports =
 	tempDisplayBuffer: null,
 
 	/**
-	**	Map with the status of all keys.
+	**	Map with the status of all keys (along with other flags).
 	*/
-	keyState: { },
-
-	/**
-	**	Event arguments for the keyboard events.
-	*/
-	keyEvtArgs: { time: 0, shift: false, ctrl: false, alt: false, keyCode: 0, keyState: null },
+	keyState: { time: 0, shift: false, ctrl: false, alt: false, keyCode: 0 },
 
 	/**
 	**	Current status of all pointers. The related object is known as the Pointer State, and has the following fields:
@@ -245,7 +240,7 @@ const System = module.exports =
 
 		global.onresize = this.onWindowResized.bind(this);
 
-		this.frameTimer = new Timer (this.frameInterval, this.onFrame, this);
+		this.frameTimer = new Timer (this.frameInterval, this.onFrame.bind(this), true);
 
 		// Setup canvas buffer.
 		this.displayBuffer = new Canvas (null, { gl: o.gl, elem: o.canvas, absolute: true, hidden: false, antialias: o.antialias, background: o.background });
@@ -271,9 +266,6 @@ const System = module.exports =
 		System.onWindowResized (true);
 
 		// Attach keyboard event handlers.
-		this.keyState = { };
-		this.keyEvtArgs = { shift: false, ctrl: false, alt: false, keyCode: 0, keyState: this.keyState };
-
 		var _this = this;
 
 		global.onkeydown = function (evt)
@@ -286,32 +278,32 @@ const System = module.exports =
 
 			_this.keyState[evt.keyCode] = true;
 
-			_this.keyEvtArgs.keyCode = evt.keyCode;
-			_this.keyEvtArgs.startTime = System.now(true);
+			_this.keyState.keyCode = evt.keyCode;
+			_this.keyState.startTime = System.now(true);
 
 			switch (evt.keyCode)
 			{
 				case 16: // SHIFT
-					_this.keyEvtArgs.shift = true;
+					_this.keyState.shift = true;
 					break;
 
 				case 17: // CTRL
-					_this.keyEvtArgs.ctrl = true;
+					_this.keyState.ctrl = true;
 					break;
 
 				case 18: // ALT
-					_this.keyEvtArgs.alt = true;
+					_this.keyState.alt = true;
 					break;
 			}
 
 			// CTRL+TAB should always be handled by the browser.
-			if (_this.keyEvtArgs.ctrl && evt.keyCode == KeyCodes.TAB)
+			if (_this.keyState.ctrl && evt.keyCode == KeyCodes.TAB)
 			{
 				_this.keyState[evt.keyCode] = false;
 				return true;
 			}
 
-			if (_this.onKeyboardEvent (_this.EVT_KEY_DOWN, evt.keyCode, _this.keyEvtArgs) === false)
+			if (_this.onKeyboardEvent (_this.EVT_KEY_DOWN, evt.keyCode, _this.keyState) === false)
 				return false;
 		};
 
@@ -324,26 +316,25 @@ const System = module.exports =
 				return false;
 
 			_this.keyState[evt.keyCode] = false;
-			_this.keyEvtArgs.endTime = System.now(true);
-
-			_this.keyEvtArgs.keyCode = evt.keyCode;
+			_this.keyState.endTime = System.now(true);
+			_this.keyState.keyCode = evt.keyCode;
 
 			switch (evt.keyCode)
 			{
 				case 16: // SHIFT
-					_this.keyEvtArgs.shift = false;
+					_this.keyState.shift = false;
 					break;
 
 				case 17: // CTRL
-					_this.keyEvtArgs.ctrl = false;
+					_this.keyState.ctrl = false;
 					break;
 
 				case 18: // ALT
-					_this.keyEvtArgs.alt = false;
+					_this.keyState.alt = false;
 					break;
 			}
 
-			if (_this.onKeyboardEvent (_this.EVT_KEY_UP, evt.keyCode, _this.keyEvtArgs) === false)
+			if (_this.onKeyboardEvent (_this.EVT_KEY_UP, evt.keyCode, _this.keyState) === false)
 				return false;
 		};
 
@@ -971,9 +962,9 @@ const System = module.exports =
 
 	/**
 	**	Event triggered when a keyboard event is detected by the system, `action` is one of the EVT_KEY_* constants,
-	**	`keyCode` is one of the `KeyCodes` constants and `keys` a reference to `System.keyEvtArgs`.
+	**	`keyCode` is one of the `KeyCodes` constants and `keyState` a reference to `System.keyState`.
 	*/
-	onKeyboardEvent: function (action, keyCode, keys)
+	onKeyboardEvent: function (action, keyCode, keyState)
 	{
 	},
 

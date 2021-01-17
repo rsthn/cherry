@@ -182,7 +182,7 @@ const QuadTreeItem = module.exports = Class.extend
 	/**
 	**	Executed when the item is inserted on the tree.
 	*/
-	notifyInserted: function ()
+	notifyInserted: function (tree)
 	{
 		this.flags |= QuadTreeItem.FLAG_ATTACHED;
 		this.insertionBounds.set (this.getBounds());
@@ -197,7 +197,7 @@ const QuadTreeItem = module.exports = Class.extend
 	/**
 	**	Executed when the item is removed from the tree.
 	*/
-	notifyRemoved: function ()
+	notifyRemoved: function (tree)
 	{
 		this.flags &= ~QuadTreeItem.FLAG_ATTACHED;
 	},

@@ -19,17 +19,15 @@ require('./globals');
 /**
 **	Timer class.
 **
-**	>> Timer __constructor (float interval, function callback, object context);
+**	>> Timer __constructor (float interval, function callback, bool highPerformance=false);
 **	>> Timer __constructor (float interval, function callback);
 */
 
-const Timer = module.exports = function (interval, callback, context)
+const Timer = module.exports = function (interval, callback, highPerformance=false)
 {
 	this.callback = callback;
-	this.context = context;
-
 	this.interval = interval;
-	this.highPerformance = true;
+	this.highPerformance = highPerformance;
 };
 
 
@@ -54,7 +52,7 @@ Timer.prototype.onTimeout = function ()
 		var delta = curTime - this.lastTime;
 		this.lastTime = curTime;
 
-		this.callback.call (this.context, delta, this);
+		this.callback (delta, this);
 		this.runAfter(0);
 	}
 	else
@@ -73,8 +71,7 @@ Timer.prototype.onTimeout = function ()
 		this.tDelta = tError < 0 ? this.interval : (this.rTime - this.lTime);
 		this.lTime = this.rTime;
 
-		this.callback.call (this.context, this.tDelta, this);
-
+		this.callback (this.tDelta, this);
 		this.runAfter((this.sTime + this.interval) - (hrnow() - this.startTime));
 	}
 };
