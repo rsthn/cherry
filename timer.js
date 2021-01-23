@@ -19,8 +19,8 @@ require('./globals');
 /**
 **	Timer class.
 **
-**	>> Timer __constructor (float interval, function callback, bool highPerformance=false);
-**	>> Timer __constructor (float interval, function callback);
+**	Timer __constructor (float interval, function callback, bool highPerformance=false);
+**	Timer __constructor (float interval, function callback);
 */
 
 const Timer = module.exports = function (interval, callback, highPerformance=false)
@@ -34,7 +34,7 @@ const Timer = module.exports = function (interval, callback, highPerformance=fal
 /**
 **	Timeout handler.
 **
-**	>> void onTimeout();
+**	void onTimeout();
 */
 
 Timer.prototype.onTimeout = function ()
@@ -80,7 +80,7 @@ Timer.prototype.onTimeout = function ()
 /**
 **	Timer start handler (overridable).
 **
-**	>> void onStart();
+**	void onStart();
 */
 
 Timer.prototype.onStart = function ()
@@ -89,12 +89,13 @@ Timer.prototype.onStart = function ()
 
 
 /**
-**	Starts the timer.
+**	Starts the timer. When immediate is `true` the callback will be executed immediately. The scale parameter is used to control when to
+**	trigger the first timeout, set to timeInterval*scale.
 **
-**	>> void start();
+**	void start (bool immediate=false, float scale=1.0);
 */
 
-Timer.prototype.start = function ()
+Timer.prototype.start = function (immediate=false, scale=1.0)
 {
 	this.startTime = hrnow();
 
@@ -105,14 +106,18 @@ Timer.prototype.start = function ()
 	this.isRunning = true;
 
 	this.onStart();
-	this.runAfter(this.interval);
+
+	if (immediate)
+		this.callback (0, this);
+
+	this.runAfter(this.interval*scale);
 };
 
 
 /**
 **	Executes the timer onTimeout() after the specified amount of milliseconds.
 **
-**	>> void runAfter (int timeout);
+**	void runAfter (int timeout);
 */
 
 Timer.prototype.runAfter = function (timeout)
@@ -124,7 +129,7 @@ Timer.prototype.runAfter = function (timeout)
 /**
 **	Stops the timer.
 **
-**	>> void stop();
+**	void stop();
 */
 
 Timer.prototype.stop = function ()
