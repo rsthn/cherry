@@ -5,3 +5,4 @@ samples/
 .svnignore
 .svn-revision
 --*
+*.pptx

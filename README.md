@@ -1,5 +1,15 @@
 # Cherry Gamedev Library (JS)
 
+<center>
+
+![Logo](./logo.png)
+
+Cherry is a small game development library.
+
+</center>
+
+<br/>
+
 ## Installation
 
 You can use npm to install this library, or download the standalone `cherry.js` file from the `dist` folder and include it in your index.html file directly. When using the latter a global object named `cherry` will be available.
