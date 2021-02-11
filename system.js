@@ -90,6 +90,11 @@ const System = module.exports =
 	screenWidth: 0, screenHeight: 0,
 
 	/**
+	**	Current screen orientation.
+	*/
+	orientation: 0,
+
+	/**
 	**	Coordinates of the screen's offset (for letter-box effect when the screen does not fit tightly).
 	*/
 	offsX: 0, offsY: 0,
@@ -833,56 +838,56 @@ const System = module.exports =
 	},
 
 	/**
-	**	Adds the specified object to the update queue. Must have method update (deltaTime: int).
+	**	Adds the specified handler to the update queue. Must have method update (deltaTime: int).
 	*/
-	updateQueueAdd: function (/*object*/obj)
+	updateQueueAdd: function (/*object*/handler)
 	{
-		this.updateQueue.push (obj);
+		this.updateQueue.push (handler);
 		return this.updateQueue.bottom;
 	},
 
 	/**
-	**	Removes the specified object from the update queue.
+	**	Removes the specified handler from the update queue.
 	*/
-	updateQueueRemove: function (/*object*/obj)
+	updateQueueRemove: function (/*object*/handler)
 	{
-		this.updateQueue.remove (obj instanceof Linkable ? obj : this.updateQueue.sgetNode(obj));
+		this.updateQueue.remove (handler instanceof Linkable ? handler : this.updateQueue.sgetNode(handler));
 	},
 
 	/**
-	**	Adds the specified object to the draw queue. Must have method draw (canvas: Canvas).
+	**	Adds the specified handler to the draw queue. Must have method draw (canvas: Canvas).
 	*/
-	drawQueueAdd: function (/*object*/obj)
+	drawQueueAdd: function (/*object*/handler)
 	{
-		this.drawQueue.push (obj);
+		this.drawQueue.push (handler);
 		return this.drawQueue.bottom;
 	},
 
 	/**
-	**	Removes the specified object from the draw queue.
+	**	Removes the specified handler from the draw queue.
 	*/
-	drawQueueRemove: function (/*object*/obj)
+	drawQueueRemove: function (/*object*/handler)
 	{
-		this.drawQueue.remove (obj instanceof Linkable ? obj : this.drawQueue.sgetNode(obj));
+		this.drawQueue.remove (handler instanceof Linkable ? handler : this.drawQueue.sgetNode(handler));
 	},
 
 	/**
-	**	Adds the specified object to the update and draw queues. Must have both update (deltaTime: int) and draw (canvas: Canvas) methods. Returns `obj`.
+	**	Adds the specified handler to the update and draw queues. Must have both update (deltaTime: int) and draw (canvas: Canvas) methods. Returns `obj`.
 	*/
-	queueAdd: function (/*object*/obj)
+	queueAdd: function (/*object*/handler)
 	{
-		this.updateQueue.push (obj);
-		this.drawQueue.push (obj);
-		return obj;
+		this.updateQueue.push (handler);
+		this.drawQueue.push (handler);
+		return handler;
 	},
 
 	/**
-	**	Removes the specified object from the update and draw queues.
+	**	Removes the specified handler from the update and draw queues.
 	*/
-	queueRemove: function (/*object*/obj)
+	queueRemove: function (/*object*/handler)
 	{
-		this.updateQueue.remove (this.updateQueue.sgetNode(obj));
-		this.drawQueue.remove (this.drawQueue.sgetNode(obj));
+		this.updateQueue.remove (this.updateQueue.sgetNode(handler));
+		this.drawQueue.remove (this.drawQueue.sgetNode(handler));
 	},
 
 	/**

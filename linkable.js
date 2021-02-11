@@ -78,32 +78,32 @@ const Linkable = module.exports = Class.extend
 	},
 
 	/**
-	**	Links the item to come after the given one.
+	**	Links the item such that it will be located after the given reference.
 	*/
-	linkAfter: function (/*Linkable*/item)
+	linkAfter: function (/*Linkable*/ref)
 	{
-		this.prev = item;
-		this.next = item ? item.next : null;
+		this.prev = ref;
+		this.next = ref ? ref.next : null;
 
-		if (item)
+		if (ref)
 		{
-			if (item.next) item.next.prev = this;
-			item.next = this;
+			if (ref.next) ref.next.prev = this;
+			ref.next = this;
 		}
 	},
 
 	/**
-	**	Links the item to come before the given one.
+	**	Links the item such that it will be located before the given reference.
 	*/
-	linkBefore: function (/*Linkable*/item)
+	linkBefore: function (/*Linkable*/ref)
 	{
-		this.prev = item ? item.prev : null;
-		this.next = item;
+		this.prev = ref ? ref.prev : null;
+		this.next = ref;
 
-		if (item)
+		if (ref)
 		{
-			if (item.prev) item.prev.next = this;
-			item.prev = this;
+			if (ref.prev) ref.prev.next = this;
+			ref.prev = this;
 		}
 	},
 

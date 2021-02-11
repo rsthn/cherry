@@ -20,7 +20,7 @@ const Matrix = require('./matrix');
 /**
 **	Constructs a canvas object. If the Canvas DOM element is not provided a new element will be created and attached to the page.
 **
-**	>> Canvas __constructor (CanvasElement elem = null[, Object opts = null]);
+**	>> Canvas Canvas (CanvasElement elem = null[, Object opts = null]);
 */
 const Canvas = module.exports = function (elem, opts)
 {
@@ -392,7 +392,7 @@ Canvas.prototype.applyConfig = function ()
 
 
 /**
-**	Disposes the resources used by the canvas. The DOMElement will also be removed.
+**	Disposes the resources used by the canvas. The DOMElement will also be removed from the document.
 **
 **	>> void dispose();
 */
@@ -459,7 +459,7 @@ Canvas.prototype.resize = function (width, height)
 
 
 /**
-**	Sets the global canvas scale. Loads identity matrix.
+**	Sets the global canvas scale.
 **
 **	>> Canvas globalScale (float value);
 */
@@ -479,8 +479,9 @@ Canvas.prototype.globalScale = function (value)
 
 
 /**
-**	Indicates if the canvas was flipped (i.e. xy is now yx).
+**	Gets or sets the flipped status of the canvas. Indicates if the canvas was flipped (i.e. xy is now yx).
 **
+**	>> Canvas flipped (bool value);
 **	>> Canvas flipped (bool value);
 */
 
@@ -756,7 +757,7 @@ Canvas.prototype.globalAlpha = function (value)
 
 
 /**
-**	Sets the relative alpha value for subsequent drawing operations.
+**	Sets or returns the relative alpha value for subsequent drawing operations.
 **
 **	>> Canvas alpha (float value);
 **	>> float alpha ();
