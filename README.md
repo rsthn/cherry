@@ -1,12 +1,14 @@
-# Cherry Gamedev Library (JS)
+<p align="center">
 
-<center>
+<img width="240px" src="./logo.png"/>
+<br/>
+<span>Cherry is yet another game development library.</span>
+<br/><br/>
+<a href="https://packagist.org/packages/rsthn/rose-core"><img src="https://poser.pugx.org/rsthn/rose-core/downloads" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/rsthn/rose-core"><img src="https://poser.pugx.org/rsthn/rose-core/v" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/rsthn/rose-core"><img src="https://poser.pugx.org/rsthn/rose-core/license" alt="License"></a>
 
-![Logo](./logo.png)
-
-Cherry is a small game development library.
-
-</center>
+</p>
 
 <br/>
 
