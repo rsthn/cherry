@@ -1,6 +1,6 @@
 {
     "name": "@rsthn/cherry",
-    "version": "2.0.26",
+    "version": "2.0.27",
     "description": "Cherry Gamedev Library (JS)",
     "main": "./main.js",
     "exports": {
@@ -16,8 +16,8 @@
     "scripts": {
         "test": "echo Ok",
         "requirements": "yarn global add --ignore-optional parcel-bundler",
-        "deploy": "node ./scripts/deploy.js",
-        "build": "parcel build ./main.js -o cherry.js --global cherry"
+        "deploy": "yarn build && node ./scripts/deploy.js",
+        "build": "parcel build ./main.js -o cherry.js --global cherry --no-source-maps --no-cache"
     },
     "repository": {
         "type": "git",
@@ -33,9 +33,9 @@
         "since 2019-01"
     ],
     "dependencies": {
-        "@rsthn/rin": "^2.0.24",
+        "@rsthn/rin": "^2.0.28",
         "filereader": "^0.10.3",
-        "image-size": "^0.8.3"
+        "image-size": "^0.9.7"
     },
     "browser": {
         "./shims": false

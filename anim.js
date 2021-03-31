@@ -17,7 +17,7 @@
 const { Rin, Class } = require('@rsthn/rin');
 
 /**
-**	Class to animate properties using different
+**	Class to animate properties using rules.
 */
 
 const Anim = module.exports = Class.extend
@@ -30,7 +30,7 @@ const Anim = module.exports = Class.extend
 	stack: null,
 	block: null,
 
-	time: 0, blockTime: 0,
+	timeScale: 1, time: 0, blockTime: 0,
 	index: 0,
 
 	paused: false,
@@ -57,7 +57,7 @@ const Anim = module.exports = Class.extend
 
 	clone: function ()
 	{
-		var a = new Anim();
+		let a = new Anim();
 
 		a.list = this.list;
 		a.initialData = this.initialData;
@@ -85,7 +85,7 @@ const Anim = module.exports = Class.extend
 		this.paused = false;
 		this.finished = false;
 
-		for (var i in this.initialData)
+		for (let i in this.initialData)
 			this.data[i] = this.initialData[i];
 
 		return this;
@@ -96,6 +96,13 @@ const Anim = module.exports = Class.extend
 	{
 		this.initialData = data;
 		return this.reset();
+	},
+
+	// Sets the time scale (animation speed).
+	speed: function (value)
+	{
+		this.timeScale = value > 0.0 ? value : 1.0;
+		return this;
 	},
 
 	// Sets the output data object.
@@ -125,14 +132,17 @@ const Anim = module.exports = Class.extend
 		if (this.index >= this.block.length)
 			return true;
 
-		var i = 0;
+		let i = 0;
+		let _block;
+		let _index;
+		let _blockTime;
 
-		this.time += dt;
+		this.time += dt*this.timeScale;
 
 		while (this.index < this.block.length)
 		{
-			var cmd = this.block[this.index];
-			var duration;
+			let cmd = this.block[this.index];
+			let duration;
 
 			switch (cmd.op)
 			{
@@ -150,12 +160,12 @@ const Anim = module.exports = Class.extend
 						}
 					}
 
-					var _block = this.block;
-					var _index = this.index;
-					var _blockTime = this.blockTime;
+					_block = this.block;
+					_index = this.index;
+					_blockTime = this.blockTime;
 
-					var n = 0;
-					var blockTime = _blockTime;
+					let n = 0;
+					let blockTime = _blockTime;
 
 					for (i = 0; i < cmd.blocks.length; i++)
 					{
@@ -199,9 +209,9 @@ const Anim = module.exports = Class.extend
 						cmd.started = true;
 					}
 
-					var _block = this.block;
-					var _index = this.index;
-					var _blockTime = this.blockTime;
+					_block = this.block;
+					_index = this.index;
+					_blockTime = this.blockTime;
 
 					this.block = cmd._block;
 					this.index = cmd._index;
@@ -238,9 +248,9 @@ const Anim = module.exports = Class.extend
 						cmd.started = true;
 					}
 
-					var _block = this.block;
-					var _index = this.index;
-					var _blockTime = this.blockTime;
+					_block = this.block;
+					_index = this.index;
+					_blockTime = this.blockTime;
 
 					this.block = cmd._block;
 					this.index = cmd._index;
@@ -400,7 +410,7 @@ const Anim = module.exports = Class.extend
 					break;
 
 				case "exec":
-					cmd.fn.call(this);
+					cmd.fn.call(this, this);
 					this.index++;
 					break;
 			}
@@ -420,7 +430,7 @@ const Anim = module.exports = Class.extend
 	// Runs the subsequent commands in parallel. Should end the parallel block by calling end().
 	parallel: function ()
 	{
-		var block = [ ];
+		let block = [ ];
 
 		this.block.push({ op: "parallel", started: false, block: block, blocks: [ ], indices: [ ], blockTimes: [ ] });
 
@@ -433,7 +443,7 @@ const Anim = module.exports = Class.extend
 	// Runs the subsequent commands in series. Should end the serial block by calling end().
 	serial: function ()
 	{
-		var block = [ ];
+		let block = [ ];
 
 		this.block.push({ op: "serial", started: false, block: block });
 
@@ -446,7 +456,7 @@ const Anim = module.exports = Class.extend
 	// Repeats a block the specified number of times.
 	repeat: function (count)
 	{
-		var block = [ ];
+		let block = [ ];
 
 		this.block.push({ op: "repeat", started: false, block: block, count: count });
 
@@ -459,7 +469,7 @@ const Anim = module.exports = Class.extend
 	// Sets the callback of the current block.
 	callback: function (fn)
 	{
-		var block = this.stack[this.stack.length-1];
+		let block = this.stack[this.stack.length-1];
 		block[block.length-1].fn = fn;
 
 		return this;
@@ -510,17 +520,17 @@ const Anim = module.exports = Class.extend
 	// Generates a certain amount of random numbers in the given range (inclusive). This uses a static random table to determine the next values.
 	randt: function (field, duration, count, startValue, endValue, easing)
 	{
-		var table = [ ];
+		let table = [ ];
 
-		for (var i = 0; i < count; i++)
+		for (let i = 0; i < count; i++)
 			table.push ((i % (endValue - startValue + 1)) + startValue);
 
-		for (var i = count >> 2; i > 0; i--)
+		for (let i = count >> 2; i > 0; i--)
 		{
-			var a = ~~(Math.random() * count);
-			var b = ~~(Math.random() * count);
+			let a = ~~(Math.random() * count);
+			let b = ~~(Math.random() * count);
 
-			var c = table[b];
+			let c = table[b];
 			table[b] = table[a];
 			table[a] = c;
 		}
