@@ -1,5 +1,5 @@
 <p align="center">
-	<img width="240px" src="./logo.png"/>
+	<img width="240px" src="./docs/logo.png"/>
 	<br/>
 	<span>Cherry is yet another game development library.</span>
 </p>

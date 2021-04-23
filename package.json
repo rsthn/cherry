@@ -1,23 +1,26 @@
 {
     "name": "@rsthn/cherry",
-    "version": "2.0.27",
+    "version": "2.0.28",
     "description": "Cherry Gamedev Library (JS)",
-    "main": "./main.js",
+    "type": "module",
+    "main": "./src/main.js",
     "exports": {
         ".": {
-            "require": "./main.js",
-            "default": "./main.mjs"
+            "default": "./src/main.js"
         },
-        "./gx": {
-            "require": "./gx.js",
-            "default": "./gx.mjs"
+        "./flow": {
+            "default": "./src/flow.js"
         }
+    },
+    "browser": {
+        "./flow": "./src/flow.js",
+        "./src/system/shims.js": false
     },
     "scripts": {
         "test": "echo Ok",
         "requirements": "yarn global add --ignore-optional parcel-bundler",
         "deploy": "yarn build && node ./scripts/deploy.js",
-        "build": "parcel build ./main.js -o cherry.js --global cherry --no-source-maps --no-cache"
+        "build": "parcel build ./src/main.js -o cherry.js --global cherry --no-source-maps --no-cache"
     },
     "repository": {
         "type": "git",
@@ -37,15 +40,10 @@
         "filereader": "^0.10.3",
         "image-size": "^0.9.7"
     },
-    "browser": {
-        "./shims": false
-    },
     "files": [
-        "wrappers/",
-        "controls/",
-        "gx/",
+        "src/",
+        "dist/",
         "*.js",
-        "*.mjs",
         "LICENSE",
         "README.md"
     ]
