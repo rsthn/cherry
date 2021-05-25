@@ -16,101 +16,97 @@
 
 import { Class } from '@rsthn/rin';
 import Element from './element.js';
-import List from '../utils/list.js';
+import QuadTree from '../spatial/quadtree.js';
 
 /*
 **	Element container class.
 */
 
-export default Class.extend(List, Element,
+export default Class.extend(Element,
 {
 	className: 'Container',
 
-	orderingEnabled: false,
 	reverseDraw: false,
 
-	__ctor: function (orderingEnabled=false)
+	tree: null,
+	viewportBounds: null,
+
+	__ctor: function (x1=-1e6, y1=-1e6, x2=1e6, y2=1e6, nodeCapacity=16)
 	{
-		this._super.List.__ctor();
 		this._super.Element.__ctor();
 
-		this.orderingEnabled = orderingEnabled;
 		this.container = false;
+
+		this.tree = new QuadTree (x1, y1, x2, y2, nodeCapacity);
 	},
 
-	_lessThan: function (a, b)
+	getTree: function()
 	{
-		return a.hitbox.y2 < b.hitbox.y2;
+		return this.tree;
 	},
 
-	_addElement: function (elem, atBottom)
+	add: function(elem)
 	{
+		if (!this.tree.addItem(elem))
+			return elem;
+
 		elem.container = this;
 
-		if (this.orderingEnabled && this.count != 0)
-		{
-			for (let i = this.top; i; i = i.next)
-			{
-				if (!this._lessThan(elem, i.value))
-					continue;
-
-				this.insertBefore(i, elem);
-
-				elem.node = i.prev;
-				return this;
-			}
-		}
-
-		this._super.List[atBottom ? 'push' : 'unshift'] (elem);
-		elem.node = atBottom ? this.bottom : this.top;
-
+		elem.onAttached(this);
 		return elem;
 	},
 
-	push: function(elem)
+	remove: function(elem)
 	{
-		return this._addElement(elem, true);
+		if (elem.container !== this)
+			return elem;
+
+		this.tree.removeItem(elem);
+
+		elem.onDetached(this);
+		return elem;
 	},
 
-	unshift: function(elem)
+	syncPosition: function(elem)
 	{
-		return this._addElement(elem, false);
+		if (!elem || elem.container !== this)
+			return;
+
+		this.tree.updateItem(elem);
 	},
 
-	updatePosition: function(elem)
+	setViewportBounds: function(rect)
 	{
-		let node = elem.node;
-
-		if (elem.container !== this || !this.orderingEnabled)
-			return;
-
-		if (node.prev && this._lessThan(elem, node.prev.value))
-		{
-			this.remove (elem.node);
-			this.push (elem);
-			return;
-		}
-
-		if (node.next && this._lessThan(node.next.value, elem))
-		{
-			this.remove (elem.node);
-			this.push (elem);
-			return;
-		}
+		this.viewportBounds = rect;
 	},
 
 	elementDraw: function(g)
 	{
-		this.curIndex = 0;
+		this.tree.selectItems(this.viewportBounds, this.reverseDraw);
 
-		if (this.reverseDraw)
-			this.forEachRev((elem) => { elem.__i = this.curIndex++; elem.draw(g); });
-		else
-			this.forEach((elem) => { elem.__i = this.curIndex++; elem.draw(g); });
+		while (true)
+		{
+			let elem = this.tree.getNextSelected();
+			if (!elem) break;
+
+			elem.draw(g);
+		}
+
+		this.containerDraw(g);
 	},
 
 	elementUpdate: function(dt)
 	{
-		this.forEach((v) => v.update(dt));
-	}
+		this.tree.getItems().forEach((v) => v.update(dt));
+		this.containerUpdate(dt);
+		this.tree.update();
+	},
+
+	containerDraw: function(g) /* @override */
+	{
+	},
+
+	containerUpdate: function(dt) /* @override */
+	{
+	},
 });

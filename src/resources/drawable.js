@@ -15,6 +15,7 @@
 */
 
 import IDrawable from '../system/idrawable.js';
+import Resources from './resources.js';
 
 export default IDrawable.extend
 ({
@@ -39,3 +40,11 @@ export default IDrawable.extend
 			g.drawImageResource (this.r, x, y, width, height);
 	}
 });
+
+/**
+**	Creates a descriptor for an image resource.
+*/
+Resources.Image = function (src, opts=null)
+{
+	return { type: "image", wrapper: "Drawable", src: src, pixelated: null, ...opts };
+};

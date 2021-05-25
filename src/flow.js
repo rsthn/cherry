@@ -20,6 +20,7 @@ import _Element from './flow/element.js'; export const Element = _Element;
 import _Container from './flow/container.js'; export const Container = _Container;
 import _Scene from './flow/scene.js'; export const Scene = _Scene;
 import _Group from './flow/group.js'; export const Group = _Group;
+import _Viewport from './flow/viewport.js'; export const Viewport = _Viewport;
 
 import _KeyboardHandler from './flow/keyboard-handler'; export const KeyboardHandler = _KeyboardHandler;
 import _PointerHandler from './flow/pointer-handler'; export const PointerHandler = _PointerHandler;

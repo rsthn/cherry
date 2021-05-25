@@ -142,8 +142,7 @@ Matrix.prototype.append = function (matr)
 		{
 			m = 0;
 
-			for (k = 0; k < 3; k++)
-			{
+			for (k = 0; k < 3; k++) {
 				m += matr[j*3+k] * this.data[k*3+i];
 			}
 

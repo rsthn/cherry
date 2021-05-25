@@ -35,7 +35,7 @@ import Canvas from '../system/canvas.js';
 
 export default Class.extend
 ({
-	className: "SpriteSheet",
+	className: "Spritesheet",
 
 	width: 0, height: 0,
 
@@ -122,7 +122,9 @@ export default Class.extend
 			g.drawImage (this.r.data, i, j, this.r_frameWidth, this.r_frameHeight, x, y, width, height);
 		}
 		else
+		{
 			g.drawImage (this.r.data[frame].data, 0, 0, this.r_frameWidth, this.r_frameHeight, x, y, width, height);
+		}
 	},
 
 	getDrawable: function (frameIndex)

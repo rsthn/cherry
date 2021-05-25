@@ -46,10 +46,12 @@ import _TFunction from './math/tfunction.js'; export const TFunction = _TFunctio
 import _Easing from './anim/easing.js'; export const Easing = _Easing;
 import _Anim from './anim/anim.js'; export const Anim = _Anim;
 
+// spatial
+import _QuadTreeItem from './spatial/quadtree-item.js'; export const QuadTreeItem = _QuadTreeItem;
+import _QuadTreeNode from './spatial/quadtree-node.js'; export const QuadTreeNode = _QuadTreeNode;
+import _QuadTree from './spatial/quadtree.js'; export const QuadTree = _QuadTree;
+
 /*
-import _QuadTreeItem from './quadtree-item.js';
-import _QuadTreeNode from './quadtree-node.js';
-import _QuadTree from './quadtree.js';
 import _DisplayElement from './display-element.js';
 import _Viewport from './viewport.js';
 import _World from './world.js';

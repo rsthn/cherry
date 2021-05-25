@@ -29,9 +29,9 @@ export default Element.extend
 	focusLock: false,
 
 	/**
-	**	Status of the button (0 for unpressed, 1 for pressed).
+	**	Current and last status of the button (0 for unpressed, 1 for pressed).
 	*/
-	status: 0, pstatus: 0,
+	status: 0, lstatus: 0,
 
 	/**
 	**	Images for the unpressed and pressed statuses.
@@ -80,8 +80,8 @@ export default Element.extend
 	*/
 	reset: function ()
 	{
-		this.status = this.pstatus = 0;
-		this.onChange (this.status, this.pstatus);
+		this.status = this.lstatus = 0;
+		this.onChange (this.status, this.lstatus);
 	},
 
 	/**
@@ -107,10 +107,10 @@ export default Element.extend
 	*/
 	pointerActivate: function (pointer)
 	{
-		this.pstatus = this.status;
+		this.lstatus = this.status;
 		this.status = 1;
 
-		this.onChange (this.status, this.pstatus);
+		this.onChange (this.status, this.lstatus);
 	},
 
 	/**
@@ -118,10 +118,10 @@ export default Element.extend
 	*/
 	pointerDeactivate: function (pointer)
 	{
-		this.pstatus = this.status;
+		this.lstatus = this.status;
 		this.status = 0;
 
-		this.onChange (this.status, this.pstatus);
+		this.onChange (this.status, this.lstatus);
 	},
 
 	/**
@@ -132,15 +132,15 @@ export default Element.extend
 		if (!this.active() || !this.visible())
 			return false;
 
-		return this.w_hitbox.containsPoint(x, y);
+		return this.bounds.containsPoint(x, y);
 	},
 
 	/**
 	**	Executed after any change in the status of the button. Be careful when overriding this, because when so, the onTap method will not work.
 	*/
-	onChange: function (status, pstatus) /* @override */
+	onChange: function (status, lstatus) /* @override */
 	{
-		if (status != pstatus)
+		if (status != lstatus)
 		{
 			if (status)
 				this.onButtonDown();
@@ -148,7 +148,7 @@ export default Element.extend
 				this.onButtonUp();
 		}
 
-		if (status == 0 && pstatus == 1) this.onTap();
+		if (status == 0 && lstatus == 1) this.onTap();
 	},
 
 	/**

@@ -15,6 +15,7 @@
 */
 
 import { Class } from '@rsthn/rin';
+import Resources from './resources.js';
 
 /*
 	track: string (music|sfx)
@@ -665,5 +666,13 @@ Object.assign(Sound,
 		50);
 	}
 });
+
+/**
+**	Creates a descriptor for an audio resource.
+*/
+Resources.Audio = function (src, opts=null)
+{
+	return { type: "audio", wrapper: "Sound", src: src, ...opts };
+};
 
 export default Sound;

@@ -17,13 +17,16 @@
 import { Rin } from '@rsthn/rin';
 import System from '../system/system.js';
 import Canvas from '../system/canvas.js';
+
+const Resources = { };
+export default Resources;
+
 import * as Wrappers from './wrappers.js';
 
 /**
 **	Provides functionality to load and manipulate resources (images, audio, etc).
 */
-
-const Resources =
+Object.assign(Resources,
 {
 	/**
 	**	Indicates if integer scaling is enabled when calling resizeImage(), when enabled, applies only to up-scaling, and images will always be up-scaled
@@ -38,7 +41,7 @@ const Resources =
 	pixelated: false,
 
 	/**
-	**	Initializes this object and loads the specified options object.
+	**	Initializes all wrappers and loads the specified options object.
 	*/
 	init: function (opts=null)
 	{
@@ -47,27 +50,11 @@ const Resources =
 	},
 
 	/**
-	**	Creates a descriptor for an image resource (with Drawable wrapper).
-	*/
-	Image: function (src, opts=null)
-	{
-		return { type: "image", wrapper: "Drawable", src: src, pixelated: this.pixelated, ...opts };
-	},
-
-	/**
-	**	Creates a descriptor for an audio resource (with Sound wrapper).
-	*/
-	Audio: function (src, opts=null)
-	{
-		return { type: "audio", wrapper: "Sound", src: src, ...opts };
-	},
-
-	/**
 	**	Loads a list of resources. The list parameter is a map with elements as shown in the example below,
 	**	the callback can be optionally specified and it will be called with the index of the element being
 	**	loaded and the total number of elements to load.
 	**
-	**	{ type: "image", wrapper: "", src: "assets/ui/btn-left.png", width: 64, [ height: 64 ], pixelated: false }
+	**	{ type: "image", wrapper: "", src: "assets/ui/btn-left.png", width: 64, [ height: 64 ], scale: 1, pixelated: false, original: false }
 	**	{ type: "images", wrapper: "", src: "assets/ui/##.png", count: 16, width: 64, [ height: 64 ], pixelated: false }
 	**	{ type: "audio", wrapper: "", src: "assets/ui/tap.wav" }
 	**	{ type: "audios", wrapper: "", src: "assets/ui/snd-##.wav", count: 4 }
@@ -127,6 +114,9 @@ const Resources =
 
 					r.owidth = r.data.width;
 					r.oheight = r.data.height;
+
+					if (r.pixelated === null || !r.hasOwnProperty('pixelated'))
+						r.pixelated = Resources.pixelated;
 
 					if (r.data.width != r.width || r.data.height != r.height || (r.original !== true && System.scaleFactor != 1))
 					{
@@ -225,6 +215,9 @@ const Resources =
 
 						if (tmp.data.width != tmp.width || tmp.data.height != tmp.height || (tmp.original !== true && System.scaleFactor != 1))
 						{
+							if (r.pixelated === null || !r.hasOwnProperty('pixelated'))
+								r.pixelated = Resources.pixelated;
+
 							if (tmp.original === true)
 								tmp.data = Resources.resizeImage (tmp, tmp.width, tmp.height, r.pixelated, true);
 							else
@@ -715,6 +708,4 @@ const Resources =
 
 		loadNext(0);
 	}
-};
-
-export default Resources;
+});

@@ -42,13 +42,13 @@ Rect.prototype.y2 = 0;
 /**
 **	Initializes the rect (takes 0, 2 or 4 parameters).
 */
-Rect.prototype.__reinit = function ()
+Rect.prototype.__reinit = function (...args)
 {
-	switch (arguments.length)
+	switch (args.length)
 	{
-		case 0: this.Rect0.apply(this, arguments); break;
-		case 2: this.Rect2.apply(this, arguments); break;
-		case 4: this.Rect4.apply(this, arguments); break;
+		case 0: this.Rect0.apply(this, args); break;
+		case 2: this.Rect2.apply(this, args); break;
+		case 4: this.Rect4.apply(this, args); break;
 	}
 
 	return this;
@@ -196,12 +196,12 @@ Rect.prototype.set1 = function (r)
 /**
 **	Returns true if the specified rect is equal to the current rect.
 */
-Rect.prototype.equals = function ()
+Rect.prototype.equals = function (...args)
 {
-	switch (arguments.length)
+	switch (args.length)
 	{
-		case 1: return this.equals1.apply(this, arguments);
-		case 4: return this.equals4.apply(this, arguments);
+		case 1: return this.equals1.apply(this, args);
+		case 4: return this.equals4.apply(this, args);
 	}
 };
 
@@ -224,12 +224,12 @@ Rect.prototype.equals4 = function (x1, y1, x2, y2)
 /**
 **	Returns a bool indicating if the specified rectangle object is contained by the current rectangle.
 */
-Rect.prototype.contains = function ()
+Rect.prototype.contains = function (...args)
 {
-	switch (arguments.length)
+	switch (args.length)
 	{
-		case 1: return this.contains1.apply(this, arguments);
-		case 4: return this.contains4.apply(this, arguments);
+		case 1: return this.contains1.apply(this, args);
+		case 4: return this.contains4.apply(this, args);
 	}
 };
 
@@ -252,12 +252,12 @@ Rect.prototype.contains4 = function (x1, y1, x2, y2)
 /**
 **	Returns a bool indicating if the specified rectangle object is contained by the current rectangle.
 */
-Rect.prototype.setAsUnion = function ()
+Rect.prototype.setAsUnion = function (...args)
 {
-	switch (arguments.length)
+	switch (args.length)
 	{
-		case 1: return this.setAsUnion1.apply(this, arguments);
-		case 4: return this.setAsUnion4.apply(this, arguments);
+		case 1: return this.setAsUnion1.apply(this, args);
+		case 4: return this.setAsUnion4.apply(this, args);
 	}
 };
 
@@ -287,12 +287,12 @@ Rect.prototype.setAsUnion4 = function (x1, y1, x2, y2)
 /**
 **	Returns a bool indicating if the rectangles intersect or not.
 */
-Rect.prototype.intersects = function ()
+Rect.prototype.intersects = function (...args)
 {
-	switch (arguments.length)
+	switch (args.length)
 	{
-		case 1: return this.intersects1.apply(this, arguments);
-		case 4: return this.intersects4.apply(this, arguments);
+		case 1: return this.intersects1.apply(this, args);
+		case 4: return this.intersects4.apply(this, args);
 	}
 };
 
@@ -321,12 +321,12 @@ Rect.prototype.intersects4 = function (x1, y1, x2, y2)
 **	Sets the rect to the intersection box formed by the current rect and the given one. The resulting bounding box contains any point
 **	that's contained simultaneously in both rects.
 */
-Rect.prototype.setAsIntersection = function ()
+Rect.prototype.setAsIntersection = function (...args)
 {
-	switch (arguments.length)
+	switch (args.length)
 	{
-		case 1: return this.setAsIntersection1.apply(this, arguments);
-		case 4: return this.setAsIntersection4.apply(this, arguments);
+		case 1: return this.setAsIntersection1.apply(this, args);
+		case 4: return this.setAsIntersection4.apply(this, args);
 	}
 };
 
@@ -444,9 +444,8 @@ Rect.prototype.isRight = function ()
 /**
 **	Returns true if the specified point is within the rectangle. The tol parameter is used to specify a tolerance value in pixels.
 */
-Rect.prototype.containsPoint = function (x, y, tol)
+Rect.prototype.containsPoint = function (x, y, tol=0)
 {
-	if (!tol) tol = 0;
 	return (this.x1-tol <= x && x <= this.x2+tol) && (this.y1-tol <= y && y <= this.y2+tol);
 };
 

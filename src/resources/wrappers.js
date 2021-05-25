@@ -15,9 +15,9 @@
 */
 
 import _Drawable from './drawable.js'; export const Drawable = _Drawable;
-import _DrawableRect from './drawable-rect.js'; export const DrawableRect = _DrawableRect;
-import _SpriteSheet from './spritesheet.js'; export const SpriteSheet = _SpriteSheet;
-import _SpriteSheetAnimation from './spritesheet-animation.js'; export const SpriteSheetAnimation = _SpriteSheetAnimation;
+import _Placeholder from './placeholder.js'; export const Placeholder = _Placeholder;
+import _Spritesheet from './spritesheet.js'; export const Spritesheet = _Spritesheet;
+import _SpritesheetAnimation from './spritesheet-animation.js'; export const SpritesheetAnimation = _SpritesheetAnimation;
 import _SpriteFont from './spritefont.js'; export const SpriteFont = _SpriteFont;
 import _Sound from './sound.js'; export const Sound = _Sound;
 import _SoundArray from './sound-array.js'; export const SoundArray = _SoundArray;

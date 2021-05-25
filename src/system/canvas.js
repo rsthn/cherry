@@ -17,6 +17,7 @@
 import { Rin } from '@rsthn/rin';
 import Matrix from '../math/matrix.js';
 import Log from './log.js';
+import System from './system.js';
 
 /**
 **	Constructs a canvas object. If the Canvas DOM element is not provided a new element will be created and attached to the page.
@@ -82,7 +83,9 @@ const Canvas = function (options=null)
 	// State stack support.
 	this.matrixStack = [];
 	this.alphaStack = [];
+
 	this.matr = new Matrix ();
+	this.transform = new Matrix ();
 
 	// Default alpha value.
 	this._alpha = 1.0;
@@ -91,11 +94,9 @@ const Canvas = function (options=null)
 	// Set initial transformation matrix.
 	this.matr.identity();
 
-	if (this.context != null) {
-		this.updateTransform();
-		this.strokeStyle("#fff");
-		this.fillStyle("#fff");
-	}
+	this.updateTransform();
+	this.strokeStyle("#fff");
+	this.fillStyle("#fff");
 
 	this.resize(opts.width, opts.height);
 };
@@ -116,10 +117,10 @@ Canvas.passThruCanvas =
 		return this;
 	},
 
-	save: function() {
+	pushClip: function() {
 	},
 
-	restore: function() {
+	popClip: function() {
 	},
 
 	scale: function (sx, sy) {
@@ -335,7 +336,7 @@ Canvas.prototype.initGl = function ()
 			this.gl_active_texture = img.gl_texture;
 		}
 
-		// image, x, y
+		// [3] image, x, y
 		if (args.length == 3)
 		{
 			if (sx == 0 && sy == 0)
@@ -343,7 +344,7 @@ Canvas.prototype.initGl = function ()
 				this.location_matrix.identity();
 				this.location_matrix.scale(img.width, img.height);
 
-				this.gl.uniformMatrix3fv(this.gl_uniform_current_matrix, false, this.matr.data);
+				this.gl.uniformMatrix3fv(this.gl_uniform_current_matrix, false, this.transform.data);
 				this.gl.uniformMatrix3fv(this.gl_uniform_matrix, false, this.location_matrix.data);
 				this.gl.uniformMatrix3fv(this.gl_uniform_texture_matrix, false, this.location_matrix.data);
 				this.gl.drawArrays (gl.TRIANGLE_STRIP, 0, 4);
@@ -358,7 +359,7 @@ Canvas.prototype.initGl = function ()
 			this.texture_matrix.identity();
 			this.texture_matrix.scale(img.width, img.height);
 
-			this.gl.uniformMatrix3fv(this.gl_uniform_current_matrix, false, this.matr.data);
+			this.gl.uniformMatrix3fv(this.gl_uniform_current_matrix, false, this.transform.data);
 			this.gl.uniformMatrix3fv(this.gl_uniform_matrix, false, this.location_matrix.data);
 			this.gl.uniformMatrix3fv(this.gl_uniform_texture_matrix, false, this.texture_matrix.data);
 			this.gl.drawArrays (gl.TRIANGLE_STRIP, 0, 4);
@@ -369,13 +370,13 @@ Canvas.prototype.initGl = function ()
 		const sw = args[3];
 		const sh = args[4];
 
-		// image, x, y, width, height
+		// [5] image, x, y, width, height
 		if (args.length == 5)
 		{
 			return;
 		}
 
-		// image, sx, sy, sw, sh, dx, dy, dw, dh
+		// [9] image, sx, sy, sw, sh, dx, dy, dw, dh
 		const dx = args[5];
 		const dy = args[6];
 		const dw = args[7];
@@ -389,7 +390,7 @@ Canvas.prototype.initGl = function ()
 		this.texture_matrix.translate(sx, sy);
 		this.texture_matrix.scale(sw, sh);
 
-		this.gl.uniformMatrix3fv(this.gl_uniform_current_matrix, false, this.matr.data);
+		this.gl.uniformMatrix3fv(this.gl_uniform_current_matrix, false, this.transform.data);
 		this.gl.uniformMatrix3fv(this.gl_uniform_matrix, false, this.location_matrix.data);
 		this.gl.uniformMatrix3fv(this.gl_uniform_texture_matrix, false, this.texture_matrix.data);
 		this.gl.drawArrays (gl.TRIANGLE_STRIP, 0, 4);
@@ -458,6 +459,7 @@ Canvas.prototype.dispose = function ()
 
 	this.matrixStack = null;
 	this.alphaStack = null;
+
 	this.matr = null;
 	this.context = null;
 	this.elem = null;
@@ -555,32 +557,43 @@ Canvas.prototype.flipped = function (value)
 		this._height = ~~(this.height / this._globalScale);
 	}
 
+	this.isFlipped = value;
 	return this;
 };
 
 
 /**
-**	Saves the state of the canvas context.
+**	Saves the clip state of the canvas.
 **
-**	>> Canvas save();
+**	>> Canvas pushClip();
 */
 
-Canvas.prototype.save = function ()
+Canvas.prototype.pushClip = function ()
 {
-	this.context.save();
+	if (this.gl != null)
+		;
+	else
+		this.context.save();
+
 	return this;
 };
 
 
 /**
-**	Restores the state of the canvas context.
+**	Restores the clip state of the canvas.
 **
-**	>> Canvas restore();
+**	>> Canvas popClip();
 */
 
-Canvas.prototype.restore = function ()
+Canvas.prototype.popClip = function ()
 {
-	this.context.restore();
+	if (this.gl != null)
+	{
+		this.gl.scissor(0, 0, this.width, this.height);
+	}
+	else
+		this.context.restore();
+
 	return this;
 };
 
@@ -618,11 +631,10 @@ Canvas.prototype.toPng64 = function ()
 
 Canvas.prototype._contextAttribute = function (name, value)
 {
+	if (!this.context) return;
+
 	if (value !== undefined)
 	{
-		if (!this.context)
-			throw new Error('Unable to set attribute: ' + name);
-
 		this.context[name] = value;
 		return this;
 	}
@@ -856,10 +868,7 @@ Canvas.prototype.globalCompositeOperation = function (value)
 
 Canvas.prototype.updateTransform = function()
 {
-	if (this.context == null)
-		return this;
-
-	this.context.setTransform (this.matr.data[0], this.matr.data[1], this.matr.data[3], this.matr.data[4], this.matr.data[6], this.matr.data[7]);
+	this.setTransform (this.matr.data[0], this.matr.data[1], this.matr.data[3], this.matr.data[4], this.matr.data[6], this.matr.data[7]);
 	return this;
 };
 
@@ -872,7 +881,22 @@ Canvas.prototype.updateTransform = function()
 
 Canvas.prototype.setTransform = function (a, b, c, d, e, f)
 {
-	this.context.setTransform (a, b, c, d, e, f);
+	if (this.context == null)
+	{
+		this.transform.data[0] = a;
+		this.transform.data[1] = b;
+		this.transform.data[2] = 0;
+		this.transform.data[3] = c;
+		this.transform.data[4] = d;
+		this.transform.data[5] = 0;
+		this.transform.data[6] = int(e);
+		this.transform.data[7] = int(f);
+		this.transform.data[8] = 1;
+
+		return this;
+	}
+
+	this.context.setTransform (a, b, c, d, int(e), int(f));
 	return this;
 };
 
@@ -1011,8 +1035,8 @@ Canvas.prototype.stroke = function (value)
 };
 
 
-/**
-**	Creates a viewport with the active path. Only the viewport will be visible.
+/*
+**	Clips a region of the canvas so that only the region will be used for drawing. Coordinates must be in logical screen space.
 **
 **	>> Canvas clip();
 */
@@ -1021,7 +1045,15 @@ Canvas.prototype.clip = function (x, y, width, height)
 {
 	if (this.gl != null)
 	{
-		this.gl.scissor(x, y, width, height);
+		x *= this._globalScale;
+		y *= this._globalScale;
+		width *= this._globalScale;
+		height *= this._globalScale;
+
+		if (this.isFlipped)
+			this.gl.scissor(this.width-y-height-1, this.height-x-width-1, height, width);
+		else
+			this.gl.scissor(x, this.height-y-height-1, width, height);
 	}
 	else
 	{
@@ -1622,15 +1654,35 @@ Canvas.prototype.removePointerHandler = function (id)
 /**
 **	Draws an image resource on the canvas (as obtained by Resources.load).
 **
-**	>> Canvas drawImageEx (Resource image, float x, float y, [float width, float height]);
+**	>> Canvas drawImageEx (Resource image, [float x, float y, float width, float height]);
 */
 
-Canvas.prototype.drawImageResource = function (image, x, y, width, height)
+Canvas.prototype.drawImageResource = function (image, x=0, y=0, width=null, height=null)
 {
 	if (width == null)
 		return this.drawImage (image.data, 0, 0, image.data.width, image.data.height, x, y, image.width, image.height);
 
 	return this.drawImage (image.data, 0, 0, image.data.width, image.data.height, x, y, width, height);
+};
+
+/*
+**	Executes the draw function on a new canvas of the specified width and height, renders it into an image and runs the
+**	completed callback with the ready image object.
+*/
+Canvas.renderImage = function (width, height, draw, completed)
+{
+	let g = new Canvas({ width: width, height: height });
+
+	draw(g);
+
+	let img = new Image();
+	img.onload = () => {
+		System.displayBuffer.prepareImage(img);
+		completed(img);
+	};
+
+	img.src = g.toDataUrl();
+	g.dispose();
 };
 
 export default Canvas;

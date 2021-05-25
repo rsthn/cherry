@@ -20,12 +20,13 @@ import Rect from '../math/rect.js'
 import Anim from '../anim/anim.js';
 import Matrix from '../math/matrix.js';
 import Log from '../system/log.js';
+import QuadTreeItem from '../spatial/quadtree-item.js';
 
 /*
 **
 */
 
-export default Class.extend
+export default QuadTreeItem.extend
 ({
 	className: 'Element',
 
@@ -40,6 +41,11 @@ export default Class.extend
 	_active: true,
 
 	/*
+	**	Controls whether bounding box creating is relative to the center (false) or to the top-left corner (true).
+	*/
+	_topLeftRelative: true,
+
+	/*
 	**	Animation related to the element.
 	*/
 	anim: null,
@@ -50,7 +56,8 @@ export default Class.extend
 	parent: null,
 
 	/*
-	**	Container where this element is stored, and its related node. If `container` is false, it means the element doesn't need a container.
+	**	Container where this element is stored, and its related node. If `container` is false, it means the element doesn't need a container. These
+	**	are set by the parent container, do not modify directly.
 	*/
 	container: null,
 	node: null,
@@ -70,12 +77,6 @@ export default Class.extend
 	width: 0, height: 0,
 
 	/*
-	**	Element hitbox in object and world space.
-	*/
-	hitbox: null,
-	w_hitbox: null,
-
-	/*
 	**	Transformation matrix to place the object in world space.
 	*/
 	transform: null,
@@ -92,6 +93,8 @@ export default Class.extend
 	*/
 	__ctor: function(x=0, y=0, width=0, height=0)
 	{
+		this._super.QuadTreeItem.__ctor();
+
 		this.anim = new Anim();
 		this.anim.output(this);
 
@@ -99,9 +102,6 @@ export default Class.extend
 		this.y = y;
 
 		this.transform = new Matrix();
-
-		this.hitbox = Rect.alloc();
-		this.w_hitbox = Rect.alloc();
 
 		this.resize(width, height);
 		this.updateTransform(true);
@@ -112,20 +112,22 @@ export default Class.extend
 	*/
 	__dtor: function()
 	{
-		dispose (this.hitbox);
-		dispose (this.w_hitbox);
+		this._super.QuadTreeItem.__dtor();
 		this.remove();
+
+		this.anim = null;
+		this.transform = null;
 	},
 
 	/*
 	**	Sets or returns the visible flag.
 	*/
-	visible: function(value=null)
+	visible: function (value=null)
 	{
 		if (value === null)
 		{
-			if (this.container === null)
-				return false;
+			//if (this.container === null)
+			//	return false;
 
 			return this._visible && (this.parent != null ? this.parent.visible() : true);
 		}
@@ -137,7 +139,7 @@ export default Class.extend
 	/*
 	**	Sets or returns the active flag.
 	*/
-	active: function(value=null)
+	active: function (value=null)
 	{
 		if (value === null)
 			return this._active && (this.parent != null ? this.parent.active() : true);
@@ -147,58 +149,44 @@ export default Class.extend
 	},
 
 	/*
-	**	Sets the width and height of the element (and its hitbox).
+	**	Sets the width and height of the element.
 	*/
 	resize: function (width, height)
 	{
 		this.width = width;
 		this.height = height;
-		this.resizeHitbox (width, height);
+
+		this._updateBounds();
 	},
 
 	/*
-	**	Resizes the hitbox to the specified size. When normalized is `true`, values are from 0 to 1 relative to the width/height
-	**	of the element respectively.
+	**	Updates the world-space bounding box.
 	*/
-	resizeHitbox: function (width, height, normalized=false)
+	_updateBounds: function()
 	{
-		if (normalized)
-		{
-			width *= this.width;
-			height *= this.height;
-		}
+		this.bounds.zero();
+		this.bounds.translate (0, 0);
+		this.bounds.resizeBy (this.width, this.height, this._topLeftRelative);
 
-		this.hitbox.zero();
-		this.hitbox.translate (0, 0);
-		this.hitbox.resizeBy (width, height, true);
-
-		this.updateHitbox();
-	},
-
-	/*
-	**	Updates the world-space hitbox.
-	*/
-	updateHitbox: function()
-	{
 		// violet: figure a way to optimize this
-		let p0 = this.transform.applyTo(this.hitbox.x1, this.hitbox.y1);
-		let p1 = this.transform.applyTo(this.hitbox.x1, this.hitbox.y2);
-		let p2 = this.transform.applyTo(this.hitbox.x2, this.hitbox.y1);
-		let p3 = this.transform.applyTo(this.hitbox.x2, this.hitbox.y2);
+		let p0 = this.transform.applyTo(this.bounds.x1, this.bounds.y1);
+		//let p1 = this.transform.applyTo(this.bounds.x1, this.bounds.y2);
+		//let p2 = this.transform.applyTo(this.bounds.x2, this.bounds.y1);
+		let p3 = this.transform.applyTo(this.bounds.x2, this.bounds.y2);
 
-		this.w_hitbox.reset();
-		this.w_hitbox.extendWithPoint(p0);
-		this.w_hitbox.extendWithPoint(p1);
-		this.w_hitbox.extendWithPoint(p2);
-		this.w_hitbox.extendWithPoint(p3);
+		this.bounds.reset();
+		this.bounds.extendWithPoint(p0);
+		//this.bounds.extendWithPoint(p1);
+		//this.bounds.extendWithPoint(p2);
+		this.bounds.extendWithPoint(p3);
 	},
 
 	/*
 	**	Updates the element's transformation matrix.
 	*/
-	updateTransform: function(immediate=false)
+	updateTransform: function(immediateTransformUpdate=false)
 	{
-		if (!immediate)
+		if (!immediateTransformUpdate)
 		{
 			this.transformDirty = true;
 			return;
@@ -226,8 +214,19 @@ export default Class.extend
 
 		this.transformDirty = false;
 
-		/* ** */
-		this.updateHitbox();
+		this._updateBounds();
+		this.updatePosition();
+	},
+
+	/*
+	**	Returns the element's root (first parent) or itself if no parent is set.
+	*/
+	getRoot: function()
+	{
+		let item = this;
+
+		while (item.parent) item = item.parent;
+		return item;
 	},
 
 	/*
@@ -240,23 +239,23 @@ export default Class.extend
 		}
 
 		this.parent = parent;
-		if (!parent) return this;
+		this.transformDirty = true;
 	},
 
 	/*
-	**	Returns the X coordinate of the element, includes any offset introduced by the parent.
+	**	Returns the X coordinate of the element, if `absolute` is true it will include any offset introduced by the parent.
 	*/
-	getX: function()
+	getX: function(absolute=false)
 	{
-		return (this.parent != null ? this.parent.getX() : 0) + this._super.Element.getX();
+		return (absolute && this.parent != null ? this.parent.getX(true) : 0) + this.x;
 	},
 
 	/*
-	**	Returns the Y coordinate of the element, includes any offset introduced by the parent.
+	**	Returns the Y coordinate of the element, if `absolute` is true it will include any offset introduced by the parent.
 	*/
-	getY: function()
+	getY: function(absolute=false)
 	{
-		return (this.parent != null ? this.parent.getY() : 0) + this._super.Element.getY();
+		return (absolute && this.parent != null ? this.parent.getY(true) : 0) + this.y;
 	},
 
 	/*
@@ -266,7 +265,7 @@ export default Class.extend
 	{
 		if (this.parent != null)
 			this.parent.inverseTransform (point);
-//violet
+//violet: check if this is ok
 		point.x -= this.x;
 		point.y -= this.y;
 
@@ -299,7 +298,7 @@ export default Class.extend
 	*/
 	addTo: function (container)
 	{
-		container.push(this);
+		container.add(this);
 		return this;
 	},
 
@@ -313,9 +312,9 @@ export default Class.extend
 
 		if (this.container)
 		{
-			this.container.remove (this.node);
+			this.container.remove (this);
 			this.container = null;
-			// VIOLET: make container set null from Conatiner class when removed
+			// VIOLET: make some method on container to set null when removed
 		}
 
 		return this;
@@ -327,27 +326,29 @@ export default Class.extend
 	updatePosition: function()
 	{
 		if (this.container)
-			this.container.updatePosition(this);
-	},
-
-	/*
-	**	Sets the position of the element.
-	*/
-	setPosition: function (x, y)
-	{
-		return this.translate(x - this.x, y - this.y);
+			this.container.syncPosition(this);
 	},
 
 	/*
 	**	Moves the element by the specified deltas.
 	*/
-	translate: function (dx, dy)
+	translate: function (dx, dy, immediateTransformUpdate=false)
 	{
 		this.x += dx;
 		this.y += dy;
 
-		this.hitbox.translate (dx, dy);
+		this.bounds.translate (dx, dy);
+
+		this.updateTransform(immediateTransformUpdate);
 		return this;
+	},
+
+	/*
+	**	Sets the position of the element.
+	*/
+	setPosition: function (x, y, immediateTransformUpdate=false)
+	{
+		return this.translate (x - this.x, y - this.y, immediateTransformUpdate);
 	},
 
 	/*
@@ -379,8 +380,9 @@ export default Class.extend
 	{
 		if (G.debugBounds || this.debugBounds)
 		{
+			g.lineWidth(1);
 			g.strokeStyle("yellow");
-			g.strokeRect(0, 0, this.width, this.height);
+			g.strokeRect(0.5, 0.5, this.width-1, this.height-1);
 		}
 
 		g.popAlpha();
@@ -399,13 +401,20 @@ export default Class.extend
 			else
 				g.fillStyle("rgba(0,255,255,0.5)");
 
-			/*if (this.highlight)
+			g.fillRect(this.insertionBounds.x1, this.insertionBounds.y1, this.insertionBounds.width(), this.insertionBounds.height());
+
+			// violet: remove this? or figure a better way to have this.
+			if (this.highlight)
 			{
 				g.fillStyle("rgba(255,0,0,0.5)");
-				this.highlight = false;
-			}*/
+				g.fillRect(this.highlight.x1, this.highlight.y1, this.highlight.width(), this.highlight.height());
+			}
 
-			g.fillRect(int(this.w_hitbox.x1), int(this.w_hitbox.y1), int(this.w_hitbox.width()), int(this.w_hitbox.height()));
+			//if (this.type) {
+			//	g.font('bold 3px monospace');
+			//	g.fillStyle('red');
+			//	g.fillText(this.selectedIndex, this.insertionBounds.x1, this.insertionBounds.y1);
+			//}
 		}
 	},
 
@@ -414,7 +423,7 @@ export default Class.extend
 	*/
 	draw: function(g)
 	{
-		if (!this.visible()) return; // violet: optimize by returning quick if elementDraw is the default one
+		if (!this.visible()) return; // violet: optimize by returning immediately if elementDraw is the default one
 
 		this.preDraw(g);
 		this.elementDraw(g);
@@ -431,10 +440,10 @@ export default Class.extend
 		if (!this.anim.update(dt) || this.transformDirty)
 		{
 			this.updateTransform(true);
-Log.vars.Y++;//violet
+//Log.vars.Y++;//violet: remove, was used to count transform updates
 		}
-		else
-Log.vars.X++;//violet
+//		else
+//Log.vars.X++;//violet: remove, was used to count transform updates
 
 		this.elementUpdate(dt);
 	},
@@ -450,6 +459,20 @@ Log.vars.X++;//violet
 	**	Updates the element. Parameter `dt` is the time delta measured in seconds.
 	*/
 	elementUpdate: function(dt) /* @override */
+	{
+	},
+
+	/*
+	**	Executed when the item is added to a container.
+	*/
+	onAttached: function (container) /* @override */
+	{
+	},
+
+	/*
+	**	Executed when the item is removed from a container.
+	*/
+	onDetached: function (container) /* @override */
 	{
 	}
 });

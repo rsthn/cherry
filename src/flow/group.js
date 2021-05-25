@@ -32,14 +32,15 @@ export default Element.extend
 	*/
 	children: null,
 
+	// violet: remove??
 	undisposable: false,
 
 	/*
 	**	Constructs an empty group element.
 	*/
-	__ctor: function (x, y)
+	__ctor: function (x, y, width=1, height=1)
 	{
-		this._super.Element.__ctor(x, y);
+		this._super.Element.__ctor(x, y, width, height);
 	},
 
 	/*
@@ -105,6 +106,17 @@ export default Element.extend
 	},
 
 	/*
+	**	Updates the position of the element in the container.
+	*/
+	updatePosition: function()
+	{
+		this._super.Element.updatePosition();
+
+		if (this.children != null)
+			this.children.forEach(elem => elem.updatePosition());
+	},
+
+	/*
 	**	Updates the element's transformation matrix.
 	*/
 	updateTransform: function(immediate=false)
@@ -113,12 +125,5 @@ export default Element.extend
 
 		if (this.children != null)
 			this.children.forEach(elem => elem.updateTransform(immediate));
-	},
-
-	/*
-	containsPoint: function(x, y)
-	{
-		return this.x <= x && x < this.x+this.width && this.y <= y && y < this.y+this.height;
-	},
-	*/
+	}
 });

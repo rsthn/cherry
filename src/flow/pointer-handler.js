@@ -37,6 +37,9 @@ export default Boot.Module.create
 	{
 		try {
 			this.handlers.add(handler);
+
+			if ('init' in handler)
+				handler.init();
 		}
 		catch (e) {
 			throw new Error ("PointerHandler (register): " + e.message);

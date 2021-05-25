@@ -68,6 +68,11 @@ Recycler.attachTo = function (_class, _maxPoolSize)
 		return item;
 	};
 
+	_class.free = function(item)
+	{
+		if (item) item.dispose();
+	};
+
 	_class.prototype.dispose = function (reason)
 	{
 		if (this.objectId == 0)

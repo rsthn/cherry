@@ -15,7 +15,7 @@
 */
 
 import { Class } from '@rsthn/rin';
-import SpriteSheet from './spritesheet.js';
+import Spritesheet from './spritesheet.js';
 import System from '../system/system.js';
 
 /*
@@ -26,7 +26,7 @@ import System from '../system/system.js';
 			seq1: { loop: bool?, group: [ [int, int, ...], ... ] },
 			seq2: { loop: bool?, group: [ [int, int, ...], ... ] },
 			seq2: { loop: bool?, group: "0,12" },
-			seq2: { loop: bool?, group: "4" },
+			seq2: { loop: bool?, group: "4 1 1 2 3" },
 		},
 
 		trans: {
@@ -56,11 +56,10 @@ export const Animation = Class.extend
 	width: null,
 	height: null,
 
-	onFinishedCallback: null,
-	onFinishedArg: null,
+	finishedCallback: null,
+	finishedCallbackChain: null,
 
-	onFrameCallback: null,
-	onFrameArg: null,
+	frameCallback: null,
 
 	__ctor: function (anim, seq, fps)
 	{
@@ -102,17 +101,36 @@ export const Animation = Class.extend
 		return this;
 	},
 
-	onFinished: function (fn, arg)
+	onFinished: function (callback)
 	{
-		this.onFinishedCallback = fn;
-		this.onFinishedArg = arg;
+		this.finishedCallback = callback;
 		return this;
 	},
 
-	onFrame: function (fn, arg)
+	then: function (callback)
 	{
-		this.onFrameCallback = fn;
-		this.onFrameArg = arg;
+		if (this.finishedCallback !== this.thenCallback)
+		{
+			this.finishedCallback = this.thenCallback;
+			this.finishedCallbackChain = [];
+		}
+
+		this.finishedCallbackChain.push(callback);
+		return this;
+	},
+
+	thenCallback: function ()
+	{
+		if (!this.finishedCallbackChain.length)
+			return false;
+
+		let callback = this.finishedCallbackChain.shift();
+		callback.call(this);
+	},
+
+	onFrame: function (fn)
+	{
+		this.frameCallback = fn;
 		return this;
 	},
 
@@ -132,7 +150,7 @@ export const Animation = Class.extend
 		return this.seq.group.length;
 	},
 
-	draw: function (g, x, y)
+	draw: function (g, x=0, y=0)
 	{
 		if (this.time < 0)
 		{
@@ -205,10 +223,10 @@ export const Animation = Class.extend
 					{
 						this.finished = true;
 
-						if (this.onFinishedCallback)
+						if (this.finishedCallback)
 						{
-							this.onFinishedCallback(this.onFinishedArg);
-							this.onFinishedCallback = null;
+							if (this.finishedCallback(this) === false)
+								this.finishedCallback = null;
 						}
 					}
 
@@ -217,10 +235,10 @@ export const Animation = Class.extend
 				}
 			}
 
-			if (this.onFrameCallback)
+			if (this.frameCallback)
 			{
-				if (this.onFrameCallback(frameIndex, this.seq.group.length-1, this.onFrameArg) === false)
-					this.onFrameCallback = null;
+				if (this.frameCallback(frameIndex, this.seq.group.length-1, this) === false)
+					this.frameCallback = null;
 			}
 		}
 	},
@@ -231,11 +249,16 @@ export const Animation = Class.extend
 		this.draw (null, 0, 0);
 	},
 
-	use: function (seqName, force)
+	getName: function ()
+	{
+		return (this.trans == null ? this.seq : this.trans_t).name;
+	},
+
+	use: function (seqName, force=false)
 	{
 		var seq = this.trans == null ? this.seq : this.trans_t;
 
-		if (seq.name == seqName && force !== true)
+		if (seq.name == seqName && !this.finished && force !== true)
 			return this;
 
 		if (seq.trans && seq.trans[seqName])
@@ -266,14 +289,16 @@ export const Animation = Class.extend
 		this.use(this.queue.shift(), true);
 	},
 
-	enqueue: function (seqName, force)
+	enqueue: function (seqName, force=false)
 	{
-		var seq = this.trans == null ? this.seq : this.trans_t;
+		let seq = this.trans == null ? this.seq : this.trans_t;
+
+		let lastName = this.queue.length > 0 ? this.queue[this.queue.length-1] : seq.name;
 
 		if (seq.name == seqName && seq.loop)
 			return this;
 
-		if (force !== true && this.queue.length > 0 && this.queue[this.queue.length-1] == seqName)
+		if (lastName == seqName && !force)
 			return this;
 
 		if (seq.loop || this.finished)
@@ -287,15 +312,16 @@ export const Animation = Class.extend
 	}
 });
 
-export default SpriteSheet.extend
+
+export default Spritesheet.extend
 ({
-	className: "SpriteSheetAnimation",
+	className: "SpritesheetAnimation",
 
 	__ctor: function (r)
 	{
 		if (!r.anim) throw new Error ("Animation descriptors not found.");
 
-		this._super.SpriteSheet.__ctor (r);
+		this._super.Spritesheet.__ctor (r);
 
 		this.r = r;
 		this.r.wrapper = this;
@@ -392,12 +418,12 @@ export default SpriteSheet.extend
 		t.initialized = true;
 	},
 
-	getDrawable: function (initialseq, fps)
+	getDrawable: function (initialseq=null, fps=null)
 	{
 		return new Animation (this, initialseq ? this.a.seq[initialseq] : this.a.def, fps || this.a.fps);
 	},
 
-	getSequence: function (initialseq)
+	getSequence: function (initialseq=null)
 	{
 		return initialseq ? this.a.seq[initialseq] : this.a.def;
 	}

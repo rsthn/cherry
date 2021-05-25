@@ -502,10 +502,8 @@ const Anim = Class.extend
 
 			if (!finished && this.finishedCallback != null)
 			{
-				let tmp = this.finishedCallback(this.data, this);
-
-				if (tmp === false)
-					this.finishedCallback = false;
+				if (this.finishedCallback(this.data, this) === false)
+					this.finishedCallback = null;
 
 				if (list !== this.list || this.block.length != count)
 				{
@@ -665,23 +663,32 @@ const Anim = Class.extend
 	},
 
 	// Translates the X coordinate.
-	translateX: function (duration, endValue, easing)
+	translateX: function (duration, deltaValue, easing)
 	{
-		return this.range('x', duration, null, (endValue < 0 ? '-' : '+') + Math.abs(endValue), easing);
+		return this.range('x', duration, null, (deltaValue < 0 ? '-' : '+') + Math.abs(deltaValue), easing);
 	},
 
 	// Translates the Y coordinate.
-	translateY: function (duration, endValue, easing)
+	translateY: function (duration, deltaValue, easing)
 	{
-		return this.range('y', duration, null, (endValue < 0 ? '-' : '+') + Math.abs(endValue), easing);
+		return this.range('y', duration, null, (deltaValue < 0 ? '-' : '+') + Math.abs(deltaValue), easing);
 	},
 
 	// Translates the X and Y coordinates.
-	translate: function (duration, endValueX, endValueY, easing)
+	translate: function (duration, deltaValueX, deltaValueY, easingX, easingY=null)
 	{
 		return this.parallel()
-				.range('x', duration, null, (endValueX < 0 ? '-' : '+') + Math.abs(endValueX), easing)
-				.range('y', duration, null, (endValueY < 0 ? '-' : '+') + Math.abs(endValueY), easing)
+				.range('x', duration, null, (deltaValueX < 0 ? '-' : '+') + Math.abs(deltaValueX), easingX)
+				.range('y', duration, null, (deltaValueY < 0 ? '-' : '+') + Math.abs(deltaValueY), easingY ? easingY : easingX)
+				.end();
+	},
+
+	// Sets the X and Y coordinates to the specified values.
+	moveTo: function (duration, endValueX, endValueY, easingX, easingY=null)
+	{
+		return this.parallel()
+				.range('x', duration, null, endValueX, easingX)
+				.range('y', duration, null, endValueY, easingY ? easingY : easingX)
 				.end();
 	},
 
@@ -698,18 +705,18 @@ const Anim = Class.extend
 	},
 
 	// Scales the X and Y coordinates.
-	scale: function (duration, endValueX, endValueY, easing)
+	scale: function (duration, endValueX, endValueY, easingX, easingY=null)
 	{
 		return this.parallel()
-				.range('sx', duration, null, endValueX, easing)
-				.range('sy', duration, null, endValueY, easing)
+				.range('sx', duration, null, endValueX, easingX)
+				.range('sy', duration, null, endValueY, easingY ? easingY : easingX)
 				.end();
 	},
 
 	// Rotates a certain number of radians.
-	rotate: function (duration, endValue, easing)
+	rotate: function (duration, deltaValue, easing)
 	{
-		return this.range('angle', duration, null, (endValue < 0 ? '-' : '+') + Math.abs(endValue), easing);
+		return this.range('angle', duration, null, (deltaValue < 0 ? '-' : '+') + Math.abs(deltaValue), easing);
 	},
 });
 

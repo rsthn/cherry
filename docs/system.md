@@ -157,7 +157,7 @@ Initializes the system with the specified configuration options.
 |`screenWidth`|When not-null and not-zero specifies the target screen width desired. If a larger or smaller width is detected on the client, the system will scale it appropriately such that you can always assume your width is `screenWidth`.|`null`
 |`screenHeight`|Same as above, but for height.|`null`
 |`orientation`|Specifies the target screen orientation. See available [orientation constants](#display-orientations) for details.|`System.DEFAULT`
-|`fullscreen`|When `true` the system will use the `screen` object of the browser to size the canvas. When `false` it will use the `window` object's inner bounds.|`true`
+|`fullscreen`|When `true` the system will use the `screen` object of the browser to size the canvas. When `false` it will use the `window` object's inner bounds.|`false`
 
 <br/>
 

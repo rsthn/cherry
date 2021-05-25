@@ -19,6 +19,7 @@ import List from '../utils/list.js';
 import Linkable from '../utils/linkable.js';
 import Timer from './timer.js';
 import Canvas from './canvas.js';
+import Log from './log.js';
 
 /*
 **	System object.
@@ -79,7 +80,7 @@ const System =
 		orientation: 0,
 
 		extraScaleFactor: 1,
-		fullscreen: true
+		fullscreen: false
 	},
 
 	/*
@@ -715,7 +716,7 @@ const System =
 	/*
 	**	Executed when the size of the window has changed. Will cause a full buffer rendering.
 	*/
-	onWindowResized: function(notRendering)
+	onWindowResized: function(notRendering=false)
 	{
 		if ('document' in global)
 		{
@@ -734,9 +735,10 @@ const System =
 		{
 			this._screenWidth = this.options.screenWidth;
 			this._screenHeight = this.options.screenHeight;
-		}
 
-		this.canvasScaleFactor = 1;
+			if (this.options.screenWidth == null && this.options.screenHeight == null)
+				throw new Error ('At least one screen dimension must be specified in headless mode.');
+		}
 
 		if ((this._screenWidth < this._screenHeight && this.orientation == System.LANDSCAPE) || (this._screenWidth > this._screenHeight && this.orientation == System.PORTRAIT))
 		{
@@ -752,18 +754,38 @@ const System =
 
 			this.reverseRender = false;
 		}
+Log.write(this._screenWidth + 'x' + this._screenHeight);//violet:REMOVE LATER
+		// ***
+		let targetScreenWidth = this.options.screenWidth;
+		let targetScreenHeight = this.options.screenHeight;
 
-		let screenWidth = this.options.screenWidth;
-		let screenHeight = this.options.screenHeight;
+		if (targetScreenWidth == null || targetScreenHeight == null)
+		{
+			if (targetScreenWidth == null)
+			{
+				targetScreenWidth = int(this.screenWidth * (this.options.screenHeight / this.screenHeight));
+			}
+			else if (targetScreenHeight == null)
+			{
+				targetScreenHeight = int(this.screenHeight * (this.options.screenWidth / this.screenWidth));
+			}
+		}
+
+		// ***
+		let screenWidth = targetScreenWidth;
+		let screenHeight = targetScreenHeight;
 
 		if (this.orientation == System.AUTOMATIC && screenWidth && screenHeight)
 		{
 			if ((screenWidth > screenHeight && this.screenWidth < this.screenHeight) || (screenWidth < screenHeight && this.screenWidth > this.screenHeight))
 			{
 				screenWidth = screenHeight;
-				screenHeight = this.options.screenWidth;
+				screenHeight = targetScreenWidth;
 			}
 		}
+
+		// ***
+		this.canvasScaleFactor = 1;
 
 		if (screenWidth && screenHeight)
 		{
@@ -778,8 +800,9 @@ const System =
 			this.canvasScaleFactor = this.screenHeight / screenHeight;
 		}
 
-		var _screenWidth = this.screenWidth;
-		var _screenHeight = this.screenHeight;
+		// ***
+		let _screenWidth = this.screenWidth;
+		let _screenHeight = this.screenHeight;
 
 		if (screenWidth) this.screenWidth = screenWidth;
 		if (screenHeight) this.screenHeight = screenHeight;
@@ -789,7 +812,7 @@ const System =
 
 		if (this.reverseRender)
 		{
-			var tmp = this.offsX;
+			let tmp = this.offsX;
 			this.offsX = this.offsY;
 			this.offsY = tmp;
 		}
@@ -802,52 +825,58 @@ const System =
 		if ('document' in global)
 			global.document.body.style.backgroundColor = this.displayBuffer.backgroundColor;
 
-			if (!this.reverseRender)
-			{
-				this.displayBuffer.resize (this.screenWidth*this.scaleFactor, this.screenHeight*this.scaleFactor);
-				this.displayBuffer.elem.style.width = (this.screenWidth*this.canvasScaleFactor) + "px";
-				this.displayBuffer.elem.style.height = (this.screenHeight*this.canvasScaleFactor) + "px";
+		if (!this.reverseRender)
+		{
+			this.displayBuffer.resize (this.screenWidth*this.scaleFactor, this.screenHeight*this.scaleFactor);
+			this.displayBuffer.elem.style.width = (this.screenWidth*this.canvasScaleFactor) + "px";
+			this.displayBuffer.elem.style.height = (this.screenHeight*this.canvasScaleFactor) + "px";
 
-				this.displayBuffer2.resize (this.screenWidth*this.scaleFactor, this.screenHeight*this.scaleFactor);
-				this.displayBuffer2.elem.style.width = (this.screenWidth*this.canvasScaleFactor) + "px";
-				this.displayBuffer2.elem.style.height = (this.screenHeight*this.canvasScaleFactor) + "px";
-			}
-			else
-			{
-				this.displayBuffer.resize (this.screenHeight*this.scaleFactor, this.screenWidth*this.scaleFactor);
-				this.displayBuffer.elem.style.width = (this.screenHeight*this.canvasScaleFactor) + "px";
-				this.displayBuffer.elem.style.height = (this.screenWidth*this.canvasScaleFactor) + "px";
+			this.displayBuffer2.resize (this.screenWidth*this.scaleFactor, this.screenHeight*this.scaleFactor);
+			this.displayBuffer2.elem.style.width = (this.screenWidth*this.canvasScaleFactor) + "px";
+			this.displayBuffer2.elem.style.height = (this.screenHeight*this.canvasScaleFactor) + "px";
+		}
+		else
+		{
+			this.displayBuffer.resize (this.screenHeight*this.scaleFactor, this.screenWidth*this.scaleFactor);
+			this.displayBuffer.elem.style.width = (this.screenHeight*this.canvasScaleFactor) + "px";
+			this.displayBuffer.elem.style.height = (this.screenWidth*this.canvasScaleFactor) + "px";
 
-				this.displayBuffer2.resize (this.screenHeight*this.scaleFactor, this.screenWidth*this.scaleFactor);
-				this.displayBuffer2.elem.style.width = (this.screenHeight*this.canvasScaleFactor) + "px";
-				this.displayBuffer2.elem.style.height = (this.screenWidth*this.canvasScaleFactor) + "px";
-			}
+			this.displayBuffer2.resize (this.screenHeight*this.scaleFactor, this.screenWidth*this.scaleFactor);
+			this.displayBuffer2.elem.style.width = (this.screenHeight*this.canvasScaleFactor) + "px";
+			this.displayBuffer2.elem.style.height = (this.screenWidth*this.canvasScaleFactor) + "px";
+		}
 
-			this.displayBuffer.elem.style.marginLeft = this.offsX + "px";
-			this.displayBuffer.elem.style.marginTop = this.offsY + "px";
+		this.displayBuffer.elem.style.marginLeft = this.offsX + "px";
+		this.displayBuffer.elem.style.marginTop = this.offsY + "px";
 
-			this.displayBuffer2.elem.style.marginLeft = this.offsX + "px";
-			this.displayBuffer2.elem.style.marginTop = this.offsY + "px";
+		this.displayBuffer2.elem.style.marginLeft = this.offsX + "px";
+		this.displayBuffer2.elem.style.marginTop = this.offsY + "px";
 
-			this.displayBuffer.loadIdentity();
-			this.displayBuffer2.loadIdentity();
+		this.displayBuffer.loadIdentity();
+		this.displayBuffer2.loadIdentity();
 
-			if (this.scaleFactor != 1) {
-				this.displayBuffer.globalScale(this.scaleFactor);
-				this.displayBuffer2.globalScale(this.scaleFactor);
-			}
+		if (this.scaleFactor != 1) {
+			this.displayBuffer.globalScale(this.scaleFactor);
+			this.displayBuffer2.globalScale(this.scaleFactor);
+		}
 
-			if (this.reverseRender)
-			{
-				this.displayBuffer.rotate(-Math.PI / 2);
-				this.displayBuffer.translate(0, -this.screenHeight);
-				this.displayBuffer.flipped(true);
+		if (this.reverseRender)
+		{
+			this.displayBuffer.rotate(-Math.PI / 2);
+			this.displayBuffer.translate(0, -this.screenHeight);
+			this.displayBuffer.flipped(true);
 
-				this.displayBuffer2.rotate(-Math.PI / 2);
-				this.displayBuffer2.translate(0, -this.screenHeight);
-				this.displayBuffer2.flipped(true);
-			}
+			this.displayBuffer2.rotate(-Math.PI / 2);
+			this.displayBuffer2.translate(0, -this.screenHeight);
+			this.displayBuffer2.flipped(true);
+		}
+		else
+		{
+			this.displayBuffer.flipped(false);
+			this.displayBuffer2.flipped(false);
+		}
 
+		/* *** */
 		this.scaleFactor *= this.options.extraScaleFactor;
 
 		this.integerScaleFactor = ~~(this.scaleFactor + 0.9);

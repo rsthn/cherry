@@ -1,5 +1,5 @@
 /*
-**	resources/drawable-rect.js
+**	resources/placeholder.js
 **
 **	Copyright (c) 2016-2021, RedStar Technologies, All rights reserved.
 **	https://rsthn.com/
@@ -15,10 +15,12 @@
 */
 
 import IDrawable from '../system/idrawable.js';
+import Canvas from '../system/canvas.js';
+import Resources from './resources.js';
 
 export default IDrawable.extend
 ({
-	className: "DrawableRect",
+	className: "Placeholder",
 
 	width: null,
 	height: null,
@@ -32,11 +34,32 @@ export default IDrawable.extend
 
 		this.r = r;
 		this.r.wrapper = this;
+
+		this.data = null;
+
+		Canvas.renderImage(r.width, r.height,
+		(g) => {
+			g.fillStyle(this.r.color);
+			g.fillRect(0, 0, r.width, r.height);
+		},
+		(img) => {
+			this.data = img;
+		});
 	},
 
-	draw: function (g, x=0, y=0)
+	draw: function (g, x=0, y=0, width=null, height=null)
 	{
-		g.fillStyle (this.r.color);
-		g.fillRect (x, y, this.width, this.height);
+		if (!this.data)
+			return;
+
+		g.drawImageResource (this, x, y, width, height);
 	}
 });
+
+/**
+**	Creates a descriptor for a placeholder.
+*/
+Resources.Placeholder = function (width, height, color='#ff0000', opts=null)
+{
+	return { type: "object", wrapper: "Placeholder", width: width, height: height, color: color, ...opts };
+};
