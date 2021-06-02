@@ -14,6 +14,7 @@
 **	USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+import Group from './group.js';
 import Element from './element.js';
 import ScreenControls from './screen-controls.js';
 
@@ -21,7 +22,7 @@ import ScreenControls from './screen-controls.js';
 **	Button class provides an easy way to add push-button support to the world.
 */
 
-export default Element.extend
+export default Group.extend
 ({
 	/**
 	**	Indicates if once focus is obtained it is locked until the user releases it.
@@ -44,15 +45,23 @@ export default Element.extend
 	*/
 	keyCode: 0,
 
+	/*
+	**	Hitbox element.
+	*/
+	mask: 0,
+
 	/**
 	**	Creates the button with the specified parameters. Automatically adds it to the screen controls.
 	*/
 	__ctor: function (x, y, unpressedImg, pressedImg=null, relativeToCenter=true)
 	{
-		this._super.Element.__ctor(x, y, unpressedImg.width, unpressedImg.height);
+		this._super.Group.__ctor(x, y, unpressedImg.width, unpressedImg.height);
 
 		this.unpressedImg = unpressedImg;
 		this.pressedImg = pressedImg || unpressedImg;
+
+		this.mask = new Element(0, 0, this.width, this.height);
+		this.addChild(this.mask);
 
 		ScreenControls.add(this);
 	},
@@ -62,8 +71,26 @@ export default Element.extend
 	*/
 	__dtor: function ()
 	{
-		this._super.Element.__dtor();
+		this._super.Group.__dtor();
 		ScreenControls.remove(this);
+	},
+
+	/*
+	**	Executed when the item is added to a container.
+	*/
+	onAttached: function (container)
+	{
+		container.add(this.mask);
+	},
+
+	/*
+	**	Executed when the item is removed from a container.
+	*/
+	onDetached: function (container)
+	{
+		// VIOLET: container should set the 'container' property to null
+		container.remove(this.mask);
+		this.mask.container = null;
 	},
 
 	/*
@@ -132,7 +159,7 @@ export default Element.extend
 		if (!this.active() || !this.visible())
 			return false;
 
-		return this.bounds.containsPoint(x, y);
+		return this.mask.bounds.containsPoint(x, y);
 	},
 
 	/**

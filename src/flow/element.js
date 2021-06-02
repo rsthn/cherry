@@ -390,12 +390,6 @@ export default QuadTreeItem.extend
 
 		if (G.debugHitbox || this.debugHitbox)
 		{
-			/*if (this.sensebox)
-			{
-				g.fillStyle("rgba(255,255,0,0.2)");
-				g.fillRect(int(this.sensebox.x1), int(this.sensebox.y1), int(this.sensebox.width()), int(this.sensebox.height()));
-			}*/
-
 			if (!this.type)
 				g.fillStyle("rgba(255,255,255,0.5)");
 			else
@@ -404,11 +398,11 @@ export default QuadTreeItem.extend
 			g.fillRect(this.insertionBounds.x1, this.insertionBounds.y1, this.insertionBounds.width(), this.insertionBounds.height());
 
 			// violet: remove this? or figure a better way to have this.
-			if (this.highlight)
+			/*if (this.highlight)
 			{
 				g.fillStyle("rgba(255,0,0,0.5)");
 				g.fillRect(this.highlight.x1, this.highlight.y1, this.highlight.width(), this.highlight.height());
-			}
+			}*/
 
 			//if (this.type) {
 			//	g.font('bold 3px monospace');

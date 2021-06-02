@@ -19,7 +19,6 @@ import List from '../utils/list.js';
 import Linkable from '../utils/linkable.js';
 import Timer from './timer.js';
 import Canvas from './canvas.js';
-import Log from './log.js';
 
 /*
 **	System object.
@@ -360,6 +359,18 @@ const System =
 				return false;
 		};
 
+		// Converts pointer coordinates from physical space to screen space.
+
+		const pointerConvX = function (x, y)
+		{
+			return System.reverseRender ? ~~(System.screenWidth-1 - (y-System.offsY)/System.canvasScaleFactor) : ~~((x-System.offsX)/System.canvasScaleFactor);
+		};
+
+		const pointerConvY = function (x, y)
+		{
+			return System.reverseRender ? ~~((x-System.offsX)/System.canvasScaleFactor) : ~~((y-System.offsY)/System.canvasScaleFactor);
+		};
+
 		// Attach pointer event handlers if pointer-events are available.
 		if ("ontouchstart" in global)
 		{
@@ -387,8 +398,8 @@ const System =
 
 					p.startTime = System.now(true);
 
-					p.x = p.sx = System.reverseRender ? ~~((touches[i].clientY-System.offsY) / System.canvasScaleFactor) : ~~((touches[i].clientX-System.offsX) / System.canvasScaleFactor);
-					p.y = p.sy = System.reverseRender ? ~~(System.screenHeight - (touches[i].clientX-System.offsX) / System.canvasScaleFactor - 1) : ~~((touches[i].clientY-System.offsY) / System.canvasScaleFactor);
+					p.x = p.sx = pointerConvX(touches[i].clientX, touches[i].clientY);
+					p.y = p.sy = pointerConvY(touches[i].clientX, touches[i].clientY);
 
 					System.onPointerEvent (System.EVT_POINTER_DOWN, p, System.pointerState);
 				}
@@ -412,8 +423,8 @@ const System =
 					p.endTime = System.now(true);
 					p.deltaTime = p.endTime - p.startTime;
 
-					p.x = System.reverseRender ? ~~((touches[i].clientY-System.offsY) / System.canvasScaleFactor) : ~~((touches[i].clientX-System.offsX) / System.canvasScaleFactor);
-					p.y = System.reverseRender ? ~~(System.screenHeight - (touches[i].clientX-System.offsX) / System.canvasScaleFactor - 1) : ~~((touches[i].clientY-System.offsY) / System.canvasScaleFactor);
+					p.x = pointerConvX(touches[i].clientX, touches[i].clientY)
+					p.y = pointerConvY(touches[i].clientX, touches[i].clientY)
 
 					if (p.isDragging)
 						System.onPointerEvent (System.EVT_POINTER_DRAG_STOP, p, System.pointerState);
@@ -422,6 +433,7 @@ const System =
 
 					p.isActive = false;
 					p.isDragging = false;
+
 					p.button = 0;
 				}
 
@@ -441,13 +453,14 @@ const System =
 
 					var p = System.pointerState[touches[i].identifier];
 
-					p.x = System.reverseRender ? ~~((touches[i].clientY-System.offsY) / System.canvasScaleFactor) : ~~((touches[i].clientX-System.offsX) / System.canvasScaleFactor);
-					p.y = System.reverseRender ? ~~(System.screenHeight - (touches[i].clientX-System.offsX) / System.canvasScaleFactor - 1) : ~~((touches[i].clientY-System.offsY) / System.canvasScaleFactor);
+					p.x = pointerConvX(touches[i].clientX, touches[i].clientY);
+					p.y = pointerConvY(touches[i].clientX, touches[i].clientY);
 
 					System.onPointerEvent (p.isDragging ? System.EVT_POINTER_DRAG_STOP : System.EVT_POINTER_UP, p, System.pointerState);
 
 					p.isActive = false;
 					p.isDragging = false;
+
 					p.button = 0;
 				}
 
@@ -473,8 +486,8 @@ const System =
 						p.isDragging = true;
 					}
 
-					p.x = System.reverseRender ? ~~((touches[i].clientY-System.offsY) / System.canvasScaleFactor) : ~~((touches[i].clientX-System.offsX) / System.canvasScaleFactor);
-					p.y = System.reverseRender ? ~~(System.screenHeight - (touches[i].clientX-System.offsX) / System.canvasScaleFactor - 1) : ~~((touches[i].clientY-System.offsY) / System.canvasScaleFactor);
+					p.x = pointerConvX(touches[i].clientX, touches[i].clientY);
+					p.y = pointerConvY(touches[i].clientX, touches[i].clientY);
 
 					p.dx = p.x - p.sx;
 					p.dy = p.y - p.sy;
@@ -506,11 +519,10 @@ const System =
 				p.isDragging = false;
 				p.button = evt.which;
 
-				p.x = p.sx = System.reverseRender ? ~~((evt.clientY-System.offsY) / System.canvasScaleFactor) : ~~((evt.clientX-System.offsX) / System.canvasScaleFactor);
-				p.y = p.sy = System.reverseRender ? ~~(System.screenHeight - (evt.clientX-System.offsX) / System.canvasScaleFactor - 1) : ~~((evt.clientY-System.offsY) / System.canvasScaleFactor);
+				p.x = p.sx = pointerConvX(evt.clientX, evt.clientY);
+				p.y = p.sy = pointerConvY(evt.clientX, evt.clientY);
 
 				System.onPointerEvent (System.EVT_POINTER_DOWN, p, System.pointerState);
-
 				return false;
 			};
 
@@ -523,8 +535,8 @@ const System =
 
 				var p = System.pointerState[0];
 
-				p.x = System.reverseRender ? ~~((evt.clientY-System.offsY) / System.canvasScaleFactor) : ~~((evt.clientX-System.offsX) / System.canvasScaleFactor);
-				p.y = System.reverseRender ? ~~(System.screenHeight - (evt.clientX-System.offsX) / System.canvasScaleFactor - 1) : ~~((evt.clientY-System.offsY) / System.canvasScaleFactor);
+				p.x = pointerConvX(evt.clientX, evt.clientY);
+				p.y = pointerConvY(evt.clientX, evt.clientY);
 
 				if (p.isDragging)
 					System.onPointerEvent (System.EVT_POINTER_DRAG_STOP, p, System.pointerState);
@@ -533,6 +545,7 @@ const System =
 
 				p.isActive = false;
 				p.isDragging = false;
+
 				p.button = 0;
 			};
 
@@ -551,14 +564,13 @@ const System =
 					p.isDragging = true;
 				}
 
-				p.x = System.reverseRender ? ~~((evt.clientY-System.offsY) / System.canvasScaleFactor) : ~~((evt.clientX-System.offsX) / System.canvasScaleFactor);
-				p.y = System.reverseRender ? ~~(System.screenHeight - (evt.clientX-System.offsX) / System.canvasScaleFactor - 1) : ~~((evt.clientY-System.offsY) / System.canvasScaleFactor);
+				p.x = pointerConvX(evt.clientX, evt.clientY);
+				p.y = pointerConvY(evt.clientX, evt.clientY);
 
 				p.dx = p.x - p.sx;
 				p.dy = p.y - p.sy;
 
 				System.onPointerEvent (p.isDragging ? System.EVT_POINTER_DRAG_MOVE : System.EVT_POINTER_MOVE, p, System.pointerState);
-
 				return false;
 			};
 		}
@@ -754,7 +766,7 @@ const System =
 
 			this.reverseRender = false;
 		}
-Log.write(this._screenWidth + 'x' + this._screenHeight);//violet:REMOVE LATER
+
 		// ***
 		let targetScreenWidth = this.options.screenWidth;
 		let targetScreenHeight = this.options.screenHeight;
@@ -862,12 +874,12 @@ Log.write(this._screenWidth + 'x' + this._screenHeight);//violet:REMOVE LATER
 
 		if (this.reverseRender)
 		{
-			this.displayBuffer.rotate(-Math.PI / 2);
-			this.displayBuffer.translate(0, -this.screenHeight);
+			this.displayBuffer.rotate(Math.PI/2);
+			this.displayBuffer.translate(-this.screenWidth, 0);
 			this.displayBuffer.flipped(true);
 
-			this.displayBuffer2.rotate(-Math.PI / 2);
-			this.displayBuffer2.translate(0, -this.screenHeight);
+			this.displayBuffer2.rotate(Math.PI/2);
+			this.displayBuffer2.translate(-this.screenWidth, 0);
 			this.displayBuffer2.flipped(true);
 		}
 		else

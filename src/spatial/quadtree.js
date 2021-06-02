@@ -454,6 +454,21 @@ const QuadTree = Class.extend
 	detectCollisions: function (/*IQuadTreeHandler*/handler, forced=false)
 	{
 		this.root.detectCollisions (handler, forced);
+	},
+
+	/*
+	**	Returns the items inside the specified region.
+	*/
+	selectItemsIntoArray: function (/*Rect*/rect, filter=null)
+	{
+		let list = [];
+
+		this.selectItems(rect, filter);
+
+		while (this.getCountSelected())
+			list.push(this.getNextSelected());
+
+		return list;
 	}
 });
 

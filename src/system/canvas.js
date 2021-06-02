@@ -889,14 +889,14 @@ Canvas.prototype.setTransform = function (a, b, c, d, e, f)
 		this.transform.data[3] = c;
 		this.transform.data[4] = d;
 		this.transform.data[5] = 0;
-		this.transform.data[6] = int(e);
-		this.transform.data[7] = int(f);
+		this.transform.data[6] = Math.ceil(e);
+		this.transform.data[7] = Math.ceil(f);
 		this.transform.data[8] = 1;
 
 		return this;
 	}
 
-	this.context.setTransform (a, b, c, d, int(e), int(f));
+	this.context.setTransform (a, b, c, d, Math.ceil(e), Math.ceil(f));
 	return this;
 };
 
