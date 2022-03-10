@@ -1,3 +1,7 @@
+## ⛔ This package has been rebranded. ⛔<br/>Using this is highly discouraged as it will no longer be maintained. <br/><br/>Please migrate to [froxel](https://github.com/rsthn/froxel/).
+
+<br/>
+
 <p align="center">
 	<img width="240px" src="./docs/logo.png"/>
 	<br/>
